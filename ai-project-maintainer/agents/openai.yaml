@@ -1,0 +1,6 @@
+interface:
+  display_name: "AI Project Maintainer"
+  short_description: "Reusable local and CI safety gates for AI-coded projects."
+  default_prompt: "Use $ai-project-maintainer to run a strict local safety gate for this project and explain any blockers."
+policy:
+  allow_implicit_invocation: true

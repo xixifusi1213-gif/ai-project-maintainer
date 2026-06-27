@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.venv/
+venv/
+dist/
+build/
+coverage/
+*.log
+*.tmp
+*.zip
+reports/
+local-gate-*.json
+
