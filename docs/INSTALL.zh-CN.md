@@ -61,6 +61,8 @@ npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github --pre
 reports/.gitkeep
 ```
 
+生成的 GitHub Actions workflow 不要求工具包已经发布到 npm。CI 会临时 clone `https://github.com/xixifusi1213-gif/ai-project-maintainer.git`，然后用 `node` 运行仓库里的门禁脚本。
+
 重复运行不会覆盖你已经手工修改过的文件。
 
 ## 门禁通过和失败

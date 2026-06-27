@@ -72,6 +72,8 @@ This creates, without overwriting manual edits:
 reports/.gitkeep
 ```
 
+The generated GitHub Actions workflow does not require the package to be published to npm. It clones `https://github.com/xixifusi1213-gif/ai-project-maintainer.git` inside the runner and executes the Node scripts from that checkout.
+
 ## Policy
 
 V2 policy supports per-check levels:
