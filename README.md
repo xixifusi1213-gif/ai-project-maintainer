@@ -14,10 +14,11 @@ It gives local development, GitHub Actions, and Codex the same maintenance contr
 - Checkov and Trivy config for IaC
 - Electron dangerous setting and privileged IPC checks
 - database migration risk routing
+- project intake, evidence source mapping, and production audit planning
 - optional open source hygiene checks: OpenSSF Scorecard, pre-commit, MegaLinter
 - JSON, Markdown, SARIF, and optional SBOM reports
 
-This is not a promise of absolute security. It is a practical gate: run it, fix blockers, document narrow exceptions, and rerun until the project passes.
+This is not a promise of absolute security. It is a practical gate: collect project evidence, run it, fix blockers, document narrow exceptions, and rerun until the project passes.
 
 ## CLI
 
@@ -26,7 +27,10 @@ After npm publication, use:
 ```powershell
 npx ai-project-maintainer doctor
 npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
+npx ai-project-maintainer init-audit "E:\my-project"
+npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
 npx ai-project-maintainer gate "E:\my-project" --strict --release --output reports/security-report.json
+npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
 npx ai-project-maintainer summary "E:\my-project\reports\security-report.json"
 ```
 
@@ -35,7 +39,10 @@ Local source checkout still works:
 ```powershell
 node .\ai-project-maintainer\scripts\doctor.mjs
 node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
+node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project"
+node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
 node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
 ```
 
@@ -73,6 +80,22 @@ reports/.gitkeep
 ```
 
 The generated GitHub Actions workflow does not require the package to be published to npm. It clones `https://github.com/xixifusi1213-gif/ai-project-maintainer.git` inside the runner and executes the Node scripts from that checkout.
+
+## Production Audit
+
+For production-oriented review, initialize the intake templates before running the gate:
+
+```powershell
+npx ai-project-maintainer init-audit "E:\my-project"
+npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
+npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
+```
+
+`init-audit` creates project profile, evidence source, business flow, risk policy, threat model, release, incident, database, and observability templates. The templates record evidence locations and maintainer decisions, not secrets or tokens.
+
+`audit-plan` does not run scanners. It explains what should be reviewed for the detected project type and labels each item as `PASS`, `FAIL`, `WARN`, `GAP`, `N/A`, or `USER_DECISION`.
+
+`gate --production` keeps the existing local security gate and adds production readiness evidence. Coverage gaps are reported but do not block by default. Set `production.block_on_coverage_gaps: true` in `.ai-maintainer/risk-policy.yml` to make missing production evidence fail the gate.
 
 ## Policy
 
@@ -116,7 +139,7 @@ reports/security-report.sarif
 reports/sbom.cdx.json
 ```
 
-Reports include PASS/FAIL, blockers, warnings, coverage gaps, tool versions, commands, exception usage, and an open source maintenance score from `0-100`.
+Reports include PASS/FAIL, blockers, warnings, coverage gaps, tool versions, commands, exception usage, production audit evidence, and an open source maintenance score from `0-100`.
 
 ## Development
 

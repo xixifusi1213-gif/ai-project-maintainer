@@ -118,7 +118,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json
+          EXTRA_FLAGS=""
+          if [ -f ".ai-maintainer/project-profile.yml" ]; then
+            EXTRA_FLAGS="$EXTRA_FLAGS --production"
+          fi
+          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release $EXTRA_FLAGS --output reports/security-report.json
 
       - name: Write gate summary
         if: always()

@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { parseCliArgs } from "../ai-project-maintainer/scripts/cli.mjs";
+import { parseCliArgs, runCli } from "../ai-project-maintainer/scripts/cli.mjs";
 
 test("package exposes ai-project-maintainer npm bin", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
@@ -12,7 +13,7 @@ test("package exposes ai-project-maintainer npm bin", () => {
   assert.equal(pkg.bin["ai-project-maintainer"], "ai-project-maintainer/scripts/cli.mjs");
 });
 
-test("CLI parses doctor, init, gate, and summary subcommands", () => {
+test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
   assert.deepEqual(parseCliArgs(["doctor"]), {
     command: "doctor",
     args: { jsonOnly: false, checkTrivyDb: true },
@@ -31,12 +32,50 @@ test("CLI parses doctor, init, gate, and summary subcommands", () => {
       release: true,
       noTests: false,
       jsonOnly: false,
+      production: false,
       outputPath: "reports/security-report.json",
     },
+  });
+
+  assert.deepEqual(parseCliArgs(["gate", "E:\\my-project", "--production", "--strict"]), {
+    command: "gate",
+    args: {
+      projectRoot: "E:\\my-project",
+      strict: true,
+      release: false,
+      noTests: false,
+      jsonOnly: false,
+      production: true,
+      outputPath: null,
+    },
+  });
+
+  assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project"]), {
+    command: "init-audit",
+    args: { projectRoot: "E:\\my-project" },
+  });
+
+  assert.deepEqual(parseCliArgs(["audit-plan", "E:\\my-project", "--output", "reports/audit-plan.json"]), {
+    command: "audit-plan",
+    args: { projectRoot: "E:\\my-project", outputPath: "reports/audit-plan.json", jsonOnly: false },
   });
 
   assert.deepEqual(parseCliArgs(["summary", "reports/security-report.json"]), {
     command: "summary",
     args: { reportPath: "reports/security-report.json" },
   });
+});
+
+test("audit-plan command exits successfully even when the plan contains coverage gaps", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-cli-plan-"));
+  let stdout = "";
+  let stderr = "";
+  const code = runCli(["audit-plan", root], {
+    stdout: { write: (chunk) => { stdout += chunk; } },
+    stderr: { write: (chunk) => { stderr += chunk; } },
+  });
+
+  assert.equal(code, 0);
+  assert.match(stdout, /coverageGaps/);
+  assert.equal(stderr, "");
 });

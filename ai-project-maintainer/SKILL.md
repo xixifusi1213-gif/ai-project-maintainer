@@ -19,11 +19,14 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 
 1. Check the local environment with `node <this-skill>/scripts/doctor.mjs` or `npx ai-project-maintainer doctor`.
 2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo> --profile oss --ci github` or `npx ai-project-maintainer init <repo> --profile oss --ci github`.
-3. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --strict --release --output reports/security-report.json`.
-4. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
-5. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
-6. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
-7. Read only the relevant references:
+3. For production-oriented review, initialize intake with `node <this-skill>/scripts/init-audit.mjs <repo>` or `npx ai-project-maintainer init-audit <repo>`.
+4. Generate the audit plan with `node <this-skill>/scripts/audit-plan.mjs <repo> --output reports/audit-plan.json` or `npx ai-project-maintainer audit-plan <repo> --output reports/audit-plan.json`.
+5. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --strict --release --output reports/security-report.json`.
+6. For production evidence review, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --production --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --production --strict --release --output reports/security-report.json`.
+7. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
+8. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
+9. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
+10. Read only the relevant references:
    - Local account-free gate: `references/local-gate.md`
    - Database and migrations: `references/database.md`
    - Electron desktop apps: `references/electron-desktop.md`
@@ -31,9 +34,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
    - Production incidents and SRE triage: `references/incident-response.md`
    - CI/CD guardrails and maintenance automation: `references/ci-guardrails.md`
    - Tool selection details: `references/tool-router.md`
-8. Build a short execution plan from the detected risk surfaces.
-9. Run the least invasive checks first, then deeper checks only where evidence points.
-10. Return findings first, ordered by severity, with commands/tests already run.
+11. Build a short execution plan from the detected risk surfaces and the audit plan.
+12. Run the least invasive checks first, then deeper checks only where evidence points.
+13. Return findings first, ordered by severity, with commands/tests already run.
 
 ## Modes
 
@@ -45,6 +48,7 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 - **Network or cloud security review**: Focus on exposed services, auth boundaries, IAM, CORS, SSRF, TLS, Kubernetes policies, and IaC drift.
 - **Production incident triage**: Stay read-only. Build a timeline from deploys, migrations, metrics, logs, traces, Kubernetes events, and alerts.
 - **Guardrail setup**: Add or propose CI checks only after identifying the repo's package manager, CI provider, and deployment path.
+- **Production audit readiness**: If `.ai-maintainer/project-profile.yml` is missing, run `init-audit` and ask the maintainer to fill business and evidence facts. Then run `audit-plan`, followed by `gate --production`. Treat `GAP` as missing evidence, not proof of safety.
 
 ## Output Contract
 

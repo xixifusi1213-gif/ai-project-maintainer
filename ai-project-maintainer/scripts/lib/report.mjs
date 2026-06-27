@@ -5,6 +5,10 @@ function stableStatus(status) {
   return status || "unknown";
 }
 
+function statusKey(status) {
+  return String(stableStatus(status)).toLowerCase();
+}
+
 function gradeForScore(score) {
   if (score >= 90) return "A";
   if (score >= 75) return "B";
@@ -35,13 +39,14 @@ export function buildJsonReport({
   mode,
   probe,
   checks,
+  audit = null,
   toolVersions = {},
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
 }) {
   const blockers = checks.filter((check) => check.blocking);
-  const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "missing", "skipped"].includes(stableStatus(check.status)));
-  const coverageGaps = checks.filter((check) => check.coverageGap || ["missing", "skipped"].includes(stableStatus(check.status)));
+  const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
+  const coverageGaps = checks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
   const exceptionUsage = checks.filter((check) => check.exception).map((check) => ({
     check: check.name,
     exception: check.exception,
@@ -58,6 +63,7 @@ export function buildJsonReport({
     maintenance: buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExceptions }),
     generatedAt,
     probe,
+    audit,
     blockers,
     warnings,
     coverageGaps,
@@ -75,7 +81,7 @@ export function toMarkdown(report) {
   lines.push(`# Local Security Gate: ${report.passed ? "PASS" : "FAIL"}`);
   lines.push("");
   lines.push(`Root: ${report.root}`);
-  lines.push(`Mode: strict=${Boolean(report.mode?.strict)}, release=${Boolean(report.mode?.release)}`);
+  lines.push(`Mode: strict=${Boolean(report.mode?.strict)}, release=${Boolean(report.mode?.release)}, production=${Boolean(report.mode?.production)}`);
   lines.push(`Generated: ${report.generatedAt}`);
   if (report.maintenance) {
     lines.push(`Open Source Maintenance Score: ${report.maintenance.score}/100 (${report.maintenance.grade})`);
@@ -105,6 +111,35 @@ export function toMarkdown(report) {
     lines.push(`- ${check.name}: ${check.summary || "tool unavailable"}`);
   }
   lines.push("");
+
+  if (report.audit) {
+    lines.push("## Production Audit");
+    lines.push(`Project Type: ${report.audit.profile?.projectType || "unknown"}`);
+    lines.push(`Database: ${Boolean(report.audit.profile?.hasDatabase)}`);
+    lines.push(`CI: ${Boolean(report.audit.profile?.hasCi)}`);
+    lines.push("");
+
+    lines.push("### Plan");
+    for (const item of report.audit.plan || []) {
+      lines.push(`- ${item.status} ${item.title}: ${item.summary}`);
+    }
+    if (!(report.audit.plan || []).length) lines.push("- None");
+    lines.push("");
+
+    lines.push("### Coverage Gaps");
+    if (!(report.audit.coverageGaps || []).length) lines.push("- None");
+    for (const gap of report.audit.coverageGaps || []) {
+      lines.push(`- ${gap.title}: ${gap.summary}${gap.recommendation ? ` Recommendation: ${gap.recommendation}` : ""}`);
+    }
+    lines.push("");
+
+    lines.push("### User Decisions");
+    if (!(report.audit.userDecisions || []).length) lines.push("- None");
+    for (const decision of report.audit.userDecisions || []) {
+      lines.push(`- ${decision.title}: ${decision.summary}${decision.recommendation ? ` Recommendation: ${decision.recommendation}` : ""}`);
+    }
+    lines.push("");
+  }
 
   lines.push("## Tools");
   for (const [tool, version] of Object.entries(report.toolVersions || {})) {
@@ -139,6 +174,7 @@ export function toSarif(report) {
   const results = [];
 
   for (const check of report.checks) {
+    if (["pass", "skipped", "missing", "n/a"].includes(statusKey(check.status))) continue;
     const ruleId = check.name.replace(/\s+/g, "-").toLowerCase();
     if (!rules.has(ruleId)) {
       rules.set(ruleId, {
@@ -148,7 +184,6 @@ export function toSarif(report) {
       });
     }
 
-    if (["pass", "skipped", "missing"].includes(check.status)) continue;
     results.push({
       ruleId,
       level: check.blocking ? "error" : "warning",

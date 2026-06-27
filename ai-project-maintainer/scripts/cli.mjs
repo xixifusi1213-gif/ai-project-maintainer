@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
+import { initAudit } from "./init-audit.mjs";
 import { initProject } from "./init-project.mjs";
 import { runLocalGate } from "./run-local-gate.mjs";
 import { summarizeReport } from "./report-summary.mjs";
@@ -50,7 +52,28 @@ export function parseCliArgs(argv) {
         release: rest.includes("--release"),
         noTests: rest.includes("--no-tests"),
         jsonOnly: rest.includes("--json"),
+        production: rest.includes("--production"),
         outputPath: readOption(rest, "--output", null),
+      },
+    };
+  }
+
+  if (command === "init-audit") {
+    return {
+      command,
+      args: {
+        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
+      },
+    };
+  }
+
+  if (command === "audit-plan") {
+    return {
+      command,
+      args: {
+        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
+        outputPath: readOption(rest, "--output", null),
+        jsonOnly: rest.includes("--json"),
       },
     };
   }
@@ -108,6 +131,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       strict: parsed.args.strict,
       release: parsed.args.release,
       noTests: parsed.args.noTests,
+      production: parsed.args.production,
       outputPath: parsed.args.outputPath,
       writeReports: true,
     });
@@ -115,12 +139,24 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     return report.passed ? 0 : 1;
   }
 
+  if (parsed.command === "init-audit") {
+    const result = initAudit(parsed.args.projectRoot);
+    io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return 0;
+  }
+
+  if (parsed.command === "audit-plan") {
+    const audit = runAuditPlan(parsed.args.projectRoot, { outputPath: parsed.args.outputPath });
+    io.stdout.write(`${JSON.stringify(audit, null, 2)}\n`);
+    return 0;
+  }
+
   if (parsed.command === "summary" && parsed.args.reportPath) {
     io.stdout.write(`${summarizeReport(parsed.args.reportPath)}\n`);
     return 0;
   }
 
-  io.stderr.write("Usage: ai-project-maintainer <doctor|init|gate|summary> [options]\n");
+  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|summary> [options]\n");
   return 2;
 }
 

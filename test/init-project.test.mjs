@@ -47,6 +47,7 @@ test("initProject oss github profile creates GitHub-source CI, dependabot, and p
   assert.match(policy, /megalinter: warn/);
   assert.match(workflow, /git clone --depth 1 https:\/\/github\.com\/xixifusi1213-gif\/ai-project-maintainer\.git/);
   assert.match(workflow, /npm ci --omit=dev \|\| npm install --omit=dev/);
+  assert.match(workflow, /EXTRA_FLAGS="\$EXTRA_FLAGS --production"/);
   assert.match(workflow, /node "\$RUNNER_TEMP\/ai-project-maintainer\/ai-project-maintainer\/scripts\/run-local-gate\.mjs"/);
   assert.doesNotMatch(workflow, /npx ai-project-maintainer gate/);
   assert.match(workflow, /GITHUB_STEP_SUMMARY/);

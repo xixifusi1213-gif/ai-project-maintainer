@@ -70,3 +70,36 @@ test("reports include open source maintenance score", () => {
   assert.equal(report.maintenance.grade, "C");
   assert.match(toMarkdown(report), /Open Source Maintenance Score/);
 });
+
+test("reports include production audit sections and omit N/A from SARIF", () => {
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: true, release: true, production: true },
+    probe: {},
+    checks: [
+      { name: "production audit: observability", group: "production-audit", status: "GAP", blocking: false, coverageGap: true, summary: "No error monitoring evidence" },
+      { name: "production audit: database", group: "production-audit", status: "N/A", blocking: false, summary: "No database detected" },
+    ],
+    audit: {
+      profile: { projectType: "web", hasDatabase: false },
+      plan: [
+        { id: "observability-errors", title: "Error monitoring", status: "GAP", summary: "No error monitoring evidence" },
+        { id: "database-migrations", title: "Database migrations", status: "N/A", summary: "No database detected" },
+      ],
+      evidence: [],
+      coverageGaps: [{ id: "observability-errors", title: "Error monitoring", status: "GAP", summary: "No error monitoring evidence" }],
+      userDecisions: [{ id: "business-critical-flows", title: "Business critical flows", status: "USER_DECISION", summary: "Confirm core flows" }],
+    },
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+
+  const markdown = toMarkdown(report);
+  const sarif = toSarif(report);
+
+  assert.equal(report.audit.coverageGaps.length, 1);
+  assert.match(markdown, /Production Audit/);
+  assert.match(markdown, /Coverage Gaps/);
+  assert.match(markdown, /User Decisions/);
+  assert.equal(JSON.stringify(sarif).includes("No database detected"), false);
+});

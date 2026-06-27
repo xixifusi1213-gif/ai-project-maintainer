@@ -36,7 +36,8 @@ node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profil
 - 安装常用安全扫描器。
 - 临时 clone `https://github.com/xixifusi1213-gif/ai-project-maintainer.git` 到 runner。
 - 在 runner 里安装工具包依赖。
-- 运行 `node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json`。
+- 如果项目存在 `.ai-maintainer/project-profile.yml`，自动追加 `--production`。
+- 运行 `node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release $EXTRA_FLAGS --output reports/security-report.json`。
 - 把 Markdown 报告写入 GitHub Step Summary。
 - 尝试上传 SARIF 到 GitHub Code Scanning。
 - 上传 `reports/` 作为 artifact。
@@ -54,10 +55,19 @@ node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profil
 - Trivy 数据库在严格模式下不可用。
 - Electron 危险配置。
 - GitHub Actions 高风险配置。
+- 过期或缺字段的例外。
 
-默认警告：
+默认不阻断：
 
-- OSV-Scanner、Syft、Grype、zizmor、Checkov、Scorecard、MegaLinter、pre-commit 等可选增强检查缺失或失败。
+- 缺少生产监控、日志、备份、回滚、发布审批等证据，报告中标记为 `GAP`。
+- `USER_DECISION` 项，例如核心业务流程尚未由项目负责人确认。
+
+如果希望生产证据缺口也阻断 CI，在 `.ai-maintainer/risk-policy.yml` 设置：
+
+```yaml
+production:
+  block_on_coverage_gaps: true
+```
 
 ## 报告
 
@@ -70,4 +80,4 @@ security-report.sarif
 sbom.cdx.json
 ```
 
-`sbom.cdx.json` 只有 Syft 可用时生成。
+`security-report.md` 会包含 `Production Audit`、`Coverage Gaps` 和 `User Decisions`。
