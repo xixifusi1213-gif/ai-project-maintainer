@@ -17,10 +17,13 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 
 ## Quick Start
 
-1. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release`.
-2. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,squawk`.
-3. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
-4. Read only the relevant references:
+1. Check the local environment with `node <this-skill>/scripts/doctor.mjs`.
+2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo>` when it does not yet have `.ai-maintainer/` policy files or GitHub Actions.
+3. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json`.
+4. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json`.
+5. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
+6. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
+7. Read only the relevant references:
    - Local account-free gate: `references/local-gate.md`
    - Database and migrations: `references/database.md`
    - Electron desktop apps: `references/electron-desktop.md`
@@ -28,9 +31,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
    - Production incidents and SRE triage: `references/incident-response.md`
    - CI/CD guardrails and maintenance automation: `references/ci-guardrails.md`
    - Tool selection details: `references/tool-router.md`
-5. Build a short execution plan from the detected risk surfaces.
-6. Run the least invasive checks first, then deeper checks only where evidence points.
-7. Return findings first, ordered by severity, with commands/tests already run.
+8. Build a short execution plan from the detected risk surfaces.
+9. Run the least invasive checks first, then deeper checks only where evidence points.
+10. Return findings first, ordered by severity, with commands/tests already run.
 
 ## Modes
 

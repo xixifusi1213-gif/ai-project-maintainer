@@ -1,24 +1,28 @@
 # AI Project Maintainer
 
-`ai-project-maintainer` is a Codex skill and local safety gate for AI-coded projects.
+`ai-project-maintainer` is a Codex skill and reusable safety gate for AI-coded projects.
 
-It helps run repeatable release checks before you ship a project:
+It turns common release checks into a repeatable local and CI workflow:
 
 - project tests, E2E, build, and packaging scripts
-- secret scanning with Gitleaks
-- static security scanning with Semgrep
-- dependency, secret, and configuration scanning with Trivy
-- Electron desktop app checks for dangerous IPC, preload, update, and file-system patterns
-- database migration, Docker, Kubernetes, Terraform, and CI risk routing
-- a pass/fail report with blocking findings and coverage gaps
+- Gitleaks secret scanning
+- Semgrep static application scanning
+- Trivy dependency, secret, and configuration scanning
+- OSV-Scanner dependency checks when lockfiles exist
+- Syft SBOM and Grype supply-chain checks when available
+- GitHub Actions checks with actionlint and zizmor
+- Checkov and Trivy config checks for IaC
+- Electron IPC, preload, update, and dangerous `webPreferences` checks
+- database migration routing through Squawk, Atlas, or Bytebase review
+- JSON, Markdown, and SARIF reports with blockers, warnings, coverage gaps, tool versions, commands, and exception usage
 
-This tool does not promise absolute security. It is intended to be a practical engineering gate: run it, fix blockers, add tests for newly discovered bug classes, and rerun until the project passes.
+This tool does not promise absolute security. It is a practical engineering gate: run it, fix blockers, document narrow exceptions, and rerun until the project passes.
 
 ## Install As A Codex Skill
 
-Clone or download this repository, then copy the skill folder:
-
 ```powershell
+git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
+cd .\ai-project-maintainer
 Copy-Item -Recurse .\ai-project-maintainer "$env:USERPROFILE\.codex\skills\ai-project-maintainer"
 ```
 
@@ -30,40 +34,70 @@ $ai-project-maintainer run a strict local safety gate for this project and expla
 
 Chinese setup guide: [docs/INSTALL.zh-CN.md](docs/INSTALL.zh-CN.md)
 
-## Run The Gate Directly
+## Direct CLI Usage
 
-First install local tools:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\ai-project-maintainer\scripts\bootstrap-local-tools.ps1" -Tools gitleaks,trivy,semgrep
-```
-
-Run a first adoption pass:
+Check your local environment:
 
 ```powershell
-node "$env:USERPROFILE\.codex\skills\ai-project-maintainer\scripts\run-local-gate.mjs" "E:\path\to\project"
+node .\ai-project-maintainer\scripts\doctor.mjs
 ```
 
-Run a release gate:
+Initialize a project with policy, exceptions, GitHub Actions, and report folders:
 
 ```powershell
-node "$env:USERPROFILE\.codex\skills\ai-project-maintainer\scripts\run-local-gate.mjs" "E:\path\to\project" --strict --release
+node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project"
 ```
 
-## How To Use It
+Run the gate:
 
-1. Put your project in Git.
-2. Run the non-strict gate once to see missing tools and coverage gaps.
-3. Install missing local tools where practical.
-4. Run `--strict --release` before publishing.
-5. Fix blockers and rerun until it passes.
-6. Convert repeated findings into project tests or custom guardrails.
+```powershell
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project"
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --strict --release --output reports/security-report.json
+```
+
+Print a saved report summary:
+
+```powershell
+node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
+```
+
+The old command still works:
+
+```powershell
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project"
+```
+
+## Initialize A Project
+
+`init-project.mjs` creates these files without overwriting manual edits:
+
+```text
+.ai-maintainer/policy.yml
+.ai-maintainer/exceptions.yml
+.github/workflows/security-gate.yml
+reports/.gitkeep
+```
+
+Add `--pre-commit` if you also want a starter `.pre-commit-config.yaml`.
+
+## Reports
+
+Each CLI release run can write:
+
+```text
+reports/security-report.json
+reports/security-report.md
+reports/security-report.sarif
+reports/sbom.cdx.json
+```
+
+`reports/sbom.cdx.json` is generated only when Syft is available.
 
 ## Account-Free By Default
 
-The local gate does not require GitHub, Bytebase, cloud, Kubernetes, or observability accounts.
+The first-stage gate does not require GitHub, Bytebase, cloud, Kubernetes, Sentry, Grafana, or other paid or hosted accounts.
 
-Accounts are only needed for deeper platform evidence:
+Accounts are only needed for deeper evidence:
 
 - Bytebase database review workflows
 - cloud IAM and networking state
@@ -71,40 +105,30 @@ Accounts are only needed for deeper platform evidence:
 - staging DAST targets
 - production logs, metrics, traces, and incident timelines
 
-Without those accounts, the skill still reviews local code, tests, dependencies, secrets, config files, Electron risks, and packaging scripts.
+Without those accounts, the tool still reviews local code, tests, dependencies, secrets, config files, Electron risks, CI files, and packaging scripts.
 
-## Current Windows Tool Notes
+## Local Tool Bootstrap
 
-- `gitleaks` and `trivy` can be downloaded as local binaries.
-- `semgrep` can often be installed through `uv tool install semgrep`.
-- Trivy needs to download its vulnerability database on first run. If the network cannot reach GHCR or another configured OCI mirror, strict mode fails because vulnerability coverage is incomplete.
-- `squawk` may need WSL, Docker, Cargo, or another installation method on Windows if no matching release asset is available.
-
-## Repository Layout
-
-```text
-ai-project-maintainer/
-  SKILL.md
-  agents/openai.yaml
-  references/
-  scripts/
-docs/
-  INSTALL.zh-CN.md
-```
-
-## Maintenance
-
-When improving the skill:
-
-1. Update `ai-project-maintainer/SKILL.md` only for core routing and workflow instructions.
-2. Put domain details in `ai-project-maintainer/references/`.
-3. Put deterministic checks in `ai-project-maintainer/scripts/`.
-4. Run:
+On Windows, the helper can install the most common local tools:
 
 ```powershell
-node --check .\ai-project-maintainer\scripts\probe-project.mjs
-node --check .\ai-project-maintainer\scripts\run-local-gate.mjs
+powershell -ExecutionPolicy Bypass -File .\ai-project-maintainer\scripts\bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov
 ```
 
-5. Test the local gate on a real project before tagging a release.
+Trivy must download its vulnerability database. In strict mode, a Trivy DB download failure is a blocker because dependency vulnerability coverage is incomplete.
 
+## Documentation
+
+- [Install guide, Chinese](docs/INSTALL.zh-CN.md)
+- [GitHub Actions CI](docs/CI-GITHUB-ACTIONS.zh-CN.md)
+- [Policy and exceptions](docs/POLICY-AND-EXCEPTIONS.zh-CN.md)
+- [Upgrade roadmap](docs/UPGRADE-ROADMAP.zh-CN.md)
+
+## Development
+
+```powershell
+npm test
+npm run check
+```
+
+The test suite uses Node's built-in test runner and does not require extra test dependencies.

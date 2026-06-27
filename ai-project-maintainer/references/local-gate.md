@@ -19,10 +19,22 @@ Accounts are optional. They are only needed for platform-backed evidence: Byteba
 
 ## Default Gate Command
 
+Check the current machine first:
+
+```bash
+node <skill>/scripts/doctor.mjs
+```
+
+Initialize a project once:
+
+```bash
+node <skill>/scripts/init-project.mjs <repo>
+```
+
 Run this for release decisions:
 
 ```bash
-node <skill>/scripts/run-local-gate.mjs <repo> --strict --release
+node <skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json
 ```
 
 Use non-strict mode during adoption:
@@ -32,6 +44,12 @@ node <skill>/scripts/run-local-gate.mjs <repo>
 ```
 
 Strict mode treats missing relevant tools as failures. Non-strict mode reports missing tools as coverage gaps.
+
+Summarize a saved report:
+
+```bash
+node <skill>/scripts/report-summary.mjs <repo>/reports/security-report.json
+```
 
 ## Adoption Loop
 
@@ -74,6 +92,17 @@ powershell -ExecutionPolicy Bypass -File <skill>\scripts\bootstrap-local-tools.p
 ```
 
 If Semgrep or Checkov cannot install on the current Windows environment, keep them as coverage gaps and rely on Codex security review plus project tests until Python, Docker, or WSL is ready.
+
+## Policy And Exceptions
+
+Project policy lives in:
+
+```text
+.ai-maintainer/policy.yml
+.ai-maintainer/exceptions.yml
+```
+
+Exceptions must include `id`, `check`, `reason`, `expires`, and `owner`. Expired or incomplete exceptions are blocking failures. Exceptions only downgrade the matching finding, not an entire tool category.
 
 ## Trivy Database Availability
 

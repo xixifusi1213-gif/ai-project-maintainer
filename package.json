@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node ai-project-maintainer/scripts/check-syntax.mjs"
+  }
+}
