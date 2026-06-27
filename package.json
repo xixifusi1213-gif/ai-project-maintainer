@@ -1,7 +1,7 @@
 {
   "name": "ai-project-maintainer",
   "version": "0.2.0",
-  "description": "Account-free semi-automated maintenance and security gate for AI-coded open source projects.",
+  "description": "Production-readiness audit and CI gate for AI-coded projects.",
   "type": "module",
   "files": [
     "ai-project-maintainer/",
