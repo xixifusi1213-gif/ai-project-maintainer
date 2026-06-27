@@ -1,136 +1,103 @@
 # AI Project Maintainer
 
-`ai-project-maintainer` is an account-free, semi-automated maintenance gate for AI-coded open source projects.
+![AI coding](https://img.shields.io/badge/built%20for-AI%20coding-111827)
+![Production audit](https://img.shields.io/badge/gate-production%20audit-0f766e)
+![Account free](https://img.shields.io/badge/default-account%20free-2563eb)
+![CI ready](https://img.shields.io/badge/CI-GitHub%20Actions-24292f)
 
-It gives local development, GitHub Actions, and Codex the same maintenance contract:
+**A production-readiness gate for AI-coded projects.**
 
-- tests, E2E, build, and release scripts
-- Gitleaks secret scanning
-- Semgrep static analysis
-- Trivy filesystem dependency, secret, and misconfiguration scanning
-- OSV-Scanner for lockfile dependency risk
-- Syft SBOM and Grype supply-chain scans
-- actionlint and zizmor for GitHub Actions security
-- Checkov and Trivy config for IaC
-- Electron dangerous setting and privileged IPC checks
-- database migration risk routing
-- project intake, evidence source mapping, and production audit planning
-- optional open source hygiene checks: OpenSSF Scorecard, pre-commit, MegaLinter
-- JSON, Markdown, SARIF, and optional SBOM reports
+AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-This is not a promise of absolute security. It is a practical gate: collect project evidence, run it, fix blockers, document narrow exceptions, and rerun until the project passes.
+It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
-## CLI
+```text
+project profile -> audit plan -> local/CI gate -> evidence report -> AI fixes -> rerun
+```
 
-After npm publication, use:
+## Why This Exists
+
+AI coding makes it easy to ship code that looks complete but quietly misses production basics:
+
+- no business-flow tests
+- no secret/dependency/security gate
+- no database migration review
+- no release approval or rollback evidence
+- no monitoring/logging/alerting proof
+- no clear owner-approved exceptions
+
+`ai-project-maintainer` makes those gaps visible before they become production surprises.
+
+## The 3-Minute Flow
 
 ```powershell
-npx ai-project-maintainer doctor
+# 1. Add local and CI guardrails
 npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
+
+# 2. Create the production audit intake templates
 npx ai-project-maintainer init-audit "E:\my-project"
+
+# 3. Generate the project-specific audit plan
 npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
-npx ai-project-maintainer gate "E:\my-project" --strict --release --output reports/security-report.json
-npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
-npx ai-project-maintainer summary "E:\my-project\reports\security-report.json"
-```
 
-Local source checkout still works:
-
-```powershell
-node .\ai-project-maintainer\scripts\doctor.mjs
-node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
-node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project"
-node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
-node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --strict --release --output reports/security-report.json
-node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
-node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
-```
-
-## Codex Skill Install
-
-```powershell
-git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
-cd .\ai-project-maintainer
-Copy-Item -Recurse .\ai-project-maintainer "$env:USERPROFILE\.codex\skills\ai-project-maintainer"
-```
-
-Restart Codex, then invoke:
-
-```text
-$ai-project-maintainer run a strict local safety gate for this project and explain any blockers.
-```
-
-## Project Init
-
-For open source projects:
-
-```powershell
-npx ai-project-maintainer init "E:\my-project" --profile oss --ci github --pre-commit
-```
-
-This creates, without overwriting manual edits:
-
-```text
-.ai-maintainer/policy.yml
-.ai-maintainer/exceptions.yml
-.github/workflows/security-gate.yml
-.github/dependabot.yml
-.pre-commit-config.yaml
-reports/.gitkeep
-```
-
-The generated GitHub Actions workflow does not require the package to be published to npm. It clones `https://github.com/xixifusi1213-gif/ai-project-maintainer.git` inside the runner and executes the Node scripts from that checkout.
-
-## Production Audit
-
-For production-oriented review, initialize the intake templates before running the gate:
-
-```powershell
-npx ai-project-maintainer init-audit "E:\my-project"
-npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
+# 4. Run the production gate
 npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
 ```
 
-`init-audit` creates project profile, evidence source, business flow, risk policy, threat model, release, incident, database, and observability templates. The templates record evidence locations and maintainer decisions, not secrets or tokens.
+No npm publication is required for GitHub Actions. The generated workflow clones this repository and runs the Node scripts directly.
 
-`audit-plan` does not run scanners. It explains what should be reviewed for the detected project type and labels each item as `PASS`, `FAIL`, `WARN`, `GAP`, `N/A`, or `USER_DECISION`.
+## What It Checks
 
-`gate --production` keeps the existing local security gate and adds production readiness evidence. Coverage gaps are reported but do not block by default. Set `production.block_on_coverage_gaps: true` in `.ai-maintainer/risk-policy.yml` to make missing production evidence fail the gate.
+| Area | Evidence produced |
+| --- | --- |
+| Tests and release scripts | test/E2E/build/dist failures |
+| Secrets | Gitleaks findings |
+| Dependencies | npm/pnpm/yarn audit, Trivy, OSV-Scanner |
+| Static security | Semgrep blocking findings |
+| Supply chain | Syft SBOM, Grype scan |
+| CI security | actionlint, zizmor |
+| IaC | Checkov, Trivy config |
+| Electron apps | dangerous webPreferences, preload/IPC/file-read risks |
+| Database projects | migration, backup, rollback, review-tool gaps |
+| Production readiness | monitoring, logs, metrics, alerts, release approval, incident runbook |
 
-## Policy
+## Production Audit, Not Just Scanning
 
-V2 policy supports per-check levels:
+V3 adds an intake-driven audit layer:
+
+```text
+.ai-maintainer/project-profile.yml
+.ai-maintainer/evidence-sources.yml
+.ai-maintainer/business-flows.yml
+.ai-maintainer/risk-policy.yml
+.ai-maintainer/threat-model.md
+.ai-maintainer/release-checklist.yml
+.ai-maintainer/incident-runbook.md
+.ai-maintainer/db-migration-policy.yml
+.ai-maintainer/observability-checklist.yml
+```
+
+The user supplies business facts and evidence locations. The tool decides which checks apply and labels every item clearly:
+
+```text
+PASS           checked and OK
+FAIL           checked and failed
+WARN           risky but not blocking by default
+GAP            missing evidence
+N/A            not applicable to this project
+USER_DECISION  maintainer judgment required
+```
+
+By default, `GAP` is reported but does not fail the gate. To make missing production evidence a hard release blocker:
 
 ```yaml
-profile: oss
-mode: strict
-checks:
-  gitleaks: block
-  trivy: block
-  semgrep: block
-  osv-scanner: warn
-  syft: warn
-  grype: warn
-  actionlint: block
-  zizmor: warn
-  checkov: warn
-  trivy-config: warn
-  scorecard: warn
-  megalinter: warn
-  pre-commit: warn
+production:
+  block_on_coverage_gaps: true
 ```
-
-Levels:
-
-- `block`: finding can fail the gate.
-- `warn`: finding appears in warnings and score, but does not fail the gate.
-- `off`: check is disabled.
-
-Exceptions remain narrow and expiring. Each exception must include `id`, `check`, `reason`, `expires`, and `owner`.
 
 ## Reports
 
-The gate writes:
+Each run writes:
 
 ```text
 reports/security-report.json
@@ -139,7 +106,59 @@ reports/security-report.sarif
 reports/sbom.cdx.json
 ```
 
-Reports include PASS/FAIL, blockers, warnings, coverage gaps, tool versions, commands, exception usage, production audit evidence, and an open source maintenance score from `0-100`.
+Reports include:
+
+- PASS/FAIL summary
+- blockers and warnings
+- production evidence gaps
+- user decisions still needed
+- tool versions and commands
+- exception usage
+- SARIF for GitHub Code Scanning
+- open source maintenance score
+
+## Use With Codex
+
+Install as a Codex skill:
+
+```powershell
+git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
+cd .\ai-project-maintainer
+Copy-Item -Recurse .\ai-project-maintainer "$env:USERPROFILE\.codex\skills\ai-project-maintainer"
+```
+
+Then ask Codex:
+
+```text
+$ai-project-maintainer generate a production audit plan for this project, run the production gate, fix blockers, and rerun until it passes.
+```
+
+## Source Checkout Commands
+
+If you are using the repository directly instead of npm:
+
+```powershell
+node .\ai-project-maintainer\scripts\doctor.mjs
+node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
+node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project"
+node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
+```
+
+## What This Is Not
+
+This tool does not prove absolute security, replace human risk ownership, or eliminate final audits for high-stakes systems.
+
+It is designed for the practical middle ground: a personal developer or small team using AI coding, with enough process to maintain a serious project without manually checking every item from scratch.
+
+## Documentation
+
+- [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)
+- [Intake schema](docs/INTAKE-SCHEMA.zh-CN.md)
+- [Install guide](docs/INSTALL.zh-CN.md)
+- [GitHub Actions guide](docs/CI-GITHUB-ACTIONS.zh-CN.md)
+- [Policy and exceptions](docs/POLICY-AND-EXCEPTIONS.zh-CN.md)
 
 ## Development
 
