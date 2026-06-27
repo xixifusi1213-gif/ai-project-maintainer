@@ -5,7 +5,7 @@ import { commandPath, runCommand } from "./lib/command-runner.mjs";
 
 const coreTools = ["git", "npm", "pnpm", "yarn", "bun"];
 const requiredScanners = ["gitleaks", "trivy", "semgrep"];
-const optionalScanners = ["osv-scanner", "actionlint", "zizmor", "syft", "grype", "checkov", "squawk"];
+const optionalScanners = ["osv-scanner", "actionlint", "zizmor", "syft", "grype", "checkov", "squawk", "scorecard", "pre-commit", "mega-linter-runner"];
 
 function inspectTool(name, options) {
   const resolved = commandPath(name, options.runnerOptions || {});

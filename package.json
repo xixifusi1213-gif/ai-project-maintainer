@@ -1,7 +1,21 @@
 {
+  "name": "ai-project-maintainer",
+  "version": "0.2.0",
+  "description": "Account-free semi-automated maintenance and security gate for AI-coded open source projects.",
   "type": "module",
+  "files": [
+    "ai-project-maintainer/",
+    "docs/",
+    "README.md"
+  ],
+  "bin": {
+    "ai-project-maintainer": "ai-project-maintainer/scripts/cli.mjs"
+  },
   "scripts": {
     "test": "node --test",
     "check": "node ai-project-maintainer/scripts/check-syntax.mjs"
+  },
+  "dependencies": {
+    "yaml": "2.9.0"
   }
 }

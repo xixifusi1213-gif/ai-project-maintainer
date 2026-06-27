@@ -98,3 +98,52 @@ test("policy can downgrade a disabled blocking category", () => {
   assert.equal(result.checks[0].policyDowngrade, "fail_on.secrets=false");
   assert.equal(result.checks[1].blocking, true);
 });
+
+test("policy loads real YAML maps and lists", () => {
+  const root = tempProject();
+  fs.mkdirSync(path.join(root, ".ai-maintainer"));
+  fs.writeFileSync(
+    path.join(root, ".ai-maintainer", "policy.yml"),
+    [
+      "profile: oss",
+      "mode: strict",
+      "tool_groups:",
+      "  - oss-hygiene",
+      "checks:",
+      "  gitleaks: block",
+      "  semgrep: warn",
+      "  scorecard: off",
+      "fail_on:",
+      "  secrets: true",
+      "",
+    ].join("\n"),
+  );
+
+  const bundle = loadPolicyBundle(root);
+
+  assert.equal(bundle.policy.profile, "oss");
+  assert.deepEqual(bundle.policy.tool_groups, ["oss-hygiene"]);
+  assert.equal(bundle.policy.checks.semgrep, "warn");
+  assert.equal(bundle.policy.checks.scorecard, "off");
+});
+
+test("policy check levels can warn or disable specific findings", () => {
+  const checks = [
+    { checkId: "semgrep", name: "semgrep static scan", group: "sast", status: "fail", blocking: true },
+    { checkId: "gitleaks", name: "gitleaks secret scan", group: "secrets", status: "fail", blocking: true },
+  ];
+  const result = applyPolicy(checks, {
+    policy: {
+      mode: "strict",
+      checks: { semgrep: "warn", gitleaks: "off" },
+      fail_on: {},
+      warn_on: {},
+    },
+    exceptions: [],
+  });
+
+  assert.equal(result.checks[0].blocking, false);
+  assert.equal(result.checks[0].policyLevel, "warn");
+  assert.equal(result.checks[1].blocking, false);
+  assert.equal(result.checks[1].policyLevel, "off");
+});

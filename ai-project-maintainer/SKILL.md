@@ -17,10 +17,10 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 
 ## Quick Start
 
-1. Check the local environment with `node <this-skill>/scripts/doctor.mjs`.
-2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo>` when it does not yet have `.ai-maintainer/` policy files or GitHub Actions.
-3. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json`.
-4. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json`.
+1. Check the local environment with `node <this-skill>/scripts/doctor.mjs` or `npx ai-project-maintainer doctor`.
+2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo> --profile oss --ci github` or `npx ai-project-maintainer init <repo> --profile oss --ci github`.
+3. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --strict --release --output reports/security-report.json`.
+4. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
 5. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
 6. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
 7. Read only the relevant references:

@@ -5,6 +5,31 @@ function stableStatus(status) {
   return status || "unknown";
 }
 
+function gradeForScore(score) {
+  if (score >= 90) return "A";
+  if (score >= 75) return "B";
+  if (score >= 60) return "C";
+  if (score >= 40) return "D";
+  return "F";
+}
+
+function buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExceptions }) {
+  const score = Math.max(
+    0,
+    Math.min(100, 100 - blockers.length * 25 - warnings.length * 3 - coverageGaps.length * 2 - invalidExceptions.length * 20),
+  );
+  return {
+    score,
+    grade: gradeForScore(score),
+    basis: {
+      blockers: blockers.length,
+      warnings: warnings.length,
+      coverageGaps: coverageGaps.length,
+      invalidExceptions: invalidExceptions.length,
+    },
+  };
+}
+
 export function buildJsonReport({
   root,
   mode,
@@ -30,6 +55,7 @@ export function buildJsonReport({
     blockerCount: blockers.length + invalidExceptions.length,
     warningCount: warnings.length,
     coverageGapCount: coverageGaps.length,
+    maintenance: buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExceptions }),
     generatedAt,
     probe,
     blockers,
@@ -51,6 +77,9 @@ export function toMarkdown(report) {
   lines.push(`Root: ${report.root}`);
   lines.push(`Mode: strict=${Boolean(report.mode?.strict)}, release=${Boolean(report.mode?.release)}`);
   lines.push(`Generated: ${report.generatedAt}`);
+  if (report.maintenance) {
+    lines.push(`Open Source Maintenance Score: ${report.maintenance.score}/100 (${report.maintenance.grade})`);
+  }
   lines.push("");
 
   lines.push("## Blocking Checks");

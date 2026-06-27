@@ -1,50 +1,47 @@
 # 升级路线图
 
-## 第一阶段：免账号本地和 CI 门禁
+## V2：开源维护者专业半自动平台
 
-当前版本优先实现：
+当前目标：
 
-- `doctor.mjs`：检查 Node、Git、包管理器和扫描器可用性。
-- `init-project.mjs`：给任意项目生成 policy、exceptions、GitHub Actions 和报告目录。
-- `run-local-gate.mjs`：运行本地门禁，输出 JSON、Markdown、SARIF。
-- `report-summary.mjs`：读取 JSON 报告并打印摘要。
-- Gitleaks、Trivy、Semgrep、OSV-Scanner、Syft、Grype、actionlint、zizmor、Checkov、Squawk 路由。
-- Electron 危险配置和可疑 IPC 检查。
-- policy 和 exceptions 机制。
-- GitHub Actions 模板。
+- 提供 npm/npx CLI。
+- 保留 Codex skill 和旧 Node 脚本兼容。
+- 使用插件化检查注册表。
+- 使用 `yaml@2.9.0` 解析真实 YAML 配置。
+- 生成 GitHub Actions、Dependabot、pre-commit 起步配置。
+- 生成 JSON、Markdown、SARIF、SBOM 报告。
+- 提供开源维护分。
 
-这个阶段不要求任何账号。
+V2 仍然免账号优先，不依赖 Bytebase、云、K8s、Sentry 或 Grafana。
 
-## 第二阶段：平台增强
+## V2 后续增强
 
-后续可以增强：
+优先增强：
 
-- Bytebase：接入 SQL Review、审批流、发布状态。
-- Atlas：schema diff 和 migration lint。
-- 云平台：IAM、网络、安全组、公开入口检查。
-- Kubernetes：集群实时状态、NetworkPolicy、RBAC、PodSecurity、镜像风险。
-- Sentry/Grafana/Loki/Datadog：事故时间线、错误率、日志和 trace 证据。
+- GitHub Action 独立发布，减少 workflow 中的安装成本。
+- OpenSSF Scorecard 更细粒度解析。
+- MegaLinter profile 配置模板。
+- pre-commit 官方 hook 模板。
+- SARIF 更精确定位到文件和行。
+- 报告转 GitHub PR comment。
 
-这些能力通常需要账号、token 或只读权限，所以不作为第一阶段硬依赖。
+## V3：平台证据接入
 
-## 第三阶段：修复辅助
+可选接入：
 
-可以继续做：
+- Bytebase：SQL Review、审批流、发布状态。
+- Sentry/Grafana/Loki/Datadog：发布后错误率、日志、trace 和事故时间线。
+- 云平台：IAM、网络、安全组、公开入口。
+- Kubernetes：RBAC、NetworkPolicy、PodSecurity、镜像和运行时风险。
 
-- 根据报告自动生成修复清单。
-- 对安全 finding 生成最小补丁。
-- 对重复 finding 自动建议项目测试。
-- 给 GitHub issue 或 PR comment 输出结构化报告。
-- 将 SARIF 上传到 GitHub Code Scanning。
+这些能力需要账号或只读 token，所以不作为 V2 硬依赖。
 
-默认仍应保持“先发现和阻断，再由人确认修复”的安全边界。
+## 不做
 
-## 不做什么
+默认不做：
 
-第一阶段不做：
-
-- GUI。
-- 自动改生产数据库。
+- 自动修改生产数据库。
 - 主动攻击公网目标。
+- 自动承担发布责任。
 - 把扫描器二进制提交进仓库。
-- 要求用户必须有 Bytebase、云、K8s 或监控账号。
+- 用 AI 替代维护者的最终判断。

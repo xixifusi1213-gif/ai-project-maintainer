@@ -32,3 +32,22 @@ test("initProject does not overwrite existing policy", () => {
   assert.equal(policy, "mode: custom\n");
   assert.equal(result.skipped.includes(".ai-maintainer/policy.yml"), true);
 });
+
+test("initProject oss github profile creates npm CI, dependabot, and pre-commit templates", () => {
+  const root = tempProject();
+  const result = initProject(root, { profile: "oss", ci: "github", preCommit: true });
+  const policy = fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8");
+  const workflow = fs.readFileSync(path.join(root, ".github", "workflows", "security-gate.yml"), "utf8");
+  const dependabot = fs.readFileSync(path.join(root, ".github", "dependabot.yml"), "utf8");
+  const preCommit = fs.readFileSync(path.join(root, ".pre-commit-config.yaml"), "utf8");
+
+  assert.equal(result.created.includes(".github/dependabot.yml"), true);
+  assert.match(policy, /profile: oss/);
+  assert.match(policy, /scorecard: warn/);
+  assert.match(policy, /megalinter: warn/);
+  assert.match(workflow, /npx ai-project-maintainer gate/);
+  assert.match(workflow, /GITHUB_STEP_SUMMARY/);
+  assert.match(workflow, /upload-sarif/);
+  assert.match(dependabot, /package-ecosystem: "github-actions"/);
+  assert.match(preCommit, /ai-project-maintainer-local-gate/);
+});

@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { detectProject } from "./lib/project-detect.mjs";
 import { getToolVersions } from "./lib/command-runner.mjs";
-import { runAllChecks } from "./lib/checks.mjs";
+import { runRegisteredChecks } from "./lib/check-registry.mjs";
 import { applyPolicy, loadPolicyBundle } from "./lib/policy.mjs";
 import { buildJsonReport, toMarkdown, writeReportFiles } from "./lib/report.mjs";
 
@@ -24,6 +24,9 @@ const versionedTools = [
   "grype",
   "checkov",
   "squawk",
+  "scorecard",
+  "pre-commit",
+  "mega-linter-runner",
 ];
 
 function resolveOutputPath(root, outputPath) {
@@ -39,12 +42,13 @@ export function runLocalGate(projectRoot, options = {}) {
   if (writeReports) fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   const project = detectProject(root);
   const policyBundle = loadPolicyBundle(root);
-  const checks = runAllChecks(project, {
+  const checks = runRegisteredChecks(project, {
     strict: Boolean(options.strict),
     release: Boolean(options.release),
     noTests: Boolean(options.noTests),
     runnerOptions: options.runnerOptions || {},
     sbomOutputPath,
+    policy: policyBundle.policy,
   });
   const policyResult = applyPolicy(checks, policyBundle);
   const toolVersions = getToolVersions(versionedTools, options.runnerOptions || {});

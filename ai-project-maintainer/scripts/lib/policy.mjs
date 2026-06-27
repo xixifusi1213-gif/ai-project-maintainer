@@ -1,8 +1,26 @@
 import fs from "node:fs";
 import path from "node:path";
+import YAML from "yaml";
 
 export const defaultPolicy = {
+  profile: "oss",
   mode: "strict",
+  tool_groups: [],
+  checks: {
+    gitleaks: "block",
+    trivy: "block",
+    semgrep: "block",
+    "osv-scanner": "warn",
+    syft: "warn",
+    grype: "warn",
+    actionlint: "block",
+    zizmor: "warn",
+    checkov: "warn",
+    "trivy-config": "warn",
+    scorecard: "warn",
+    megalinter: "warn",
+    "pre-commit": "warn",
+  },
   fail_on: {
     tests: true,
     secrets: true,
@@ -18,66 +36,20 @@ export const defaultPolicy = {
   },
 };
 
-function parseScalar(value) {
-  const trimmed = String(value || "").trim();
-  if (trimmed === "true") return true;
-  if (trimmed === "false") return false;
-  return trimmed.replace(/^["']|["']$/g, "");
-}
-
-function parseMapYaml(text) {
-  const root = {};
-  let currentKey = null;
-  for (const rawLine of String(text || "").split(/\r?\n/)) {
-    if (!rawLine.trim() || rawLine.trimStart().startsWith("#")) continue;
-    const topMatch = rawLine.match(/^([A-Za-z0-9_-]+):(?:\s*(.*))?$/);
-    if (topMatch) {
-      const [, key, value] = topMatch;
-      if (value === undefined || value === "") {
-        root[key] = {};
-        currentKey = key;
-      } else {
-        root[key] = parseScalar(value);
-        currentKey = null;
-      }
-      continue;
-    }
-
-    const nestedMatch = rawLine.match(/^\s{2}([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (nestedMatch && currentKey) {
-      const [, key, value] = nestedMatch;
-      root[currentKey][key] = parseScalar(value);
-    }
+function parseYamlFile(filePath, fallback) {
+  try {
+    const text = fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, "");
+    return YAML.parse(text) || fallback;
+  } catch {
+    return fallback;
   }
-  return root;
-}
-
-function parseExceptionsYaml(text) {
-  const exceptions = [];
-  let current = null;
-
-  for (const rawLine of String(text || "").split(/\r?\n/)) {
-    if (!rawLine.trim() || rawLine.trimStart().startsWith("#")) continue;
-    const itemMatch = rawLine.match(/^\s{2}-\s+([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (itemMatch) {
-      current = { [itemMatch[1]]: parseScalar(itemMatch[2]) };
-      exceptions.push(current);
-      continue;
-    }
-
-    const fieldMatch = rawLine.match(/^\s{4}([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (fieldMatch && current) {
-      current[fieldMatch[1]] = parseScalar(fieldMatch[2]);
-    }
-  }
-
-  return exceptions;
 }
 
 function mergePolicy(customPolicy) {
   return {
     ...defaultPolicy,
     ...customPolicy,
+    checks: { ...defaultPolicy.checks, ...(customPolicy.checks || {}) },
     fail_on: { ...defaultPolicy.fail_on, ...(customPolicy.fail_on || {}) },
     warn_on: { ...defaultPolicy.warn_on, ...(customPolicy.warn_on || {}) },
   };
@@ -87,9 +59,10 @@ export function loadPolicyBundle(projectRoot) {
   const root = path.resolve(projectRoot);
   const policyPath = path.join(root, ".ai-maintainer", "policy.yml");
   const exceptionsPath = path.join(root, ".ai-maintainer", "exceptions.yml");
-  const customPolicy = fs.existsSync(policyPath) ? parseMapYaml(fs.readFileSync(policyPath, "utf8")) : {};
+  const customPolicy = fs.existsSync(policyPath) ? parseYamlFile(policyPath, {}) : {};
+  const exceptionDocument = fs.existsSync(exceptionsPath) ? parseYamlFile(exceptionsPath, { exceptions: [] }) : { exceptions: [] };
   const exceptions = fs.existsSync(exceptionsPath)
-    ? parseExceptionsYaml(fs.readFileSync(exceptionsPath, "utf8"))
+    ? (Array.isArray(exceptionDocument.exceptions) ? exceptionDocument.exceptions : [])
     : [];
 
   return {
@@ -148,9 +121,16 @@ export function applyPolicy(checks, bundle, now = new Date()) {
   const validation = validateExceptions(bundle.exceptions, now);
   const applied = checks.map((check) => ({ ...check }));
   const failOn = bundle.policy?.fail_on || {};
+  const checkLevels = bundle.policy?.checks || {};
 
   for (const check of applied) {
     if (!check.blocking) continue;
+    const checkLevel = checkLevels[check.checkId];
+    if (checkLevel === "warn" || checkLevel === "off") {
+      check.blocking = false;
+      check.policyLevel = checkLevel;
+      continue;
+    }
     const policyKey = policyKeyForCheck(check);
     if (policyKey && failOn[policyKey] === false) {
       check.blocking = false;

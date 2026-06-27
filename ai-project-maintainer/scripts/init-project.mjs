@@ -3,7 +3,22 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const policyTemplate = `mode: strict
+const policyTemplate = `profile: oss
+mode: strict
+checks:
+  gitleaks: block
+  trivy: block
+  semgrep: block
+  osv-scanner: warn
+  syft: warn
+  grype: warn
+  actionlint: block
+  zizmor: warn
+  checkov: warn
+  trivy-config: warn
+  scorecard: warn
+  megalinter: warn
+  pre-commit: warn
 fail_on:
   tests: true
   secrets: true
@@ -91,17 +106,26 @@ jobs:
           go install github.com/anchore/grype/cmd/grype@latest
           curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "$HOME/.local/bin"
 
-      - name: Checkout AI Project Maintainer
-        shell: bash
-        run: |
-          set -euo pipefail
-          git clone --depth 1 https://github.com/xixifusi1213-gif/ai-project-maintainer.git "$RUNNER_TEMP/ai-project-maintainer"
-
       - name: Run security gate
         shell: bash
         run: |
           set -euo pipefail
-          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json
+          npx ai-project-maintainer gate "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json
+
+      - name: Write gate summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f reports/security-report.md ]; then
+            cat reports/security-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload SARIF to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/security-report.sarif
+        continue-on-error: true
 
       - name: Upload security reports
         if: always()
@@ -116,12 +140,24 @@ jobs:
           if-no-files-found: ignore
 `;
 
+const dependabotTemplate = `version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+`;
+
 const preCommitTemplate = `repos:
   - repo: local
     hooks:
       - id: ai-project-maintainer-local-gate
         name: AI Project Maintainer local gate
-        entry: node %USERPROFILE%/.codex/skills/ai-project-maintainer/scripts/run-local-gate.mjs .
+        entry: npx ai-project-maintainer gate .
         language: system
         pass_filenames: false
 `;
@@ -143,7 +179,10 @@ export function initProject(projectRoot, options = {}) {
 
   safeWrite(root, ".ai-maintainer/policy.yml", policyTemplate, result);
   safeWrite(root, ".ai-maintainer/exceptions.yml", exceptionsTemplate, result);
-  safeWrite(root, ".github/workflows/security-gate.yml", workflowTemplate, result);
+  if ((options.ci || "github") === "github") {
+    safeWrite(root, ".github/workflows/security-gate.yml", workflowTemplate, result);
+    safeWrite(root, ".github/dependabot.yml", dependabotTemplate, result);
+  }
   safeWrite(root, "reports/.gitkeep", "", result);
   if (options.preCommit) {
     safeWrite(root, ".pre-commit-config.yaml", preCommitTemplate, result);
@@ -153,15 +192,23 @@ export function initProject(projectRoot, options = {}) {
 }
 
 function parseArgs(args) {
+  const readOption = (name, fallback) => {
+    const index = args.indexOf(name);
+    if (index !== -1) return args[index + 1] || fallback;
+    const inline = args.find((arg) => arg.startsWith(`${name}=`));
+    return inline ? inline.slice(name.length + 1) : fallback;
+  };
   return {
     projectRoot: args.find((arg) => !arg.startsWith("--")) || process.cwd(),
+    profile: readOption("--profile", "oss"),
+    ci: readOption("--ci", "github"),
     preCommit: args.includes("--pre-commit"),
   };
 }
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const result = initProject(args.projectRoot, { preCommit: args.preCommit });
+  const result = initProject(args.projectRoot, { profile: args.profile, ci: args.ci, preCommit: args.preCommit });
   console.log(JSON.stringify(result, null, 2));
 }
 

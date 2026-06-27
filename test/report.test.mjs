@@ -50,3 +50,23 @@ test("report summary accepts UTF-8 JSON with BOM", () => {
 
   assert.match(summarizeReport(reportPath), /Local Security Gate: PASS/);
 });
+
+test("reports include open source maintenance score", () => {
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: false, release: false, profile: "oss" },
+    probe: {},
+    checks: [
+      { name: "package test", group: "tests", status: "pass", blocking: false },
+      { name: "gitleaks secret scan", group: "secrets", status: "pass", blocking: false },
+      { name: "scorecard", group: "oss-hygiene", status: "missing", blocking: false },
+      { name: "semgrep static scan", group: "sast", status: "fail", blocking: true, summary: "finding" },
+    ],
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+
+  assert.equal(typeof report.maintenance.score, "number");
+  assert.equal(report.maintenance.grade, "C");
+  assert.match(toMarkdown(report), /Open Source Maintenance Score/);
+});
