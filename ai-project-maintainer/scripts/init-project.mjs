@@ -106,11 +106,19 @@ jobs:
           go install github.com/anchore/grype/cmd/grype@latest
           curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "$HOME/.local/bin"
 
+      - name: Checkout AI Project Maintainer
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/xixifusi1213-gif/ai-project-maintainer.git "$RUNNER_TEMP/ai-project-maintainer"
+          cd "$RUNNER_TEMP/ai-project-maintainer"
+          npm ci --omit=dev || npm install --omit=dev
+
       - name: Run security gate
         shell: bash
         run: |
           set -euo pipefail
-          npx ai-project-maintainer gate "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json
+          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --output reports/security-report.json
 
       - name: Write gate summary
         if: always()
