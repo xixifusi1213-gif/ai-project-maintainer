@@ -4,7 +4,7 @@
 
 **Goal:** Add a real GitHub Actions CI gate so the repository dogfoods its own tests, syntax checks, package validation, and local safety gate.
 
-**Architecture:** Use a single GitHub Actions workflow at `.github/workflows/ci.yml` that runs on pushes and pull requests to `main`. Keep the first version account-free and deterministic: install npm dependencies with `npm ci`, run Node tests and syntax checks, validate npm package contents, run `doctor` without Trivy DB, and run a local gate smoke test that generates reports while treating external scanners as unavailable on day one.
+**Architecture:** Use a single GitHub Actions workflow at `.github/workflows/ci.yml` that runs on pushes and pull requests to `main`. Keep the first version account-free and deterministic: install npm dependencies with `npm ci`, run Node tests and syntax checks, validate npm package contents, run `doctor` without Trivy DB as a non-blocking tool probe, and run a local gate smoke test that generates reports while treating external scanners as unavailable on day one.
 
 **Tech Stack:** GitHub Actions, Node.js 20 and 22, npm, existing Node scripts in `ai-project-maintainer/scripts`.
 
@@ -68,7 +68,8 @@ jobs:
       - name: Validate package contents
         run: npm pack --dry-run
 
-      - name: Run doctor without external DB download
+      - name: Probe local tool availability
+        continue-on-error: true
         run: node ai-project-maintainer/scripts/doctor.mjs --no-trivy-db
 
       - name: Run local gate smoke test

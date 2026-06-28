@@ -45,7 +45,8 @@ jobs:
       - name: Validate package contents
         run: npm pack --dry-run
 
-      - name: Run doctor without external DB download
+      - name: Probe local tool availability
+        continue-on-error: true
         run: node ai-project-maintainer/scripts/doctor.mjs --no-trivy-db
 
       - name: Run local gate smoke test
