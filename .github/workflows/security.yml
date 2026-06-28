@@ -69,45 +69,36 @@ jobs:
         run: mkdir -p reports
 
       - name: Capture Gitleaks evidence
-        continue-on-error: true
-        run: gitleaks detect --source . --redact --no-git --report-format json --report-path reports/gitleaks.json
+        run: gitleaks detect --source . --redact --no-git --report-format json --report-path reports/gitleaks.json || true
 
       - name: Capture Trivy evidence
-        continue-on-error: true
-        run: trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --format json --output reports/trivy.json .
+        run: trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --format json --output reports/trivy.json . || true
 
       - name: Capture Semgrep evidence
-        continue-on-error: true
-        run: semgrep scan --config auto --sarif --output reports/semgrep.sarif .
+        run: semgrep scan --config auto --sarif --output reports/semgrep.sarif . || true
 
       - name: Capture OSV-Scanner evidence
-        continue-on-error: true
         shell: bash
-        run: osv-scanner --recursive . > reports/osv-scanner.txt
+        run: osv-scanner --recursive . > reports/osv-scanner.txt || true
 
       - name: Capture SBOM evidence
-        continue-on-error: true
-        run: syft . -o cyclonedx-json=reports/sbom.cdx.json
+        run: syft . -o cyclonedx-json=reports/sbom.cdx.json || true
 
       - name: Capture Grype evidence
-        continue-on-error: true
         shell: bash
-        run: grype . --fail-on high -o json > reports/grype.json
+        run: grype . --fail-on high -o json > reports/grype.json || true
 
       - name: Capture actionlint evidence
-        continue-on-error: true
         shell: bash
-        run: actionlint | tee reports/actionlint.txt
+        run: actionlint | tee reports/actionlint.txt || true
 
       - name: Capture zizmor evidence
-        continue-on-error: true
         shell: bash
-        run: zizmor .github/workflows | tee reports/zizmor.txt
+        run: zizmor .github/workflows | tee reports/zizmor.txt || true
 
       - name: Capture OpenSSF Scorecard evidence
-        continue-on-error: true
         shell: bash
-        run: scorecard --local . --format json > reports/scorecard.json
+        run: scorecard --local . --format json > reports/scorecard.json || true
 
       - name: Run production security gate
         run: node ai-project-maintainer/scripts/run-local-gate.mjs . --production --strict --release --output reports/security-report.json
@@ -124,7 +115,7 @@ jobs:
 
       - name: Upload SARIF to code scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: reports/security-report.sarif
         continue-on-error: true
