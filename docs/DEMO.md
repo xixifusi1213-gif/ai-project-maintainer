@@ -42,7 +42,7 @@ This script runs the real AI Project Maintainer gate with temporary scanner shim
 Expected result:
 
 ```text
-Local Security Gate: PASS
+Local Security Gate: PASS_WITH_GAPS
 Blocking Checks: None
 Coverage Gaps:
 - Production release approval
@@ -53,6 +53,7 @@ Coverage Gaps:
 ```
 
 See the generated-style [sample report](demo-output/security-report.md).
+`PASS_WITH_GAPS` means deterministic blockers are clear, but production evidence still needs to be filled in or explicitly accepted before release.
 
 ## 4. Run The Real Gate
 

@@ -1,5 +1,5 @@
 import {
-  runCiSecurityChecks,
+  runActionlintChecks,
   runDatabaseChecks,
   runElectronChecks,
   runGrypeChecks,
@@ -14,6 +14,7 @@ import {
   runSyftChecks,
   runTestChecks,
   runTrivyFilesystemChecks,
+  runZizmorChecks,
 } from "./checks.mjs";
 
 const builtinCheckRegistry = [
@@ -25,8 +26,8 @@ const builtinCheckRegistry = [
   { id: "semgrep", group: "sast", title: "Semgrep static scan", requiredTools: ["semgrep"], detect: () => true, run: ({ project, options }) => runSastChecks(project, options), defaultLevel: "block" },
   { id: "syft", group: "supply-chain", title: "Syft SBOM", requiredTools: ["syft"], detect: () => true, run: ({ project, options }) => runSyftChecks(project, options), defaultLevel: "warn" },
   { id: "grype", group: "supply-chain", title: "Grype vulnerability scan", requiredTools: ["grype"], detect: () => true, run: ({ project, options }) => runGrypeChecks(project, options), defaultLevel: "warn" },
-  { id: "actionlint", group: "ci-security", title: "actionlint workflow lint", requiredTools: ["actionlint"], detect: (project) => (project.riskSurfaces?.ci || []).length > 0, run: ({ project, options }) => runCiSecurityChecks(project, options).filter((check) => check.checkId === "actionlint"), defaultLevel: "block" },
-  { id: "zizmor", group: "ci-security", title: "zizmor workflow security", requiredTools: ["zizmor"], detect: (project) => (project.riskSurfaces?.ci || []).length > 0, run: ({ project, options }) => runCiSecurityChecks(project, options).filter((check) => check.checkId === "zizmor"), defaultLevel: "warn" },
+  { id: "actionlint", group: "ci-security", title: "actionlint workflow lint", requiredTools: ["actionlint"], detect: (project) => (project.riskSurfaces?.ci || []).length > 0, run: ({ project, options }) => runActionlintChecks(project, options), defaultLevel: "block" },
+  { id: "zizmor", group: "ci-security", title: "zizmor workflow security", requiredTools: ["zizmor"], detect: (project) => (project.riskSurfaces?.ci || []).length > 0, run: ({ project, options }) => runZizmorChecks(project, options), defaultLevel: "warn" },
   { id: "checkov", group: "iac", title: "Checkov IaC scan", requiredTools: ["checkov"], detect: (project) => (project.riskSurfaces?.infra || []).length > 0, run: ({ project, options }) => runIacChecks(project, options).filter((check) => check.checkId === "checkov" || check.checkId === "trivy-config"), defaultLevel: "warn" },
   { id: "electron", group: "electron", title: "Electron baseline", requiredTools: [], detect: (project) => Boolean(project.electron?.detected), run: ({ project }) => runElectronChecks(project), defaultLevel: "block" },
   { id: "database", group: "database", title: "Database migration review", requiredTools: ["squawk"], detect: (project) => (project.riskSurfaces?.database || []).length > 0, run: ({ project, options }) => runDatabaseChecks(project, options), defaultLevel: "block" },

@@ -51,7 +51,7 @@ node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
 Expected result:
 
 ```text
-Local Security Gate: PASS
+Local Security Gate: PASS_WITH_GAPS
 Blocking Checks: None
 Open Source Maintenance Score: 75/100 (B)
 ```

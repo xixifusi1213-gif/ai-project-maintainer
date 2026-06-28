@@ -42,7 +42,7 @@ node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
 预期结果：
 
 ```text
-Local Security Gate: PASS
+Local Security Gate: PASS_WITH_GAPS
 Blocking Checks: None
 Coverage Gaps:
 - Production release approval

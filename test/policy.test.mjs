@@ -80,6 +80,32 @@ test("valid exception downgrades only matching check", () => {
   assert.equal(result.invalidExceptions.length, 0);
 });
 
+test("valid exception can match by checkId", () => {
+  const root = tempProject();
+  fs.mkdirSync(path.join(root, ".ai-maintainer"));
+  fs.writeFileSync(
+    path.join(root, ".ai-maintainer", "exceptions.yml"),
+    [
+      "exceptions:",
+      "  - id: package-audit-transitive-dev",
+      "    check: package-audit",
+      "    reason: transitive dev dependency, not shipped",
+      "    expires: 2999-01-01",
+      "    owner: repo-owner",
+      "",
+    ].join("\n"),
+  );
+
+  const bundle = loadPolicyBundle(root);
+  const checks = [
+    { checkId: "package-audit", name: "npm production audit", group: "dependencies", status: "fail", blocking: true },
+  ];
+  const result = applyPolicy(checks, bundle, new Date("2026-06-28T00:00:00Z"));
+
+  assert.equal(result.checks[0].blocking, false);
+  assert.equal(result.checks[0].exception.id, "package-audit-transitive-dev");
+});
+
 test("policy can downgrade a disabled blocking category", () => {
   const checks = [
     { name: "gitleaks secret scan", group: "secrets", status: "fail", blocking: true },

@@ -34,6 +34,13 @@ function buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExce
   };
 }
 
+function buildOverallStatus({ blockers, warnings, coverageGaps, invalidExceptions, userDecisionCount }) {
+  if (blockers.length || invalidExceptions.length) return "FAIL";
+  if (coverageGaps.length || userDecisionCount > 0) return "PASS_WITH_GAPS";
+  if (warnings.length) return "PASS_WITH_WARNINGS";
+  return "PASS";
+}
+
 export function buildJsonReport({
   root,
   mode,
@@ -47,15 +54,22 @@ export function buildJsonReport({
   const blockers = checks.filter((check) => check.blocking);
   const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
   const coverageGaps = checks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
+  const userDecisionCount = checks.filter((check) => statusKey(check.status) === "user_decision").length + (audit?.userDecisions || []).length;
   const exceptionUsage = checks.filter((check) => check.exception).map((check) => ({
-    check: check.name,
+    check: {
+      checkId: check.checkId || null,
+      name: check.name,
+      group: check.group,
+    },
     exception: check.exception,
   }));
+  const overallStatus = buildOverallStatus({ blockers, warnings, coverageGaps, invalidExceptions, userDecisionCount });
 
   return {
     schemaVersion: 1,
     root,
     mode,
+    overallStatus,
     passed: blockers.length === 0 && invalidExceptions.length === 0,
     blockerCount: blockers.length + invalidExceptions.length,
     warningCount: warnings.length,
@@ -78,7 +92,8 @@ export function buildJsonReport({
 
 export function toMarkdown(report) {
   const lines = [];
-  lines.push(`# Local Security Gate: ${report.passed ? "PASS" : "FAIL"}`);
+  const overallStatus = report.overallStatus || (report.passed ? "PASS" : "FAIL");
+  lines.push(`# Local Security Gate: ${overallStatus}`);
   lines.push("");
   lines.push(`Root: ${report.root}`);
   lines.push(`Mode: strict=${Boolean(report.mode?.strict)}, release=${Boolean(report.mode?.release)}, production=${Boolean(report.mode?.production)}`);
@@ -157,7 +172,8 @@ export function toMarkdown(report) {
   lines.push("## Exceptions");
   if (!report.exceptions.used.length && !report.exceptions.invalid.length) lines.push("- None");
   for (const item of report.exceptions.used) {
-    lines.push(`- ${item.exception.id}: applied to ${item.check}, expires ${item.exception.expires}`);
+    const checkName = typeof item.check === "string" ? item.check : `${item.check.checkId || item.check.name} (${item.check.group})`;
+    lines.push(`- ${item.exception.id}: applied to ${checkName}, expires ${item.exception.expires}`);
   }
   for (const item of report.exceptions.invalid) {
     lines.push(`- ${item.id || "(missing id)"}: invalid, ${item.reason}`);
@@ -165,7 +181,15 @@ export function toMarkdown(report) {
   lines.push("");
 
   lines.push("## Next Step");
-  lines.push(report.passed ? "- Gate passed. Keep this command in CI before release." : "- Fix blocking checks or add narrow, owner-approved exceptions, then rerun the gate.");
+  if (!report.passed) {
+    lines.push("- Fix blocking checks or add narrow, owner-approved exceptions, then rerun the gate.");
+  } else if (overallStatus === "PASS_WITH_GAPS") {
+    lines.push("- No blocking checks failed, but release-readiness gaps or user decisions remain. Fill evidence, accept risk explicitly, or enable block_on_coverage_gaps before release.");
+  } else if (overallStatus === "PASS_WITH_WARNINGS") {
+    lines.push("- Gate has no blockers or release-readiness gaps. Review warnings, then keep this command in CI before release.");
+  } else {
+    lines.push("- Gate passed without blockers, warnings, or release-readiness gaps. Keep this command in CI before release.");
+  }
   return lines.join("\n");
 }
 

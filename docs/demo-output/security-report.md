@@ -1,4 +1,4 @@
-# Local Security Gate: PASS
+# Local Security Gate: PASS_WITH_GAPS
 
 Root: `examples/demo-ai-app`
 Mode: strict=true, release=true, production=true
@@ -60,5 +60,6 @@ CI: true
 
 ## Next Step
 
-- Add real release approval, monitoring, logs, metrics, and alerts evidence.
+- No blocking checks failed, but release-readiness gaps remain.
+- Add real release approval, monitoring, logs, metrics, and alerts evidence, or explicitly accept those gaps before release.
 - Rerun `gate --production --strict --release`.
