@@ -33,6 +33,8 @@ AI coding makes it easy to ship code that looks complete but quietly misses prod
 
 ## The 3-Minute Flow
 
+Requires Node.js 20+.
+
 ```powershell
 # 1. Add local and CI guardrails
 npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
@@ -47,7 +49,7 @@ npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan
 npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
 ```
 
-No npm publication is required for GitHub Actions. The generated workflow clones this repository and runs the Node scripts directly.
+GitHub Actions templates can either use the npm package or clone this repository directly.
 
 ## What It Checks
 
