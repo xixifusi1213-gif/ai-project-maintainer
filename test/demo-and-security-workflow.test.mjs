@@ -9,6 +9,7 @@ import YAML from "yaml";
 
 import { createBeforeState } from "../examples/demo-ai-app/scripts/create-before-state.mjs";
 import { runDemoGate } from "../examples/demo-ai-app/scripts/run-demo-gate.mjs";
+import { initProject } from "../ai-project-maintainer/scripts/init-project.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const demoRoot = path.join(repoRoot, "examples", "demo-ai-app");
@@ -60,18 +61,34 @@ test("demo production gate passes with mocked scanner tools and writes reports",
 });
 
 test("security workflow is parseable and includes the heavy gate", () => {
-  const workflow = YAML.parse(fs.readFileSync(path.join(repoRoot, ".github", "workflows", "security.yml"), "utf8"));
+  const workflowText = fs.readFileSync(path.join(repoRoot, ".github", "workflows", "security.yml"), "utf8");
+  const workflow = YAML.parse(workflowText);
   const steps = workflow.jobs.security.steps.map((step) => step.name);
 
   assert.equal(workflow.name, "Security");
   assert.equal(workflow.permissions["security-events"], "write");
   assert.equal(steps.includes("Install scanner CLIs"), true);
   assert.equal(steps.includes("Run production security gate"), true);
+  assert.doesNotMatch(workflowText, /@latest/);
+  assert.doesNotMatch(workflowText, /pip install --user semgrep zizmor checkov/);
+  assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
+  assert.match(workflowText, /TRIVY_VERSION: v0\.71\.2/);
+});
+
+test("generated security workflow pins scanner versions", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-init-pinned-workflow-"));
+  initProject(root, { profile: "oss", ci: "github" });
+  const workflowText = fs.readFileSync(path.join(root, ".github", "workflows", "security-gate.yml"), "utf8");
+
+  assert.doesNotMatch(workflowText, /@latest/);
+  assert.doesNotMatch(workflowText, /pip install --user semgrep zizmor checkov/);
+  assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
+  assert.match(workflowText, /OSV_SCANNER_VERSION: v2\.4\.0/);
 });
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.4.0");
+  assert.equal(packageJson.version, "0.4.1");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

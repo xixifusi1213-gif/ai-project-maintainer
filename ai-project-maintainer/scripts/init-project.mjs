@@ -34,7 +34,7 @@ warn_on:
 
 const exceptionsTemplate = `exceptions:
   - id: "example-dev-only-vuln"
-    check: "npm audit"
+    check: "package-audit"
     reason: "dev-only transitive dependency, not shipped"
     expires: "2026-09-01"
     owner: "repo-owner"
@@ -93,18 +93,30 @@ jobs:
 
       - name: Install security scanners
         shell: bash
+        env:
+          GITLEAKS_VERSION: v8.30.0
+          TRIVY_VERSION: v0.71.2
+          SEMGREP_VERSION: 1.168.0
+          ZIZMOR_VERSION: 1.26.1
+          OSV_SCANNER_VERSION: v2.4.0
+          ACTIONLINT_VERSION: v1.7.12
+          SYFT_VERSION: v1.46.0
+          GRYPE_VERSION: v0.111.1
+          CHECKOV_VERSION: 3.3.2
+          SCORECARD_VERSION: v5.3.0
         run: |
           set -euo pipefail
           mkdir -p "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
-          python -m pip install --user semgrep zizmor checkov
-          go install github.com/gitleaks/gitleaks/v8@latest
-          go install github.com/google/osv-scanner/cmd/osv-scanner@latest
-          go install github.com/rhysd/actionlint/cmd/actionlint@latest
-          go install github.com/anchore/syft/cmd/syft@latest
-          go install github.com/anchore/grype/cmd/grype@latest
-          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "$HOME/.local/bin"
+          python -m pip install --user "semgrep==$SEMGREP_VERSION" "zizmor==$ZIZMOR_VERSION" "checkov==$CHECKOV_VERSION"
+          go install "github.com/zricethezav/gitleaks/v8@$GITLEAKS_VERSION"
+          go install "github.com/google/osv-scanner/v2/cmd/osv-scanner@$OSV_SCANNER_VERSION"
+          go install "github.com/rhysd/actionlint/cmd/actionlint@$ACTIONLINT_VERSION"
+          go install "github.com/anchore/syft/cmd/syft@$SYFT_VERSION"
+          go install "github.com/anchore/grype/cmd/grype@$GRYPE_VERSION"
+          go install "github.com/ossf/scorecard/v5@$SCORECARD_VERSION"
+          curl -sSfL "https://raw.githubusercontent.com/aquasecurity/trivy/$TRIVY_VERSION/contrib/install.sh" | sh -s -- -b "$HOME/.local/bin" "$TRIVY_VERSION"
 
       - name: Checkout AI Project Maintainer
         shell: bash

@@ -22,6 +22,7 @@ test("reports include blockers, warnings, coverage gaps, and tool versions", () 
   });
 
   assert.equal(report.passed, false);
+  assert.equal(report.overallStatus, "FAIL");
   assert.equal(report.blockers.length, 1);
   assert.equal(report.coverageGaps.length, 1);
   assert.equal(report.toolVersions.node, "v24.0.0");
@@ -37,6 +38,7 @@ test("report summary accepts UTF-8 JSON with BOM", () => {
     `\uFEFF${JSON.stringify({
       passed: true,
       root: dir,
+      overallStatus: "PASS",
       mode: { strict: false, release: false },
       generatedAt: "2026-06-27T00:00:00.000Z",
       blockers: [],
@@ -49,6 +51,31 @@ test("report summary accepts UTF-8 JSON with BOM", () => {
   );
 
   assert.match(summarizeReport(reportPath), /Local Security Gate: PASS/);
+});
+
+test("reports distinguish pass, warnings, gaps, and failures", () => {
+  const base = {
+    root: "C:/project",
+    mode: { strict: false, release: false },
+    probe: {},
+    toolVersions: {},
+    invalidExceptions: [],
+  };
+
+  const pass = buildJsonReport({ ...base, checks: [{ name: "package test", group: "tests", status: "pass", blocking: false }] });
+  const warnings = buildJsonReport({ ...base, checks: [{ name: "scorecard", group: "oss-hygiene", status: "fail", blocking: false, coverageGap: false }] });
+  const gaps = buildJsonReport({ ...base, checks: [{ name: "production audit: alerts", group: "production-audit", status: "GAP", blocking: false, coverageGap: true }] });
+  const decisions = buildJsonReport({ ...base, checks: [{ name: "production audit: core flows", group: "production-audit", status: "USER_DECISION", blocking: false }] });
+  const fail = buildJsonReport({ ...base, checks: [{ name: "semgrep static scan", group: "sast", status: "fail", blocking: true }] });
+
+  assert.equal(pass.overallStatus, "PASS");
+  assert.equal(warnings.overallStatus, "PASS_WITH_WARNINGS");
+  assert.equal(gaps.overallStatus, "PASS_WITH_GAPS");
+  assert.equal(decisions.overallStatus, "PASS_WITH_GAPS");
+  assert.equal(fail.overallStatus, "FAIL");
+  assert.equal(gaps.passed, true);
+  assert.match(toMarkdown(gaps), /Local Security Gate: PASS_WITH_GAPS/);
+  assert.match(toMarkdown(gaps), /No blocking checks failed, but release-readiness gaps or user decisions remain/);
 });
 
 test("reports include open source maintenance score", () => {
@@ -97,9 +124,36 @@ test("reports include production audit sections and omit N/A from SARIF", () => 
   const markdown = toMarkdown(report);
   const sarif = toSarif(report);
 
+  assert.equal(report.overallStatus, "PASS_WITH_GAPS");
   assert.equal(report.audit.coverageGaps.length, 1);
   assert.match(markdown, /Production Audit/);
   assert.match(markdown, /Coverage Gaps/);
   assert.match(markdown, /User Decisions/);
   assert.equal(JSON.stringify(sarif).includes("No database detected"), false);
+});
+
+test("reports expose exception usage with check identity", () => {
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: true },
+    probe: {},
+    checks: [
+      {
+        checkId: "package-audit",
+        name: "npm production audit",
+        group: "dependencies",
+        status: "fail",
+        blocking: false,
+        exception: { id: "accepted-dev-only", check: "package-audit", reason: "not shipped", expires: "2999-01-01", owner: "owner" },
+      },
+    ],
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+
+  assert.deepEqual(report.exceptions.used[0].check, {
+    checkId: "package-audit",
+    name: "npm production audit",
+    group: "dependencies",
+  });
 });

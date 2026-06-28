@@ -43,7 +43,7 @@ ai-agents
 ```text
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v0.4.0
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v0.4.1
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 ```
 
@@ -140,5 +140,5 @@ I built a production-readiness gate for AI-coded projects
 - [x] Security badge is green.
 - [x] Real demo link works.
 - [x] Before/after case exists.
-- [ ] 90-second GIF or recorded video exported from `docs/demo-output/90-second-demo.html`.
+- [x] 90-second GIF exported from `docs/demo-output/90-second-demo.html`.
 - [ ] First external post published by the maintainer.

@@ -147,6 +147,7 @@ reports/sbom.cdx.json
 Reports include:
 
 - PASS/FAIL summary
+- `overallStatus`: `FAIL`, `PASS_WITH_GAPS`, `PASS_WITH_WARNINGS`, or `PASS`
 - blockers and warnings
 - production evidence gaps
 - user decisions still needed

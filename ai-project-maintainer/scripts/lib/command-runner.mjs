@@ -79,6 +79,20 @@ function spawnTarget(resolved, args) {
 }
 
 export function runCommand(command, commandArgs = [], options = {}) {
+  if (typeof options.commandRunner === "function") {
+    const started = Date.now();
+    const commandText = [command, ...commandArgs].join(" ");
+    const result = options.commandRunner(command, commandArgs, options) || {};
+    return {
+      status: result.status || (result.code === 0 ? "pass" : "fail"),
+      command: result.command || commandText,
+      stdout: tail(result.stdout),
+      stderr: tail(result.stderr || result.error?.message || ""),
+      code: result.code ?? null,
+      durationMs: result.durationMs ?? Date.now() - started,
+    };
+  }
+
   const resolved = commandPath(command, options);
   const commandText = [command, ...commandArgs].join(" ");
   if (!resolved) {

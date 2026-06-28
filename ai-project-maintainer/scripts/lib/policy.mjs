@@ -103,7 +103,9 @@ export function validateExceptions(exceptions, now = new Date()) {
 
 function matchesException(check, exception) {
   const target = String(exception.check || "").toLowerCase();
-  return target === String(check.name || "").toLowerCase() || target === String(check.group || "").toLowerCase();
+  return [check.checkId, check.name, check.group]
+    .map((value) => String(value || "").toLowerCase())
+    .includes(target);
 }
 
 function policyKeyForCheck(check) {

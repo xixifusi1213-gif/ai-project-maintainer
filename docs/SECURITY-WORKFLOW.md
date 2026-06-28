@@ -1,6 +1,6 @@
 # Heavy Security Workflow
 
-`v0.4.0` adds `.github/workflows/security.yml` so the repository dogfoods a heavier security gate.
+`v0.4.1` keeps `.github/workflows/security.yml` as the repository's heavier dogfooding gate and pins scanner versions for more reproducible CI runs.
 
 ## When It Runs
 
@@ -39,9 +39,11 @@ The workflow also captures extra evidence and uploads it as an artifact:
 
 Some advisory steps use `continue-on-error: true` because early public projects often need one or two runs to tune scanner baselines. The production gate remains the release decision.
 
+Scanner installers are pinned by environment variables in the workflow. Update those variables deliberately instead of relying on `@latest`.
+
 ## Why Not Block Everything Immediately
 
-This project is a public tool, so a permanently red workflow hurts trust as much as missing checks. The v0.4.0 policy is:
+This project is a public tool, so a permanently red workflow hurts trust as much as missing checks. The v0.4.1 policy is:
 
 ```text
 high-confidence release risk -> block

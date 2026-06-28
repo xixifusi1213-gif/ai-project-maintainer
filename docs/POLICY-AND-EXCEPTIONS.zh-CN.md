@@ -58,7 +58,7 @@ warn_on:
 ```yaml
 exceptions:
   - id: "example-dev-only-vuln"
-    check: "npm audit"
+    check: "package-audit"
     reason: "dev-only transitive dependency, not shipped"
     expires: "2026-09-01"
     owner: "repo-owner"

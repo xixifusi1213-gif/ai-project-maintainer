@@ -193,11 +193,23 @@ export function runGrypeChecks(project, options = {}) {
 
 export function runCiSecurityChecks(project, options = {}) {
   if (!(project.riskSurfaces?.ci || []).length) return [];
+  return [...runActionlintChecks(project, options), ...runZizmorChecks(project, options)];
+}
+
+export function runActionlintChecks(project, options = {}) {
+  if (!(project.riskSurfaces?.ci || []).length) return [];
   const runner = options.runnerOptions || {};
   const actionlint = runCommand("actionlint", [], { ...runner, cwd: project.root, timeoutMs: 5 * 60 * 1000 });
-  const zizmor = runCommand("zizmor", [".github/workflows"], { ...runner, cwd: project.root, timeoutMs: 5 * 60 * 1000 });
   return [
     makeCheck("actionlint workflow lint", "ci-security", actionlint, actionlint.status === "fail", "GitHub Actions workflow syntax and common mistakes must be fixed.", { checkId: "actionlint" }),
+  ];
+}
+
+export function runZizmorChecks(project, options = {}) {
+  if (!(project.riskSurfaces?.ci || []).length) return [];
+  const runner = options.runnerOptions || {};
+  const zizmor = runCommand("zizmor", [".github/workflows"], { ...runner, cwd: project.root, timeoutMs: 5 * 60 * 1000 });
+  return [
     makeCheck("zizmor workflow security", "ci-security", zizmor, zizmor.status === "fail", "High-risk GitHub Actions patterns must be fixed.", { checkId: "zizmor" }),
   ];
 }
