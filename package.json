@@ -29,6 +29,7 @@
   },
   "files": [
     "ai-project-maintainer/",
+    "assets/",
     "examples/demo-ai-app/.ai-maintainer/",
     "examples/demo-ai-app/package.json",
     "examples/demo-ai-app/package-lock.json",

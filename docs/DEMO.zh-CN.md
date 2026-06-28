@@ -2,6 +2,12 @@
 
 这个演示使用仓库里的真实项目：`examples/demo-ai-app`。不需要付费账号，也不需要外部 API。
 
+演示素材：
+
+- [90 秒 GIF 故事板](../assets/demo-90s.gif)
+- [90 秒浏览器演示页](demo-output/90-second-demo.html)
+- [before/after 案例](demo-output/before-after-case.md)
+
 ## 1. 跑健康态项目
 
 ```powershell

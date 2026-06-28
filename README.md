@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) · [中文演示](docs/DEMO.zh-CN.md) · [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+[See the demo](docs/DEMO.md) · [Before/after case](docs/demo-output/before-after-case.md) · [中文演示](docs/DEMO.zh-CN.md) · [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -56,6 +56,8 @@ GitHub Actions templates can either use the npm package or clone this repository
 
 This repository includes a runnable sample project at `examples/demo-ai-app`.
 
+![90-second demo storyboard](assets/demo-90s.gif)
+
 ```powershell
 npm test --prefix .\examples\demo-ai-app
 npm run build --prefix .\examples\demo-ai-app
@@ -75,6 +77,12 @@ node .\examples\demo-ai-app\scripts\create-before-state.mjs
 ```
 
 It writes a broken copy under the OS temp directory, where the business tests fail.
+
+More demo material:
+
+- [Before/after case](docs/demo-output/before-after-case.md)
+- [90-second browser demo](docs/demo-output/90-second-demo.html)
+- [Animated SVG storyboard](assets/demo-90s-storyboard.svg)
 
 ## What It Checks
 
@@ -186,6 +194,7 @@ It is designed for the practical middle ground: a personal developer or small te
 
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
+- [Before/after case](docs/demo-output/before-after-case.md)
 - [Security workflow](docs/SECURITY-WORKFLOW.md)
 - [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)
 - [Intake schema](docs/INTAKE-SCHEMA.zh-CN.md)

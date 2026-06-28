@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">AI Project Maintainer 90-second demo storyboard</title>
+  <desc id="desc">Animated storyboard showing project profile, broken before state, fixed tests, production gate, evidence report, and security workflow.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#111827"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <style>
+      .label { font: 700 48px system-ui, -apple-system, Segoe UI, sans-serif; fill: #f8fafc; }
+      .subtitle { font: 600 25px system-ui, -apple-system, Segoe UI, sans-serif; fill: #bae6fd; }
+      .body { font: 600 27px ui-monospace, SFMono-Regular, Consolas, monospace; fill: #e5e7eb; }
+      .muted { font: 600 21px system-ui, -apple-system, Segoe UI, sans-serif; fill: #94a3b8; }
+      .pass { fill: #34d399; }
+      .fail { fill: #fb7185; }
+      .gap { fill: #fbbf24; }
+      .panel { opacity: 0; animation: reveal 90s linear infinite; }
+      #s1 { animation-delay: 0s; }
+      #s2 { animation-delay: 15s; }
+      #s3 { animation-delay: 30s; }
+      #s4 { animation-delay: 45s; }
+      #s5 { animation-delay: 60s; }
+      #s6 { animation-delay: 75s; }
+      @keyframes reveal {
+        0%, 15% { opacity: 1; }
+        16%, 100% { opacity: 0; }
+      }
+      .bar { animation: progress 90s linear infinite; transform-origin: 120px 642px; }
+      @keyframes progress {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+      }
+    </style>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="72" y="56" width="1136" height="560" rx="28" fill="#111827" opacity="0.93" stroke="#334155" stroke-width="2"/>
+  <text x="120" y="124" class="label">AI Project Maintainer</text>
+  <text x="120" y="168" class="subtitle">90-second production-readiness demo for AI-coded projects</text>
+
+  <g id="s1" class="panel">
+    <text x="120" y="245" class="body">1. Start with project profile</text>
+    <text x="120" y="304" class="body">npx ai-project-maintainer init-audit .\examples\demo-ai-app</text>
+    <text x="120" y="365" class="muted">The maintainer declares project facts, business flows, evidence sources, and risk policy.</text>
+    <rect x="120" y="420" width="210" height="56" rx="12" fill="#0f766e"/>
+    <text x="146" y="456" class="body">PROFILE</text>
+    <rect x="360" y="420" width="210" height="56" rx="12" fill="#1d4ed8"/>
+    <text x="386" y="456" class="body">EVIDENCE</text>
+    <rect x="600" y="420" width="210" height="56" rx="12" fill="#6d28d9"/>
+    <text x="626" y="456" class="body">POLICY</text>
+  </g>
+
+  <g id="s2" class="panel">
+    <text x="120" y="245" class="body">2. Before state: behavior is broken</text>
+    <text x="120" y="304" class="body">node .\examples\demo-ai-app\scripts\create-before-state.mjs</text>
+    <text x="120" y="365" class="body fail">FAIL expensive orders require manual review</text>
+    <text x="120" y="410" class="body fail">FAIL orders cannot release without stock</text>
+    <text x="120" y="470" class="muted">No fake secrets are committed. The bad copy lives only under the OS temp directory.</text>
+  </g>
+
+  <g id="s3" class="panel">
+    <text x="120" y="245" class="body">3. Fix deterministic blockers</text>
+    <text x="120" y="304" class="body">npm test --prefix .\examples\demo-ai-app</text>
+    <text x="120" y="365" class="body pass">PASS checkout quote preserves customer-visible total</text>
+    <text x="120" y="410" class="body pass">PASS expensive orders require manual review</text>
+    <text x="120" y="455" class="body pass">PASS paid order release respects payment, stock, and risk</text>
+  </g>
+
+  <g id="s4" class="panel">
+    <text x="120" y="245" class="body">4. Run production gate</text>
+    <text x="120" y="304" class="body">npx ai-project-maintainer gate . --production --strict --release</text>
+    <text x="120" y="365" class="body pass">PASS tests, build, secrets, dependencies, SAST, CI checks</text>
+    <text x="120" y="410" class="body gap">GAP release approval, monitoring, logs, metrics, alerts</text>
+    <text x="120" y="470" class="muted">Checked failures block. Missing production evidence stays visible by default.</text>
+  </g>
+
+  <g id="s5" class="panel">
+    <text x="120" y="245" class="body">5. Produce evidence report</text>
+    <text x="120" y="304" class="body">reports/security-report.json</text>
+    <text x="120" y="349" class="body">reports/security-report.md</text>
+    <text x="120" y="394" class="body">reports/security-report.sarif</text>
+    <text x="120" y="439" class="body">reports/sbom.cdx.json</text>
+    <text x="120" y="500" class="muted">Codex can fix blockers, rerun, and leave maintainer decisions explicit.</text>
+  </g>
+
+  <g id="s6" class="panel">
+    <text x="120" y="245" class="body">6. Dogfood in GitHub Actions</text>
+    <text x="120" y="304" class="body pass">CI: green</text>
+    <text x="120" y="349" class="body pass">Security: green</text>
+    <text x="120" y="394" class="body">Gitleaks / Trivy / Semgrep / OSV / Syft / Grype / actionlint / zizmor</text>
+    <text x="120" y="470" class="subtitle">Let AI write fast. Make release readiness explicit.</text>
+  </g>
+
+  <rect x="120" y="642" width="1040" height="12" rx="6" fill="#334155"/>
+  <rect class="bar" x="120" y="642" width="1040" height="12" rx="6" fill="#38bdf8"/>
+  <text x="120" y="684" class="muted">project profile -> before failure -> fixed tests -> production gate -> evidence report -> CI security</text>
+</svg>

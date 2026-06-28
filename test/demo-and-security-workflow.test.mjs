@@ -72,6 +72,7 @@ test("security workflow is parseable and includes the heavy gate", () => {
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   assert.equal(packageJson.version, "0.4.0");
+  assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/test/"), true);

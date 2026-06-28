@@ -2,6 +2,12 @@
 
 This demo uses the runnable project in `examples/demo-ai-app`. It does not require any paid account or external API.
 
+Visual materials:
+
+- [90-second GIF storyboard](../assets/demo-90s.gif)
+- [90-second browser demo](demo-output/90-second-demo.html)
+- [Before/after case](demo-output/before-after-case.md)
+
 ## 1. Run The Healthy Demo App
 
 ```powershell
