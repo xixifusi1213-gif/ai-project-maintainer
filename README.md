@@ -3,7 +3,7 @@
 ![AI coding](https://img.shields.io/badge/built%20for-AI%20coding-111827)
 ![Production audit](https://img.shields.io/badge/gate-production%20audit-0f766e)
 ![Account free](https://img.shields.io/badge/default-account%20free-2563eb)
-![CI ready](https://img.shields.io/badge/CI-GitHub%20Actions-24292f)
+[![CI](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml)
 
 **A production-readiness gate for AI-coded projects.**
 
