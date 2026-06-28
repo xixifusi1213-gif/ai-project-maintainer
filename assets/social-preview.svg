@@ -26,13 +26,13 @@
   <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" font-weight="700">
     <rect x="144" y="340" width="192" height="70" rx="18" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
     <text x="175" y="384" fill="#dbeafe">project profile</text>
-    <text x="358" y="384" fill="#5eead4">→</text>
+    <text x="358" y="384" fill="#5eead4">-&gt;</text>
     <rect x="398" y="340" width="164" height="70" rx="18" fill="#134e4a" stroke="#2dd4bf" stroke-width="2"/>
     <text x="430" y="384" fill="#ccfbf1">audit plan</text>
-    <text x="584" y="384" fill="#5eead4">→</text>
+    <text x="584" y="384" fill="#5eead4">-&gt;</text>
     <rect x="624" y="340" width="140" height="70" rx="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
     <text x="656" y="384" fill="#e2e8f0">CI gate</text>
-    <text x="786" y="384" fill="#5eead4">→</text>
+    <text x="786" y="384" fill="#5eead4">-&gt;</text>
     <rect x="826" y="340" width="214" height="70" rx="18" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
     <text x="858" y="384" fill="#d1fae5">evidence report</text>
   </g>

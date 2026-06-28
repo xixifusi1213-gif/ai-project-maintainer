@@ -34,6 +34,12 @@ Upload a social preview image in repository settings.
 Recommended source:
 
 ```text
+assets/social-preview.png
+```
+
+Editable source:
+
+```text
 assets/social-preview.svg
 ```
 
