@@ -12,6 +12,9 @@
       <stop offset="55%" stop-color="#2dd4bf"/>
       <stop offset="100%" stop-color="#a7f3d0"/>
     </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2 2 L10 6 L2 10 Z" fill="#5eead4"/>
+    </marker>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000000" flood-opacity="0.35"/>
     </filter>
@@ -20,24 +23,33 @@
   <path d="M0 514 C210 448 322 575 520 501 C768 408 882 521 1280 390 L1280 640 L0 640 Z" fill="#0b1220" opacity="0.52"/>
   <rect x="72" y="70" width="1136" height="500" rx="34" fill="#0b1020" opacity="0.72" filter="url(#shadow)"/>
   <rect x="100" y="98" width="1080" height="444" rx="24" fill="#111827" stroke="#334155" stroke-width="2"/>
-  <text x="142" y="178" fill="#e5f7ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="0">AI Project Maintainer</text>
-  <text x="144" y="238" fill="#bae6fd" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" letter-spacing="0">Production-readiness gate for AI-coded projects</text>
-  <rect x="144" y="284" width="990" height="4" rx="2" fill="url(#accent)"/>
-  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" font-weight="700">
-    <rect x="144" y="340" width="192" height="70" rx="18" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
-    <text x="175" y="384" fill="#dbeafe">project profile</text>
-    <text x="358" y="384" fill="#5eead4">-&gt;</text>
-    <rect x="398" y="340" width="164" height="70" rx="18" fill="#134e4a" stroke="#2dd4bf" stroke-width="2"/>
-    <text x="430" y="384" fill="#ccfbf1">audit plan</text>
-    <text x="584" y="384" fill="#5eead4">-&gt;</text>
-    <rect x="624" y="340" width="140" height="70" rx="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
-    <text x="656" y="384" fill="#e2e8f0">CI gate</text>
-    <text x="786" y="384" fill="#5eead4">-&gt;</text>
-    <rect x="826" y="340" width="214" height="70" rx="18" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
-    <text x="858" y="384" fill="#d1fae5">evidence report</text>
+
+  <text x="152" y="178" fill="#e5f7ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="0">AI Project Maintainer</text>
+  <text x="154" y="236" fill="#bae6fd" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="33" font-weight="650" letter-spacing="0">Production-readiness gate for AI-coded projects</text>
+  <rect x="154" y="278" width="972" height="4" rx="2" fill="url(#accent)"/>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" font-weight="750" text-anchor="middle">
+    <rect x="154" y="336" width="208" height="76" rx="18" fill="#172554" stroke="#38bdf8" stroke-width="2"/>
+    <text x="258" y="383" fill="#dbeafe">Project profile</text>
+
+    <line x1="386" y1="374" x2="424" y2="374" stroke="#5eead4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+    <rect x="448" y="336" width="178" height="76" rx="18" fill="#134e4a" stroke="#2dd4bf" stroke-width="2"/>
+    <text x="537" y="383" fill="#ccfbf1">Audit plan</text>
+
+    <line x1="650" y1="374" x2="688" y2="374" stroke="#5eead4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+    <rect x="712" y="336" width="150" height="76" rx="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+    <text x="787" y="383" fill="#e2e8f0">CI gate</text>
+
+    <line x1="886" y1="374" x2="924" y2="374" stroke="#5eead4" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+    <rect x="948" y="336" width="216" height="76" rx="18" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+    <text x="1056" y="383" fill="#d1fae5">Evidence report</text>
   </g>
-  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">
-    <text x="144" y="472" fill="#cbd5e1">PASS / FAIL / WARN / GAP / N/A / USER_DECISION</text>
-    <text x="144" y="510" fill="#94a3b8">Let AI write fast. Make release readiness explicit.</text>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif" font-weight="650">
+    <text x="154" y="472" fill="#cbd5e1" font-size="24" letter-spacing="0">PASS / FAIL / WARN / GAP / N/A / USER_DECISION</text>
+    <text x="154" y="510" fill="#94a3b8" font-size="23" letter-spacing="0">Let AI write fast. Make release readiness explicit.</text>
   </g>
 </svg>
