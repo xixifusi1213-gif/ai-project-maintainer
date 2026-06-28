@@ -1,0 +1,6 @@
+schema_version: 1
+database:
+  changes_use_migrations: false
+  destructive_changes_require_review: true
+  backup_before_production_migration: false
+  rollback_or_forward_fix_required: false

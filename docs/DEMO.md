@@ -1,74 +1,62 @@
 # Demo: From AI-Coded Repo to Production Audit Report
 
-This demo shows the core workflow without requiring any paid account or external API.
+This demo uses the runnable project in `examples/demo-ai-app`. It does not require any paid account or external API.
 
-## 1. Initialize The Project
-
-```powershell
-npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
-```
-
-This creates the local policy, exceptions file, GitHub Actions workflow, Dependabot config, and report directory.
-
-## 2. Create Production Audit Intake
+## 1. Run The Healthy Demo App
 
 ```powershell
-npx ai-project-maintainer init-audit "E:\my-project"
+npm test --prefix .\examples\demo-ai-app
+npm run build --prefix .\examples\demo-ai-app
 ```
 
-This creates:
+The app is intentionally small: it quotes orders and decides whether paid orders can be released. The tests protect the business behavior that must not break.
+
+## 2. Generate A Broken Before State
+
+```powershell
+node .\examples\demo-ai-app\scripts\create-before-state.mjs
+```
+
+The command prints a temporary directory. Run this in that copied project:
+
+```powershell
+npm test
+```
+
+You should see the business tests fail. This is the "AI-coded project looks complete, but behavior is broken" stage. The broken copy is created under the OS temp directory, so the repository does not commit fake secrets or intentionally bad source files.
+
+## 3. Run The Reproducible Demo Gate
+
+```powershell
+node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
+```
+
+This script runs the real AI Project Maintainer gate with temporary scanner shims, so the sample report is stable even on a machine that has not installed Gitleaks, Trivy, Semgrep, OSV-Scanner, Syft, Grype, actionlint, zizmor, or Scorecard yet.
+
+Expected result:
 
 ```text
-.ai-maintainer/project-profile.yml
-.ai-maintainer/evidence-sources.yml
-.ai-maintainer/business-flows.yml
-.ai-maintainer/risk-policy.yml
-.ai-maintainer/threat-model.md
-.ai-maintainer/release-checklist.yml
-.ai-maintainer/incident-runbook.md
-.ai-maintainer/db-migration-policy.yml
-.ai-maintainer/observability-checklist.yml
+Local Security Gate: PASS
+Blocking Checks: None
+Coverage Gaps:
+- Production release approval
+- Error monitoring
+- Production logs
+- Production metrics
+- Production alerts
 ```
 
-These files record project facts and evidence locations. They should not contain tokens, DSNs, passwords, or production secrets.
+See the generated-style [sample report](demo-output/security-report.md).
 
-## 3. Generate An Audit Plan
+## 4. Run The Real Gate
+
+After installing scanner CLIs, use the same command a real project would use:
 
 ```powershell
-npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
+npx ai-project-maintainer gate .\examples\demo-ai-app --production --strict --release --output reports/security-report.json
 ```
 
-Example output:
-
-```text
-PASS          Production audit intake is present.
-USER_DECISION Critical business flows must be declared.
-GAP           No GitHub Actions workflow evidence detected.
-GAP           No production release approval evidence declared.
-GAP           Error monitoring evidence is missing.
-N/A           No database surface detected or declared.
-```
-
-The point is not to pretend the project is safe. The point is to make missing production evidence visible.
-
-## 4. Run The Production Gate
-
-```powershell
-npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
-```
-
-The report combines deterministic scanner output with production-readiness evidence:
-
-```text
-PASS gitleaks secret scan
-PASS trivy filesystem scan
-PASS semgrep static scan
-GAP  Error monitoring evidence is missing.
-GAP  Production logs evidence is missing.
-USER_DECISION Critical business flows must be declared.
-```
-
-See [sample report](demo-output/security-report.md).
+The point is not to pretend the project is perfect. The point is to make the checked failures and missing production evidence explicit before release.
 
 ## 5. Let Codex Fix Blockers
 

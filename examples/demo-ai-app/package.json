@@ -1,0 +1,16 @@
+{
+  "name": "demo-ai-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable demo project for AI Project Maintainer.",
+  "scripts": {
+    "test": "node --test",
+    "build": "node scripts/build.mjs",
+    "demo:before": "node scripts/create-before-state.mjs",
+    "demo:gate": "node scripts/run-demo-gate.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

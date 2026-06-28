@@ -1,0 +1,7 @@
+schema_version: 1
+observability:
+  error_monitoring: false
+  structured_logs: false
+  metrics: false
+  alerts: false
+  release_tracking: false

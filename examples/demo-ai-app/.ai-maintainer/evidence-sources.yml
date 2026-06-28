@@ -1,0 +1,18 @@
+schema_version: 1
+evidence:
+  github_actions: "present"
+  deployment:
+    provider: "demo"
+    has_staging: true
+    has_production: true
+    production_requires_approval: false
+  observability:
+    errors: "none"
+    logs: "none"
+    metrics: "none"
+    alerts: "none"
+  database:
+    migrations: "none"
+    review_tool: "none"
+    backup_policy: "none"
+    rollback_plan: "none"

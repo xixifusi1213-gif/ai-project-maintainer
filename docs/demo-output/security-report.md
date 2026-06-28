@@ -1,8 +1,8 @@
 # Local Security Gate: PASS
 
-Root: `example/ai-coded-project`
+Root: `examples/demo-ai-app`
 Mode: strict=true, release=true, production=true
-Open Source Maintenance Score: 82/100 (B)
+Open Source Maintenance Score: 75/100 (B)
 
 ## Blocking Checks
 
@@ -10,48 +10,55 @@ Open Source Maintenance Score: 82/100 (B)
 
 ## Warnings
 
-- production audit: Critical business flows: USER_DECISION. The maintainer must declare the business flows that must not break.
+- production audit: Production release approval: GAP. Production deployment exists without approval evidence.
 - production audit: Error monitoring: GAP. Error monitoring evidence is missing.
-- production audit: Production release approval: GAP. No production deployment approval evidence declared.
+- production audit: Production logs: GAP. Production logs evidence is missing.
+- production audit: Production metrics: GAP. Production metrics evidence is missing.
+- production audit: Production alerts: GAP. Production alerts evidence is missing.
 
 ## Coverage Gaps
 
-- Error monitoring: Error monitoring evidence is missing. Recommendation: declare Sentry, OpenTelemetry, or another error source in `.ai-maintainer/evidence-sources.yml`.
-- Production logs: Production logs evidence is missing. Recommendation: declare log evidence before relying on production recovery.
-- Production alerts: Production alerts evidence is missing. Recommendation: declare alert routing before release.
-- Business flow tests: Critical flows are not linked to automated tests.
+- Production release approval: use GitHub Environments or document the approval gate.
+- Error monitoring: declare Sentry, OpenTelemetry, or another error source.
+- Production logs: declare log evidence before relying on production recovery.
+- Production metrics: declare release and service health metrics.
+- Production alerts: declare alert routing before release.
 
 ## Production Audit
 
-Project Type: web
-Database: true
+Project Type: node
+Database: false
 CI: true
 
 ### Plan
 
-- PASS Production audit intake: Project profile and evidence templates are present.
-- USER_DECISION Critical business flows: The maintainer must declare the business flows that must not break.
-- GAP Error monitoring: Error monitoring evidence is missing.
-- GAP Production release approval: No production deployment approval evidence declared.
-- PASS CI security review: GitHub Actions workflow evidence detected.
-- GAP Database backup evidence: Database backup evidence is missing.
+- PASS Production audit intake: project profile and evidence templates are present.
+- PASS Critical business flows: 2 critical flows declared.
+- PASS Business flow tests: 2 test references declared.
+- N/A Electron security review: no Electron surface detected.
+- PASS CI security review: CI workflow evidence detected.
+- GAP Production release approval: production deployment exists without approval evidence.
+- GAP Error monitoring: error monitoring evidence is missing.
+- GAP Production logs: production logs evidence is missing.
+- GAP Production metrics: production metrics evidence is missing.
+- GAP Production alerts: production alerts evidence is missing.
+- N/A Database migration review: no database surface detected or declared.
 
-### User Decisions
+## Checks Run
 
-- Critical business flows: Confirm the business flows that must not break.
-- Business flow tests: Confirm which automated tests prove those flows.
-
-## Tools
-
-- node: v24.x
-- git: git version 2.x
-- gitleaks: available
-- trivy: available
-- semgrep: available
+- package test: pass
+- release build: pass
+- npm production audit: pass
+- gitleaks secret scan: pass
+- trivy filesystem scan: pass
+- osv-scanner dependency scan: pass
+- semgrep static scan: pass
+- syft SBOM: pass
+- grype vulnerability scan: pass
+- OpenSSF Scorecard: pass
+- production audit evidence checks: GAP items reported but not blocking by default
 
 ## Next Step
 
-- Fill `business-flows.yml` with real flows.
-- Add or document error monitoring.
-- Add production release approval evidence.
+- Add real release approval, monitoring, logs, metrics, and alerts evidence.
 - Rerun `gate --production --strict --release`.

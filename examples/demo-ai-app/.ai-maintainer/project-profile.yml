@@ -1,0 +1,15 @@
+schema_version: 1
+project:
+  name: demo-ai-app
+  type: node
+  lifecycle: production-candidate
+  production: true
+risk:
+  handles_auth: false
+  handles_sensitive_data: false
+  handles_payments: false
+  handles_financial_data: false
+  handles_health_data: false
+  has_database: false
+  has_deployment: true
+  has_user_generated_content: false

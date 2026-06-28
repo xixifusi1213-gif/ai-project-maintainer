@@ -1,0 +1,7 @@
+schema_version: 1
+release:
+  has_staging: true
+  has_smoke_tests: true
+  has_manual_approval: false
+  has_rollback_plan: false
+  has_versioned_artifacts: true

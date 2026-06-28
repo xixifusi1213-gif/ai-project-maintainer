@@ -1,0 +1,14 @@
+schema_version: 1
+business_flows:
+  - id: "checkout-quote"
+    name: "Customer checkout quote"
+    criticality: "high"
+    expected_behavior: "A customer-visible total must include the selected shipping cost exactly once."
+    tests:
+      - "test/order-risk.test.mjs"
+  - id: "order-release"
+    name: "Paid order release"
+    criticality: "high"
+    expected_behavior: "An order can be released only when payment, stock, and risk checks all pass."
+    tests:
+      - "test/order-risk.test.mjs"

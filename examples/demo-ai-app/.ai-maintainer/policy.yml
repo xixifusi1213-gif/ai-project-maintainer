@@ -1,0 +1,27 @@
+profile: oss
+mode: strict
+checks:
+  gitleaks: block
+  trivy: block
+  semgrep: block
+  osv-scanner: warn
+  syft: warn
+  grype: warn
+  actionlint: block
+  zizmor: warn
+  checkov: warn
+  trivy-config: warn
+  scorecard: warn
+  megalinter: warn
+  pre-commit: warn
+  package-audit: warn
+fail_on:
+  tests: true
+  secrets: true
+  dependency_high_or_critical: true
+  semgrep_blocking: true
+  trivy_unavailable: true
+  electron_dangerous_settings: true
+  ci_security_high: true
+warn_on:
+  missing_optional_tools: true

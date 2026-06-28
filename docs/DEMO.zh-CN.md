@@ -1,81 +1,69 @@
-# 演示：从 AI coding 项目到生产审查报告
+# 演示：从 AI 写出的项目到生产审查报告
 
-这个 demo 不需要付费账号，也不需要外部 API。
+这个演示使用仓库里的真实项目：`examples/demo-ai-app`。不需要付费账号，也不需要外部 API。
 
-## 1. 初始化项目门禁
-
-```powershell
-npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
-```
-
-这会生成本地策略、例外文件、GitHub Actions、Dependabot 配置和报告目录。
-
-## 2. 生成生产审查画像
+## 1. 跑健康态项目
 
 ```powershell
-npx ai-project-maintainer init-audit "E:\我的项目"
+npm test --prefix .\examples\demo-ai-app
+npm run build --prefix .\examples\demo-ai-app
 ```
 
-这会生成：
+这个项目很小：它负责订单报价和订单释放判断。测试覆盖的是不能被 AI 修改坏的核心业务行为。
+
+## 2. 生成坏掉的 before 状态
+
+```powershell
+node .\examples\demo-ai-app\scripts\create-before-state.mjs
+```
+
+命令会输出一个临时目录。进入那个复制出来的项目后运行：
+
+```powershell
+npm test
+```
+
+你会看到业务测试失败。这代表“AI 写出来看起来完整，但关键行为已经坏了”的阶段。坏代码只存在于系统临时目录，仓库不会提交假 secret 或故意脆弱的源码。
+
+## 3. 跑可复现的 demo gate
+
+```powershell
+node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
+```
+
+这个脚本会运行真实的 AI Project Maintainer gate，但会临时创建扫描器 mock，所以即使本机还没安装 Gitleaks、Trivy、Semgrep、OSV-Scanner、Syft、Grype、actionlint、zizmor、Scorecard，也能稳定生成示例报告。
+
+预期结果：
 
 ```text
-.ai-maintainer/project-profile.yml
-.ai-maintainer/evidence-sources.yml
-.ai-maintainer/business-flows.yml
-.ai-maintainer/risk-policy.yml
-.ai-maintainer/threat-model.md
-.ai-maintainer/release-checklist.yml
-.ai-maintainer/incident-runbook.md
-.ai-maintainer/db-migration-policy.yml
-.ai-maintainer/observability-checklist.yml
+Local Security Gate: PASS
+Blocking Checks: None
+Coverage Gaps:
+- Production release approval
+- Error monitoring
+- Production logs
+- Production metrics
+- Production alerts
 ```
 
-这些文件只记录项目事实和证据来源，不应该写 token、DSN、密码或生产 secret。
+示例报告见：[sample report](demo-output/security-report.md)。
 
-## 3. 生成审计计划
+## 4. 跑真实 gate
+
+安装扫描器 CLI 后，可以用真实项目同款命令：
 
 ```powershell
-npx ai-project-maintainer audit-plan "E:\我的项目" --output reports/audit-plan.json
+npx ai-project-maintainer gate .\examples\demo-ai-app --production --strict --release --output reports/security-report.json
 ```
 
-示例输出：
-
-```text
-PASS          生产审查画像已存在。
-USER_DECISION 需要项目负责人声明核心业务流程。
-GAP           没有 GitHub Actions 证据。
-GAP           没有生产发布审批证据。
-GAP           缺少错误监控证据。
-N/A           没有检测到数据库。
-```
-
-重点不是假装项目安全，而是把“缺少哪些生产证据”明确写出来。
-
-## 4. 运行生产级门禁
-
-```powershell
-npx ai-project-maintainer gate "E:\我的项目" --production --strict --release --output reports/security-report.json
-```
-
-报告会把确定性扫描结果和生产准备度证据合在一起：
-
-```text
-PASS gitleaks secret scan
-PASS trivy filesystem scan
-PASS semgrep static scan
-GAP  缺少错误监控证据。
-GAP  缺少生产日志证据。
-USER_DECISION 需要声明核心业务流程。
-```
-
-查看 [示例报告](demo-output/security-report.md)。
+这个工具不是为了假装项目完美，而是把已经检查失败的项和缺少的生产证据在发布前明确展示出来。
 
 ## 5. 让 Codex 修阻断项
 
-对 Codex 说：
+可以这样要求 Codex：
 
 ```text
-$ai-project-maintainer 对这个项目运行生产级门禁，修复阻断项，然后重新运行直到通过。
+$ai-project-maintainer run the production gate for this project, fix blockers, and rerun until it passes.
 ```
 
-Codex 可以处理确定性的阻断项。项目负责人仍然负责核心业务流程、风险接受和生产证据判断。
+Codex 适合处理确定性的阻断项。维护者仍然负责业务决策、风险接受和生产证据确认。

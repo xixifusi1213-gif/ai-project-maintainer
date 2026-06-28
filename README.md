@@ -5,6 +5,7 @@
 ![Account free](https://img.shields.io/badge/default-account%20free-2563eb)
 [![npm](https://img.shields.io/npm/v/ai-project-maintainer.svg)](https://www.npmjs.com/package/ai-project-maintainer)
 [![CI](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml)
+[![Security](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml)
 
 **A production-readiness gate for AI-coded projects.**
 
@@ -50,6 +51,30 @@ npx ai-project-maintainer gate "E:\my-project" --production --strict --release -
 ```
 
 GitHub Actions templates can either use the npm package or clone this repository directly.
+
+## Real Demo
+
+This repository includes a runnable sample project at `examples/demo-ai-app`.
+
+```powershell
+npm test --prefix .\examples\demo-ai-app
+npm run build --prefix .\examples\demo-ai-app
+node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
+```
+
+The demo shows the intended workflow:
+
+- healthy business tests and release build pass
+- Gitleaks, Trivy, Semgrep, OSV, Syft, Grype, Scorecard, and CI checks are represented in the report
+- production-readiness gaps remain visible for release approval, monitoring, logs, metrics, and alerts
+
+To see the "before" state without committing unsafe fixtures:
+
+```powershell
+node .\examples\demo-ai-app\scripts\create-before-state.mjs
+```
+
+It writes a broken copy under the OS temp directory, where the business tests fail.
 
 ## What It Checks
 
@@ -161,6 +186,7 @@ It is designed for the practical middle ground: a personal developer or small te
 
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
+- [Security workflow](docs/SECURITY-WORKFLOW.md)
 - [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)
 - [Intake schema](docs/INTAKE-SCHEMA.zh-CN.md)
 - [Install guide](docs/INSTALL.zh-CN.md)

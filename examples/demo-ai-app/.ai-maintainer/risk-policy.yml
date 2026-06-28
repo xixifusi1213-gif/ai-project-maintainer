@@ -1,0 +1,5 @@
+schema_version: 1
+production:
+  block_on_coverage_gaps: false
+  block_on_user_decisions: false
+  require_intake: true
