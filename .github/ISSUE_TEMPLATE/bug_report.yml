@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a broken command, incorrect report, or generated file issue.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please redact secrets, tokens, DSNs, logs, and private production data.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Paste the npm version, git commit, or branch you used.
+      placeholder: "0.3.0 or c56dcf4"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Paste the exact command that failed.
+      render: powershell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Paste the output or report section after redacting sensitive data.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, package manager, and relevant scanner versions.
+      placeholder: "Windows 11, Node 24, npm 11, trivy 0.71"

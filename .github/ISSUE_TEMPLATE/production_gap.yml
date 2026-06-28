@@ -1,0 +1,43 @@
+name: Production evidence gap
+description: Report a production-readiness gap the tool should detect or explain better.
+title: "[Production gap]: "
+labels:
+  - production-readiness
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Business flow tests
+        - Database migrations
+        - Backup or rollback
+        - Release approval
+        - Error monitoring
+        - Logs
+        - Metrics
+        - Alerts
+        - Incident response
+        - Security model
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current output
+      description: Paste the current report item after redacting sensitive data.
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired output
+      description: What should the tool report instead?
+    validations:
+      required: true
+  - type: textarea
+    id: project_context
+    attributes:
+      label: Project context
+      description: Describe the project type without exposing private production data.

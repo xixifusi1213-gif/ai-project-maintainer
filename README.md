@@ -9,6 +9,8 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
+[See the demo](docs/DEMO.md) · [中文演示](docs/DEMO.zh-CN.md) · [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
 ```text
@@ -154,11 +156,14 @@ It is designed for the practical middle ground: a personal developer or small te
 
 ## Documentation
 
+- [Demo](docs/DEMO.md)
+- [中文演示](docs/DEMO.zh-CN.md)
 - [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)
 - [Intake schema](docs/INTAKE-SCHEMA.zh-CN.md)
 - [Install guide](docs/INSTALL.zh-CN.md)
 - [GitHub Actions guide](docs/CI-GITHUB-ACTIONS.zh-CN.md)
 - [Policy and exceptions](docs/POLICY-AND-EXCEPTIONS.zh-CN.md)
+- [Promotion kit](docs/PROMOTION.md)
 
 ## Development
 

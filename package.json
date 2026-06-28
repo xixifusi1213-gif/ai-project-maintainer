@@ -1,6 +1,6 @@
 {
   "name": "ai-project-maintainer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Production-readiness audit and CI gate for AI-coded projects.",
   "type": "module",
   "files": [
