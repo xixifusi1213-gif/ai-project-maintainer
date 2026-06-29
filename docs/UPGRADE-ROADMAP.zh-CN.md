@@ -1,5 +1,17 @@
 # 升级路线图
 
+## v0.4.2：首次使用可信度修补
+
+本阶段目标是把“已经可用”修成“陌生用户第一次访问和第一次 `npx` 不容易卡住”。
+
+已完成目标：
+
+- README 首屏改为 ASCII 分隔符，避免终端或页面预览出现编码误读。
+- README 增加 30 秒 Quickstart，把 `doctor`、`init`、`init-audit`、`gate` 串成最短试用路径。
+- CLI 增加 `--version` 和 `-v`，方便 npm/npx smoke test 和用户快速确认安装版本。
+- CI 增加 npm tarball 风格 smoke，验证打包后的 CLI 在临时目录可运行。
+- 明确 `PASS_WITH_GAPS` 表示“无阻断项但仍有生产证据缺口”，不是生产上线背书。
+
 ## v0.4.0：真实 demo 项目和重型安全 workflow
 
 本阶段目标是把项目可信度从“有说明、有轻量 CI”提升到“陌生人能直接跑 demo，并且仓库自己跑重型安全证据链”。

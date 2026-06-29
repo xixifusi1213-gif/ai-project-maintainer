@@ -45,6 +45,9 @@ jobs:
       - name: Validate package contents
         run: npm pack --dry-run
 
+      - name: Run packed npm CLI smoke test
+        run: npm run smoke:npm
+
       - name: Probe local tool availability
         continue-on-error: true
         run: node ai-project-maintainer/scripts/doctor.mjs --no-trivy-db

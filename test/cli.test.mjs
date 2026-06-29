@@ -14,6 +14,16 @@ test("package exposes ai-project-maintainer npm bin", () => {
 });
 
 test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
+  assert.deepEqual(parseCliArgs(["--version"]), {
+    command: "version",
+    args: {},
+  });
+
+  assert.deepEqual(parseCliArgs(["-v"]), {
+    command: "version",
+    args: {},
+  });
+
   assert.deepEqual(parseCliArgs(["doctor"]), {
     command: "doctor",
     args: { jsonOnly: false, checkTrivyDb: true },
@@ -64,6 +74,37 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
     command: "summary",
     args: { reportPath: "reports/security-report.json" },
   });
+});
+
+test("CLI version flags print the package version", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
+  assert.equal(pkg.version, "0.4.2");
+
+  for (const flag of ["--version", "-v"]) {
+    let stdout = "";
+    let stderr = "";
+    const code = runCli([flag], {
+      stdout: { write: (chunk) => { stdout += chunk; } },
+      stderr: { write: (chunk) => { stderr += chunk; } },
+    });
+
+    assert.equal(code, 0);
+    assert.equal(stdout.trim(), pkg.version);
+    assert.equal(stderr, "");
+  }
+});
+
+test("unknown commands still print usage and fail with code 2", () => {
+  let stdout = "";
+  let stderr = "";
+  const code = runCli(["unknown-command"], {
+    stdout: { write: (chunk) => { stdout += chunk; } },
+    stderr: { write: (chunk) => { stderr += chunk; } },
+  });
+
+  assert.equal(code, 2);
+  assert.equal(stdout, "");
+  assert.match(stderr, /Usage: ai-project-maintainer/);
 });
 
 test("audit-plan command exits successfully even when the plan contains coverage gaps", () => {
