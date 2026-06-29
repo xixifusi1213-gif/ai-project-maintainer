@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "root": "TryGhost/Ghost@before",
+  "mode": {
+    "strict": true,
+    "release": true,
+    "production": true,
+    "caseStudy": true
+  },
+  "overallStatus": "FAIL",
+  "passed": false,
+  "blockerCount": 1,
+  "warningCount": 0,
+  "coverageGapCount": 0,
+  "maintenance": {
+    "score": 75,
+    "grade": "B",
+    "basis": {
+      "blockers": 1,
+      "warnings": 0,
+      "coverageGaps": 0,
+      "invalidExceptions": 0
+    }
+  },
+  "generatedAt": "2026-06-30T00:00:00.000Z",
+  "probe": {
+    "caseId": "ghost-sql-injection",
+    "stage": "before",
+    "advisory": "GHSA-w52v-v783-gw97",
+    "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)"
+  },
+  "audit": {
+    "profile": {
+      "projectType": "web-api-db",
+      "hasDatabase": true,
+      "hasCi": true
+    },
+    "plan": [
+      {
+        "status": "PASS",
+        "title": "Pinned OSS evidence",
+        "summary": "TryGhost/Ghost is referenced by advisory, release, and patch commit metadata."
+      },
+      {
+        "status": "PASS",
+        "title": "Database query boundary",
+        "summary": "The patched commit moves user-controlled ordering input behind query bindings."
+      }
+    ],
+    "coverageGaps": [],
+    "userDecisions": [],
+    "evidence": [
+      {
+        "repo": "TryGhost/Ghost",
+        "advisory": "https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97",
+        "patchCommit": "https://github.com/TryGhost/Ghost/commit/30868d632b2252b638bc8a4c8ebf73964592ed91",
+        "release": "https://github.com/TryGhost/Ghost/releases/tag/v6.19.1"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "checkId": "database-query-parameterization",
+      "name": "Database query parameterization",
+      "group": "database",
+      "status": "fail",
+      "blocking": true,
+      "summary": "The reviewed slug ordering path can construct SQL with user-controlled slug values instead of bindings.",
+      "evidence": {
+        "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
+        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)",
+        "interpolatesSlug": true,
+        "hasParameterizedBindings": false
+      }
+    }
+  ],
+  "warnings": [],
+  "coverageGaps": [],
+  "toolVersions": {
+    "ai-project-maintainer": "0.5.0-case-study"
+  },
+  "checks": [
+    {
+      "checkId": "oss-advisory-reference",
+      "name": "OSS advisory reference",
+      "group": "case-study",
+      "status": "pass",
+      "blocking": false,
+      "summary": "GHSA-w52v-v783-gw97 is pinned to https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97.",
+      "evidence": {
+        "repo": "TryGhost/Ghost",
+        "vulnerableRef": "ebf4bb79cb45e487e277318df61c6c559752fd0a",
+        "fixedRef": "30868d632b2252b638bc8a4c8ebf73964592ed91",
+        "patchCommit": "30868d632b2252b638bc8a4c8ebf73964592ed91"
+      }
+    },
+    {
+      "checkId": "database-query-parameterization",
+      "name": "Database query parameterization",
+      "group": "database",
+      "status": "fail",
+      "blocking": true,
+      "summary": "The reviewed slug ordering path can construct SQL with user-controlled slug values instead of bindings.",
+      "evidence": {
+        "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
+        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)",
+        "interpolatesSlug": true,
+        "hasParameterizedBindings": false
+      }
+    }
+  ],
+  "exceptions": {
+    "used": [],
+    "invalid": []
+  }
+}

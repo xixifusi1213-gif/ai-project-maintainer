@@ -1,5 +1,15 @@
 # 升级路线图
 
+## v0.5.0：真实开源 Before/After 案例
+
+本阶段目标是把可信度从“可运行 demo”推进到“真实开源漏洞案例”：
+
+- 新增 `docs/CASE-STUDIES.md`，集中展示真实 OSS advisory、release 和 patch commit。
+- 新增 SiYuan Electron RCE 案例，展示“官方漏洞修复”和“Electron runtime release-readiness”不是同一件事。
+- 新增 Ghost SQL injection 案例，展示数据库查询风险如何从 `FAIL` 变成 `PASS_WITH_GAPS`。
+- 新增 `npm run cases:verify`，在本地生成案例报告，并检查报告不包含 token、DSN、私有路径等敏感内容。
+- 不复制第三方完整源码，不发布 exploit，只保存链接、元数据和 APM 报告。
+
 ## v0.4.2：首次使用可信度修补
 
 本阶段目标是把“已经可用”修成“陌生用户第一次访问和第一次 `npx` 不容易卡住”。
