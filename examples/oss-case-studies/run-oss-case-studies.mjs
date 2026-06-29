@@ -404,11 +404,11 @@ function verifyReports(allReports) {
 
 export async function runOssCaseStudies(options = {}) {
   const outputDir = path.resolve(options.outputDir || path.join(os.tmpdir(), "apm-oss-case-studies"));
-  fs.rmSync(outputDir, { recursive: true, force: true });
   fs.mkdirSync(outputDir, { recursive: true });
 
   const allReports = {};
   for (const caseStudy of CASE_STUDIES) {
+    fs.rmSync(path.join(outputDir, caseStudy.id), { recursive: true, force: true });
     const reports = await reportsForCase(caseStudy, options);
     allReports[caseStudy.id] = reports;
     writeCase(caseStudy, reports, outputDir);

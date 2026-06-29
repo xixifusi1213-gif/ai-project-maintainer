@@ -41,6 +41,33 @@ Some advisory steps use `continue-on-error: true` because early public projects 
 
 Scanner installers are pinned by environment variables in the workflow. Update those variables deliberately instead of relying on `@latest`.
 
+## Code Scanning Display Policy
+
+GitHub Code Scanning is treated as the public security findings list, so v0.5.1 only uploads actionable code/security findings to SARIF by default.
+
+Uploaded to Code Scanning:
+
+- blocking findings
+- code-level security warnings such as Semgrep, Trivy, Electron hardening, database query risk, or GitHub Actions security findings
+
+Kept in the Markdown/JSON report and Actions summary, but not uploaded as Code Scanning alerts by default:
+
+- production logs, metrics, alerts, and error-monitoring gaps
+- release approval gaps
+- business-flow declaration gaps
+- `USER_DECISION` items
+- optional tool coverage gaps
+
+This keeps the repository Security page readable while preserving the full production-readiness evidence trail in `reports/security-report.md`, `reports/security-report.json`, and the `security-evidence` artifact.
+
+Projects that intentionally want production-readiness gaps in Code Scanning can opt in:
+
+```yaml
+reporting:
+  code_scanning:
+    include_coverage_gaps: true
+```
+
 ## Why Not Block Everything Immediately
 
 This project is a public tool, so a permanently red workflow hurts trust as much as missing checks. The v0.4.1 policy is:

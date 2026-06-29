@@ -184,6 +184,8 @@ Reports include:
 - SARIF for GitHub Code Scanning
 - open source maintenance score
 
+By default, SARIF only uploads actionable code/security findings to GitHub Code Scanning. Non-blocking production gaps stay in the Markdown/JSON report and Actions Summary so the public Security page does not look like a vulnerability wall for missing logs or alerts.
+
 ## Use With Codex
 
 Install as a Codex skill:

@@ -4,6 +4,7 @@ Root: siyuan-note/siyuan@patched-release
 Mode: strict=true, release=true, production=true
 Generated: 2026-06-30T00:00:00.000Z
 Open Source Maintenance Score: 70/100 (C)
+Code Scanning Results: 1 (non-blocking production gaps stay in this report and artifacts)
 
 ## Blocking Checks
 - Electron runtime hardening: fail. APM found dangerous Electron settings: nodeIntegration: true, contextIsolation: false, webSecurity: false.

@@ -27,7 +27,7 @@
     "caseId": "ghost-sql-injection",
     "stage": "after",
     "advisory": "GHSA-w52v-v783-gw97",
-    "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/30868d632b2252b638bc8a4c8ebf73964592ed91/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)"
+    "source": "offline-pinned-metadata"
   },
   "audit": {
     "profile": {
@@ -115,7 +115,7 @@
       "summary": "The reviewed slug ordering path uses parameterized placeholders and bindings for user-controlled slug values.",
       "evidence": {
         "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
-        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/30868d632b2252b638bc8a4c8ebf73964592ed91/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)",
+        "source": "offline-pinned-metadata",
         "interpolatesSlug": false,
         "hasParameterizedBindings": true
       }

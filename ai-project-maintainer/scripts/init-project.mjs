@@ -30,6 +30,9 @@ fail_on:
 warn_on:
   dev_dependency_vulnerabilities: true
   missing_optional_tools: true
+reporting:
+  code_scanning:
+    include_coverage_gaps: false
 `;
 
 const exceptionsTemplate = `exceptions:

@@ -27,7 +27,7 @@
     "caseId": "siyuan-electron-rce",
     "stage": "before",
     "advisory": "GHSA-x63q-3rcj-hhp5",
-    "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.3/app/electron/main.js)"
+    "source": "offline-pinned-metadata"
   },
   "audit": {
     "profile": {
@@ -75,7 +75,7 @@
       "summary": "APM found dangerous Electron settings: nodeIntegration: true, contextIsolation: false, webSecurity: false.",
       "evidence": {
         "file": "app/electron/main.js",
-        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.3/app/electron/main.js)",
+        "source": "offline-pinned-metadata",
         "dangerous": [
           "nodeIntegration: true",
           "contextIsolation: false",
@@ -113,7 +113,7 @@
       "summary": "APM found dangerous Electron settings: nodeIntegration: true, contextIsolation: false, webSecurity: false.",
       "evidence": {
         "file": "app/electron/main.js",
-        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.3/app/electron/main.js)",
+        "source": "offline-pinned-metadata",
         "dangerous": [
           "nodeIntegration: true",
           "contextIsolation: false",

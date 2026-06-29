@@ -4,6 +4,7 @@ Root: siyuan-note/siyuan@after-hardened
 Mode: strict=true, release=true, production=true
 Generated: 2026-06-30T00:00:00.000Z
 Open Source Maintenance Score: 95/100 (A)
+Code Scanning Results: 0 (non-blocking production gaps stay in this report and artifacts)
 
 ## Blocking Checks
 - None

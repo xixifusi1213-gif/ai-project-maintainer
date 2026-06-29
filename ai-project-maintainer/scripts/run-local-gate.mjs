@@ -91,7 +91,11 @@ export function runLocalGate(projectRoot, options = {}) {
     audit,
   });
 
-  if (writeReports) writeReportFiles(report, outputPath);
+  if (writeReports) {
+    writeReportFiles(report, outputPath, {
+      codeScanning: policyBundle.policy.reporting?.code_scanning || {},
+    });
+  }
   return report;
 }
 
