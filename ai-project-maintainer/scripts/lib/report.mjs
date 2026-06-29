@@ -41,6 +41,23 @@ function buildOverallStatus({ blockers, warnings, coverageGaps, invalidException
   return "PASS";
 }
 
+function isNonCodeReadinessSignal(check) {
+  const status = statusKey(check.status);
+  return check.group === "production-audit" || check.coverageGap || status === "gap" || status === "user_decision";
+}
+
+function shouldIncludeInSarif(check, options = {}) {
+  const status = statusKey(check.status);
+  if (["pass", "skipped", "missing", "n/a"].includes(status)) return false;
+  if (check.blocking) return true;
+  if (isNonCodeReadinessSignal(check) && !options.includeCoverageGaps) return false;
+  return true;
+}
+
+function countSarifResults(report, options = {}) {
+  return (report.checks || []).filter((check) => shouldIncludeInSarif(check, options)).length;
+}
+
 export function buildJsonReport({
   root,
   mode,
@@ -101,6 +118,7 @@ export function toMarkdown(report) {
   if (report.maintenance) {
     lines.push(`Open Source Maintenance Score: ${report.maintenance.score}/100 (${report.maintenance.grade})`);
   }
+  lines.push(`Code Scanning Results: ${countSarifResults(report)} (non-blocking production gaps stay in this report and artifacts)`);
   lines.push("");
 
   lines.push("## Blocking Checks");
@@ -193,12 +211,12 @@ export function toMarkdown(report) {
   return lines.join("\n");
 }
 
-export function toSarif(report) {
+export function toSarif(report, options = {}) {
   const rules = new Map();
   const results = [];
 
   for (const check of report.checks) {
-    if (["pass", "skipped", "missing", "n/a"].includes(statusKey(check.status))) continue;
+    if (!shouldIncludeInSarif(check, options)) continue;
     const ruleId = check.name.replace(/\s+/g, "-").toLowerCase();
     if (!rules.has(ruleId)) {
       rules.set(ruleId, {
@@ -240,12 +258,14 @@ export function toSarif(report) {
   };
 }
 
-export function writeReportFiles(report, outputPath) {
+export function writeReportFiles(report, outputPath, options = {}) {
   const jsonPath = path.resolve(outputPath);
   const dir = path.dirname(jsonPath);
   const base = jsonPath.replace(/\.json$/i, "");
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
   fs.writeFileSync(`${base}.md`, toMarkdown(report));
-  fs.writeFileSync(`${base}.sarif`, JSON.stringify(toSarif(report), null, 2));
+  fs.writeFileSync(`${base}.sarif`, JSON.stringify(toSarif(report, {
+    includeCoverageGaps: Boolean(options.codeScanning?.include_coverage_gaps),
+  }), null, 2));
 }

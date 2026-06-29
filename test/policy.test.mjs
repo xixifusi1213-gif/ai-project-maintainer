@@ -20,6 +20,7 @@ test("missing policy uses strict defaults", () => {
 
   assert.equal(bundle.policy.mode, "strict");
   assert.equal(bundle.policy.fail_on.secrets, true);
+  assert.equal(bundle.policy.reporting.code_scanning.include_coverage_gaps, false);
   assert.deepEqual(bundle.exceptions, []);
 });
 

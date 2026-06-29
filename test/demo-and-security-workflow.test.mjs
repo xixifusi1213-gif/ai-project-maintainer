@@ -99,7 +99,7 @@ test("generated security workflow pins scanner versions", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.5.0");
+  assert.equal(packageJson.version, "0.5.1");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

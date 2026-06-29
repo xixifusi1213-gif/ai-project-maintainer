@@ -34,6 +34,11 @@ export const defaultPolicy = {
     dev_dependency_vulnerabilities: true,
     missing_optional_tools: true,
   },
+  reporting: {
+    code_scanning: {
+      include_coverage_gaps: false,
+    },
+  },
 };
 
 function parseYamlFile(filePath, fallback) {
@@ -52,6 +57,14 @@ function mergePolicy(customPolicy) {
     checks: { ...defaultPolicy.checks, ...(customPolicy.checks || {}) },
     fail_on: { ...defaultPolicy.fail_on, ...(customPolicy.fail_on || {}) },
     warn_on: { ...defaultPolicy.warn_on, ...(customPolicy.warn_on || {}) },
+    reporting: {
+      ...defaultPolicy.reporting,
+      ...(customPolicy.reporting || {}),
+      code_scanning: {
+        ...defaultPolicy.reporting.code_scanning,
+        ...((customPolicy.reporting || {}).code_scanning || {}),
+      },
+    },
   };
 }
 

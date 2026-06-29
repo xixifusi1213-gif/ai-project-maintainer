@@ -4,6 +4,7 @@ Root: TryGhost/Ghost@before
 Mode: strict=true, release=true, production=true
 Generated: 2026-06-30T00:00:00.000Z
 Open Source Maintenance Score: 75/100 (B)
+Code Scanning Results: 1 (non-blocking production gaps stay in this report and artifacts)
 
 ## Blocking Checks
 - Database query parameterization: fail. The reviewed slug ordering path can construct SQL with user-controlled slug values instead of bindings.

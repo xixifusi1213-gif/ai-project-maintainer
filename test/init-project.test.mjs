@@ -19,6 +19,7 @@ test("initProject creates safety gate config and workflow", () => {
   assert.equal(result.created.includes(".github/workflows/security-gate.yml"), true);
   assert.equal(result.created.includes(".pre-commit-config.yaml"), true);
   assert.equal(fs.existsSync(path.join(root, "reports", ".gitkeep")), true);
+  assert.match(fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8"), /include_coverage_gaps: false/);
 });
 
 test("initProject does not overwrite existing policy", () => {

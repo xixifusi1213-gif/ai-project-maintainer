@@ -129,7 +129,41 @@ test("reports include production audit sections and omit N/A from SARIF", () => 
   assert.match(markdown, /Production Audit/);
   assert.match(markdown, /Coverage Gaps/);
   assert.match(markdown, /User Decisions/);
+  assert.match(markdown, /Code Scanning Results: 0/);
+  assert.equal(sarif.runs[0].results.length, 0);
+  assert.equal(JSON.stringify(sarif).includes("No error monitoring evidence"), false);
   assert.equal(JSON.stringify(sarif).includes("No database detected"), false);
+});
+
+test("SARIF filters non-blocking readiness gaps but keeps code-level and blocking findings", () => {
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: true, release: true, production: true },
+    probe: {},
+    checks: [
+      { name: "production audit: Production logs", group: "production-audit", status: "GAP", blocking: false, coverageGap: true, summary: "No logs evidence" },
+      { name: "production audit: Critical business flows", group: "production-audit", status: "USER_DECISION", blocking: false, summary: "Confirm flows" },
+      { name: "semgrep static scan", group: "sast", status: "fail", blocking: true, summary: "High confidence finding" },
+      { name: "zizmor workflow security", group: "ci-security", status: "fail", blocking: false, summary: "Workflow hardening warning" },
+    ],
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+
+  const defaultSarif = toSarif(report);
+  const optInSarif = toSarif(report, { includeCoverageGaps: true });
+  const defaultText = JSON.stringify(defaultSarif);
+  const optInText = JSON.stringify(optInSarif);
+
+  assert.equal(defaultSarif.runs[0].results.length, 2);
+  assert.match(defaultText, /High confidence finding/);
+  assert.match(defaultText, /Workflow hardening warning/);
+  assert.doesNotMatch(defaultText, /No logs evidence/);
+  assert.doesNotMatch(defaultText, /Confirm flows/);
+
+  assert.equal(optInSarif.runs[0].results.length, 4);
+  assert.match(optInText, /No logs evidence/);
+  assert.match(optInText, /Confirm flows/);
 });
 
 test("reports expose exception usage with check identity", () => {

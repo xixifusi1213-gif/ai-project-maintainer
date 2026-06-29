@@ -27,7 +27,7 @@
     "caseId": "ghost-sql-injection",
     "stage": "before",
     "advisory": "GHSA-w52v-v783-gw97",
-    "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)"
+    "source": "offline-pinned-metadata"
   },
   "audit": {
     "profile": {
@@ -68,7 +68,7 @@
       "summary": "The reviewed slug ordering path can construct SQL with user-controlled slug values instead of bindings.",
       "evidence": {
         "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
-        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)",
+        "source": "offline-pinned-metadata",
         "interpolatesSlug": true,
         "hasParameterizedBindings": false
       }
@@ -103,7 +103,7 @@
       "summary": "The reviewed slug ordering path can construct SQL with user-controlled slug values instead of bindings.",
       "evidence": {
         "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
-        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/TryGhost/Ghost/ebf4bb79cb45e487e277318df61c6c559752fd0a/ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js)",
+        "source": "offline-pinned-metadata",
         "interpolatesSlug": true,
         "hasParameterizedBindings": false
       }
