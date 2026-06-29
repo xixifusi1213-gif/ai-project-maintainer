@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) · [Before/after case](docs/demo-output/before-after-case.md) · [中文演示](docs/DEMO.zh-CN.md) · [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+[See the demo](docs/DEMO.md) | [Before/after case](docs/demo-output/before-after-case.md) | [中文演示](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -31,6 +31,19 @@ AI coding makes it easy to ship code that looks complete but quietly misses prod
 - no clear owner-approved exceptions
 
 `ai-project-maintainer` makes those gaps visible before they become production surprises.
+
+## 30-Second Quickstart
+
+Requires Node.js 20+.
+
+```powershell
+npx ai-project-maintainer doctor --no-trivy-db
+npx ai-project-maintainer init ".\my-project" --profile oss --ci github
+npx ai-project-maintainer init-audit ".\my-project"
+npx ai-project-maintainer gate ".\my-project" --production --strict --release --output reports/security-report.json
+```
+
+`PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
 
 ## The 3-Minute Flow
 

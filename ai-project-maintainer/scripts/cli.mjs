@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAuditPlan } from "./audit-plan.mjs";
@@ -18,8 +19,18 @@ function readOption(args, name, fallback = null) {
   return args[index + 1] || fallback;
 }
 
+function packageVersion() {
+  const cliDir = path.dirname(fileURLToPath(import.meta.url));
+  const packagePath = path.resolve(cliDir, "..", "..", "package.json");
+  return JSON.parse(fs.readFileSync(packagePath, "utf8")).version;
+}
+
 export function parseCliArgs(argv) {
   const [command = "help", ...rest] = argv;
+
+  if (command === "--version" || command === "-v") {
+    return { command: "version", args: {} };
+  }
 
   if (command === "doctor") {
     return {
@@ -110,6 +121,11 @@ function doctorToMarkdown(report) {
 export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
   const parsed = parseCliArgs(argv);
 
+  if (parsed.command === "version") {
+    io.stdout.write(`${packageVersion()}\n`);
+    return 0;
+  }
+
   if (parsed.command === "doctor") {
     const report = runDoctor({ checkTrivyDb: parsed.args.checkTrivyDb });
     io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : doctorToMarkdown(report)}\n`);
@@ -157,9 +173,20 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
   }
 
   io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|summary> [options]\n");
+  io.stderr.write("       ai-project-maintainer --version\n");
   return 2;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+function isDirectRun() {
+  if (!process.argv[1]) return false;
+  const modulePath = fileURLToPath(import.meta.url);
+  try {
+    return fs.realpathSync(process.argv[1]) === modulePath;
+  } catch {
+    return path.resolve(process.argv[1]) === modulePath;
+  }
+}
+
+if (isDirectRun()) {
   process.exit(runCli());
 }

@@ -75,6 +75,16 @@ test("security workflow is parseable and includes the heavy gate", () => {
   assert.match(workflowText, /TRIVY_VERSION: v0\.71\.2/);
 });
 
+test("README first-run links are readable and not mojibake", () => {
+  const readme = fs.readFileSync(path.resolve("README.md"), "utf8");
+
+  assert.doesNotMatch(readme, /涓|枃|路|·/);
+  assert.match(readme, /\[See the demo\]\(docs\/DEMO\.md\)/);
+  assert.match(readme, /\[中文演示\]\(docs\/DEMO\.zh-CN\.md\)/);
+  assert.match(readme, /30-Second Quickstart/);
+  assert.match(readme, /PASS_WITH_GAPS/);
+});
+
 test("generated security workflow pins scanner versions", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-init-pinned-workflow-"));
   initProject(root, { profile: "oss", ci: "github" });
@@ -88,7 +98,7 @@ test("generated security workflow pins scanner versions", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.4.1");
+  assert.equal(packageJson.version, "0.4.2");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);
