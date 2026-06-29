@@ -80,6 +80,7 @@ test("README first-run links are readable and not mojibake", () => {
 
   assert.doesNotMatch(readme, /涓|枃|路|·/);
   assert.match(readme, /\[See the demo\]\(docs\/DEMO\.md\)/);
+  assert.match(readme, /\[Real OSS cases\]\(docs\/CASE-STUDIES\.md\)/);
   assert.match(readme, /\[中文演示\]\(docs\/DEMO\.zh-CN\.md\)/);
   assert.match(readme, /30-Second Quickstart/);
   assert.match(readme, /PASS_WITH_GAPS/);
@@ -98,9 +99,10 @@ test("generated security workflow pins scanner versions", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.4.2");
+  assert.equal(packageJson.version, "0.5.0");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/test/"), true);
+  assert.equal(packageJson.files.includes("examples/oss-case-studies/"), true);
 });

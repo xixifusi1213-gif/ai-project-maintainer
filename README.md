@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Before/after case](docs/demo-output/before-after-case.md) | [中文演示](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+[See the demo](docs/DEMO.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [中文演示](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -96,6 +96,21 @@ More demo material:
 - [Before/after case](docs/demo-output/before-after-case.md)
 - [90-second browser demo](docs/demo-output/90-second-demo.html)
 - [Animated SVG storyboard](assets/demo-90s-storyboard.svg)
+
+## Real OSS Case Studies
+
+The demo is intentionally small. The case studies use real open source advisories, releases, and patch commits:
+
+- [SiYuan Electron RCE](docs/cases/electron-oss-before-after.md): shows why a fixed advisory can still need Electron runtime hardening before release.
+- [Ghost SQL injection](docs/cases/ghost-sql-injection-before-after.md): shows a database query blocker changing from `FAIL` to `PASS_WITH_GAPS` after the upstream parameterized-binding patch.
+
+Run the case-study verifier:
+
+```powershell
+npm run cases:verify
+```
+
+The repository stores links, metadata, and generated reports. It does not vendor third-party source trees or ship exploit code.
 
 ## What It Checks
 
@@ -208,6 +223,7 @@ It is designed for the practical middle ground: a personal developer or small te
 
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
+- [Real OSS case studies](docs/CASE-STUDIES.md)
 - [Before/after case](docs/demo-output/before-after-case.md)
 - [Security workflow](docs/SECURITY-WORKFLOW.md)
 - [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)

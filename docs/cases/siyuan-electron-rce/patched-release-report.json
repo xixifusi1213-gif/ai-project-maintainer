@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "root": "siyuan-note/siyuan@patched-release",
+  "mode": {
+    "strict": true,
+    "release": true,
+    "production": true,
+    "caseStudy": true
+  },
+  "overallStatus": "FAIL",
+  "passed": false,
+  "blockerCount": 1,
+  "warningCount": 1,
+  "coverageGapCount": 1,
+  "maintenance": {
+    "score": 70,
+    "grade": "C",
+    "basis": {
+      "blockers": 1,
+      "warnings": 1,
+      "coverageGaps": 1,
+      "invalidExceptions": 0
+    }
+  },
+  "generatedAt": "2026-06-30T00:00:00.000Z",
+  "probe": {
+    "caseId": "siyuan-electron-rce",
+    "stage": "patched-release",
+    "advisory": "GHSA-x63q-3rcj-hhp5",
+    "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.4/app/electron/main.js)"
+  },
+  "audit": {
+    "profile": {
+      "projectType": "electron",
+      "hasDatabase": false,
+      "hasCi": true
+    },
+    "plan": [
+      {
+        "status": "PASS",
+        "title": "Pinned OSS evidence",
+        "summary": "siyuan-note/siyuan is referenced by advisory, release, and patch commit metadata."
+      },
+      {
+        "status": "USER_DECISION",
+        "title": "Electron hardening boundary",
+        "summary": "Official advisory fixes must still be reviewed against Electron runtime hardening."
+      }
+    ],
+    "coverageGaps": [
+      {
+        "id": "production-monitoring",
+        "title": "Production monitoring evidence",
+        "summary": "The OSS case verifies code-level remediation, not the maintainer's deployed monitoring.",
+        "recommendation": "Require release, logging, metric, and alert evidence in the consuming project."
+      }
+    ],
+    "userDecisions": [
+      {
+        "id": "electron-runtime-risk",
+        "title": "Electron runtime risk acceptance",
+        "summary": "Maintainers must decide whether any remaining Node-enabled renderer surface is acceptable.",
+        "recommendation": "Prefer nodeIntegration=false, contextIsolation=true, webSecurity=true, and narrow preload IPC."
+      }
+    ],
+    "evidence": [
+      {
+        "repo": "siyuan-note/siyuan",
+        "advisory": "https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5",
+        "patchCommit": "https://github.com/siyuan-note/siyuan/commit/bb326aa992b26096eedea64b69b182c3d2449681",
+        "release": "https://github.com/siyuan-note/siyuan/releases/tag/v3.6.4"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "checkId": "electron-runtime-hardening",
+      "name": "Electron runtime hardening",
+      "group": "electron",
+      "status": "fail",
+      "blocking": true,
+      "summary": "APM found dangerous Electron settings: nodeIntegration: true, contextIsolation: false, webSecurity: false.",
+      "evidence": {
+        "file": "app/electron/main.js",
+        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.4/app/electron/main.js)",
+        "dangerous": [
+          "nodeIntegration: true",
+          "contextIsolation: false",
+          "webSecurity: false"
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "checkId": "production-evidence-gap",
+      "name": "Production evidence for OSS case",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The case proves the code review signal, but deployment monitoring and release approval remain project-specific evidence."
+    }
+  ],
+  "coverageGaps": [
+    {
+      "checkId": "production-evidence-gap",
+      "name": "Production evidence for OSS case",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The case proves the code review signal, but deployment monitoring and release approval remain project-specific evidence."
+    }
+  ],
+  "toolVersions": {
+    "ai-project-maintainer": "0.5.0-case-study"
+  },
+  "checks": [
+    {
+      "checkId": "oss-advisory-reference",
+      "name": "OSS advisory reference",
+      "group": "case-study",
+      "status": "pass",
+      "blocking": false,
+      "summary": "GHSA-x63q-3rcj-hhp5 is pinned to https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5.",
+      "evidence": {
+        "repo": "siyuan-note/siyuan",
+        "vulnerableRef": "v3.6.3",
+        "fixedRef": "v3.6.4",
+        "patchCommit": "bb326aa992b26096eedea64b69b182c3d2449681"
+      }
+    },
+    {
+      "checkId": "electron-runtime-hardening",
+      "name": "Electron runtime hardening",
+      "group": "electron",
+      "status": "fail",
+      "blocking": true,
+      "summary": "APM found dangerous Electron settings: nodeIntegration: true, contextIsolation: false, webSecurity: false.",
+      "evidence": {
+        "file": "app/electron/main.js",
+        "source": "offline-pinned-metadata (Timeout fetching https://raw.githubusercontent.com/siyuan-note/siyuan/v3.6.4/app/electron/main.js)",
+        "dangerous": [
+          "nodeIntegration: true",
+          "contextIsolation: false",
+          "webSecurity: false"
+        ]
+      }
+    },
+    {
+      "checkId": "production-evidence-gap",
+      "name": "Production evidence for OSS case",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The case proves the code review signal, but deployment monitoring and release approval remain project-specific evidence."
+    }
+  ],
+  "exceptions": {
+    "used": [],
+    "invalid": []
+  }
+}
