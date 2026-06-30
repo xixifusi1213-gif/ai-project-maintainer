@@ -1,8 +1,22 @@
 # Intake 配置说明
 
-`init-audit` 生成的文件用于告诉工具“这个项目是什么、有哪些资源、哪些风险需要重点审”。公开用户不需要提供所有资源，缺失项会作为 `GAP` 写入报告。
+`init-audit` 生成的文件用于告诉工具：这个项目是什么、有哪些资源、哪些风险需要重点审查。公开用户不需要提供所有资源，缺失项会作为 `GAP` 或 `USER_DECISION` 写入报告。
+
+v0.6.0 推荐先用向导：
+
+```powershell
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
+```
+
+只想预览时使用：
+
+```powershell
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN --dry-run
+```
 
 ## project-profile.yml
+
+描述项目类型、生命周期和风险面。
 
 ```yaml
 schema_version: 1
@@ -30,6 +44,8 @@ risk:
 
 ## evidence-sources.yml
 
+描述证据在哪里。这里不要写密钥、token、密码、DSN 或云凭证。
+
 ```yaml
 schema_version: 1
 evidence:
@@ -51,7 +67,7 @@ evidence:
     rollback_plan: none
 ```
 
-这里不要写密钥。只写证据类型，例如：
+可以写证据类型或系统名称，例如：
 
 ```yaml
 observability:
@@ -63,7 +79,7 @@ observability:
 
 ## business-flows.yml
 
-把核心业务流程写成可审查条目：
+把核心业务流程写成可审查条目。
 
 ```yaml
 business_flows:
@@ -79,7 +95,7 @@ business_flows:
 
 ## risk-policy.yml
 
-默认：
+默认策略：
 
 ```yaml
 production:
@@ -88,12 +104,26 @@ production:
   require_intake: false
 ```
 
-如果你希望生产证据缺口也直接失败：
+如果希望生产证据缺口也直接阻断发布：
 
 ```yaml
 production:
   block_on_coverage_gaps: true
+  block_on_user_decisions: true
 ```
+
+## intake-summary.md
+
+这是给人和 AI 看的摘要，不是配置源。
+
+它会列出：
+
+- Maintainer Confirmed：用户确认的事实。
+- AI-Inferred Signals：工具从代码中推断的信号。
+- Release Policy：当前发布阻断策略。
+- User Decisions Still Needed：仍需用户确认的事项。
+
+不要在这个文件里写 token、密码、DSN 或云凭证。
 
 ## 状态含义
 

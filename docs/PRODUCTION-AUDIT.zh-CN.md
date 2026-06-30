@@ -9,16 +9,23 @@
 ## 1. 生成审查画像
 
 ```powershell
-npx ai-project-maintainer init-audit "E:\我的项目"
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 ```
 
-填写生成的文件：
+也可以先预览，不写入文件：
+
+```powershell
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN --dry-run
+```
+
+向导会用问答生成项目画像、证据来源、核心业务流程和风险策略。Codex 使用这个 skill 时，可以先用人话解释问题，再把你的确认落到这些文件：
 
 ```text
 .ai-maintainer/project-profile.yml
 .ai-maintainer/evidence-sources.yml
 .ai-maintainer/business-flows.yml
 .ai-maintainer/risk-policy.yml
+.ai-maintainer/intake-summary.md
 .ai-maintainer/threat-model.md
 .ai-maintainer/release-checklist.yml
 .ai-maintainer/incident-runbook.md

@@ -13,7 +13,7 @@
 ```powershell
 npx ai-project-maintainer doctor
 npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
-npx ai-project-maintainer init-audit "E:\我的项目"
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 npx ai-project-maintainer audit-plan "E:\我的项目" --output reports/audit-plan.json
 npx ai-project-maintainer gate "E:\我的项目" --production --strict --release --output reports/security-report.json
 npx ai-project-maintainer summary "E:\我的项目\reports\security-report.json"
@@ -29,7 +29,7 @@ cd .\ai-project-maintainer
 npm install
 node .\ai-project-maintainer\scripts\doctor.mjs
 node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile oss --ci github
-node .\ai-project-maintainer\scripts\init-audit.mjs "E:\我的项目"
+node .\ai-project-maintainer\scripts\init-audit.mjs "E:\我的项目" --wizard --lang zh-CN
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\我的项目" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\我的项目" --production --strict --release --output reports/security-report.json
 ```
@@ -72,10 +72,14 @@ reports/.gitkeep
 正式审查前先运行：
 
 ```powershell
-npx ai-project-maintainer init-audit "E:\我的项目"
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 ```
 
-这会生成项目画像、证据来源、核心业务流程、风险策略、威胁模型、发布清单、事故手册、数据库迁移策略和观测性清单。
+这会通过问答生成项目画像、证据来源、核心业务流程、风险策略、威胁模型、发布清单、事故手册、数据库迁移策略、观测性清单和 `intake-summary.md`。如果只想预览：
+
+```powershell
+npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN --dry-run
+```
 
 用户需要填写业务判断和证据来源，例如：
 

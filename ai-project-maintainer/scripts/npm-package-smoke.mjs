@@ -89,6 +89,11 @@ if (!doctor.stdout.includes("AI Project Maintainer Doctor")) {
   throw new Error(`Doctor smoke did not print the expected report:\n${doctor.stdout}\n${doctor.stderr}`);
 }
 
+const wizardDryRun = runBin(tempRoot, ["init-audit", projectDir, "--wizard", "--dry-run"], { allowNonZero: true });
+if (wizardDryRun.status !== 0 || !wizardDryRun.stdout.includes("Project Intake Summary") || fs.existsSync(path.join(projectDir, ".ai-maintainer"))) {
+  throw new Error(`Wizard dry-run smoke failed:\n${wizardDryRun.stdout}\n${wizardDryRun.stderr}`);
+}
+
 runBin(tempRoot, [
   "init",
   projectDir,

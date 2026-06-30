@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [中文演示](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+[See the demo](docs/DEMO.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -39,7 +39,8 @@ Requires Node.js 20+.
 ```powershell
 npx ai-project-maintainer doctor --no-trivy-db
 npx ai-project-maintainer init ".\my-project" --profile oss --ci github
-npx ai-project-maintainer init-audit ".\my-project"
+npx ai-project-maintainer init-audit ".\my-project" --wizard --dry-run
+npx ai-project-maintainer init-audit ".\my-project" --wizard
 npx ai-project-maintainer gate ".\my-project" --production --strict --release --output reports/security-report.json
 ```
 
@@ -53,8 +54,8 @@ Requires Node.js 20+.
 # 1. Add local and CI guardrails
 npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
 
-# 2. Create the production audit intake templates
-npx ai-project-maintainer init-audit "E:\my-project"
+# 2. Answer the guided production audit intake
+npx ai-project-maintainer init-audit "E:\my-project" --wizard
 
 # 3. Generate the project-specific audit plan
 npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
@@ -136,12 +137,23 @@ V3 adds an intake-driven audit layer:
 .ai-maintainer/evidence-sources.yml
 .ai-maintainer/business-flows.yml
 .ai-maintainer/risk-policy.yml
+.ai-maintainer/intake-summary.md
 .ai-maintainer/threat-model.md
 .ai-maintainer/release-checklist.yml
 .ai-maintainer/incident-runbook.md
 .ai-maintainer/db-migration-policy.yml
 .ai-maintainer/observability-checklist.yml
 ```
+
+v0.6.0 adds a guided intake wizard:
+
+```powershell
+npx ai-project-maintainer init-audit "E:\my-project" --wizard
+npx ai-project-maintainer init-audit "E:\my-project" --wizard --lang zh-CN
+npx ai-project-maintainer init-audit "E:\my-project" --wizard --dry-run
+```
+
+The CLI asks deterministic questions and writes YAML. It does not call OpenAI APIs. When used from Codex, the `ai-project-maintainer` skill can explain each question, ask follow-ups, and then let the CLI write the same files.
 
 The user supplies business facts and evidence locations. The tool decides which checks apply and labels every item clearly:
 
@@ -199,6 +211,7 @@ Copy-Item -Recurse .\ai-project-maintainer "$env:USERPROFILE\.codex\skills\ai-pr
 Then ask Codex:
 
 ```text
+$ai-project-maintainer help me run the AI-assisted project intake interview.
 $ai-project-maintainer generate a production audit plan for this project, run the production gate, fix blockers, and rerun until it passes.
 ```
 
@@ -209,7 +222,7 @@ If you are using the repository directly instead of npm:
 ```powershell
 node .\ai-project-maintainer\scripts\doctor.mjs
 node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
-node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project"
+node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project" --wizard
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
 node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"

@@ -4,11 +4,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
-import { initAudit } from "./init-audit.mjs";
+import { initAudit, initAuditWizard } from "./init-audit.mjs";
 import { initProject } from "./init-project.mjs";
 import { runLocalGate } from "./run-local-gate.mjs";
 import { summarizeReport } from "./report-summary.mjs";
 import { toMarkdown } from "./lib/report.mjs";
+import { planIntakeWizard } from "./lib/intake-wizard.mjs";
 
 function readOption(args, name, fallback = null) {
   const index = args.indexOf(name);
@@ -17,6 +18,10 @@ function readOption(args, name, fallback = null) {
     return inline ? inline.slice(name.length + 1) : fallback;
   }
   return args[index + 1] || fallback;
+}
+
+function firstPositional(args, optionValueNames = []) {
+  return args.find((arg, index) => !arg.startsWith("--") && !optionValueNames.includes(args[index - 1]));
 }
 
 function packageVersion() {
@@ -70,10 +75,14 @@ export function parseCliArgs(argv) {
   }
 
   if (command === "init-audit") {
+    const langIndex = rest.indexOf("--lang");
     return {
       command,
       args: {
-        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
+        projectRoot: firstPositional(rest, ["--lang"]) || process.cwd(),
+        wizard: rest.includes("--wizard"),
+        dryRun: rest.includes("--dry-run"),
+        lang: langIndex === -1 ? "en" : rest[langIndex + 1] || "en",
       },
     };
   }
@@ -156,6 +165,18 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
   }
 
   if (parsed.command === "init-audit") {
+    if (parsed.args.wizard) {
+      if (!parsed.args.dryRun) {
+        io.stderr.write("Usage error: init-audit --wizard is interactive. Use the installed CLI directly, or add --dry-run for a non-writing preview.\n");
+        return 2;
+      }
+      const result = planIntakeWizard(parsed.args.projectRoot, {
+        dryRun: true,
+        lang: parsed.args.lang,
+      });
+      io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      return 0;
+    }
     const result = initAudit(parsed.args.projectRoot);
     io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return 0;
@@ -177,6 +198,26 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
   return 2;
 }
 
+export async function runCliAsync(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
+  const parsed = parseCliArgs(argv);
+  if (parsed.command === "init-audit" && parsed.args.wizard) {
+    try {
+      const result = await initAuditWizard(parsed.args.projectRoot, {
+        dryRun: parsed.args.dryRun,
+        lang: parsed.args.lang,
+        input: io.input || process.stdin,
+        output: io.promptOutput || process.stdout,
+      });
+      io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      return 0;
+    } catch (error) {
+      io.stderr.write(`${error.message}\n`);
+      return 2;
+    }
+  }
+  return runCli(argv, io);
+}
+
 function isDirectRun() {
   if (!process.argv[1]) return false;
   const modulePath = fileURLToPath(import.meta.url);
@@ -188,5 +229,5 @@ function isDirectRun() {
 }
 
 if (isDirectRun()) {
-  process.exit(runCli());
+  runCliAsync().then((code) => process.exit(code));
 }
