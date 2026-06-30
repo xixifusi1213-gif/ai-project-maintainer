@@ -19,7 +19,7 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 
 1. Check the local environment with `node <this-skill>/scripts/doctor.mjs` or `npx ai-project-maintainer doctor`.
 2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo> --profile oss --ci github` or `npx ai-project-maintainer init <repo> --profile oss --ci github`.
-3. For production-oriented review, initialize intake with `node <this-skill>/scripts/init-audit.mjs <repo>` or `npx ai-project-maintainer init-audit <repo>`.
+3. For production-oriented review, initialize intake with `node <this-skill>/scripts/init-audit.mjs <repo> --wizard` or `npx ai-project-maintainer init-audit <repo> --wizard`. Use `--dry-run` first when you only need a preview.
 4. Generate the audit plan with `node <this-skill>/scripts/audit-plan.mjs <repo> --output reports/audit-plan.json` or `npx ai-project-maintainer audit-plan <repo> --output reports/audit-plan.json`.
 5. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --strict --release --output reports/security-report.json`.
 6. For production evidence review, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --production --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --production --strict --release --output reports/security-report.json`.
@@ -48,7 +48,8 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 - **Network or cloud security review**: Focus on exposed services, auth boundaries, IAM, CORS, SSRF, TLS, Kubernetes policies, and IaC drift.
 - **Production incident triage**: Stay read-only. Build a timeline from deploys, migrations, metrics, logs, traces, Kubernetes events, and alerts.
 - **Guardrail setup**: Add or propose CI checks only after identifying the repo's package manager, CI provider, and deployment path.
-- **Production audit readiness**: If `.ai-maintainer/project-profile.yml` is missing, run `init-audit` and ask the maintainer to fill business and evidence facts. Then run `audit-plan`, followed by `gate --production`. Treat `GAP` as missing evidence, not proof of safety.
+- **AI-assisted project intake**: When the user asks for 项目画像问答, AI-assisted intake, or production audit initialization, first run project orientation/probing, then interview the maintainer in small sections: project type, data sensitivity, auth, database, deployment, observability, core business flows, and release-blocking policy. Explain professional terms in plain language, record `unknown` when the maintainer is unsure, and never ask for tokens, passwords, DSNs, or cloud secrets. Use `init-audit --wizard --dry-run` for a deterministic preview, then write the intake files with `init-audit --wizard` or by applying confirmed answers through the CLI.
+- **Production audit readiness**: If `.ai-maintainer/project-profile.yml` is missing, prefer the guided wizard instead of asking the maintainer to hand-edit YAML. Then run `audit-plan`, followed by `gate --production`. Treat `GAP` as missing evidence, not proof of safety.
 
 ## Output Contract
 

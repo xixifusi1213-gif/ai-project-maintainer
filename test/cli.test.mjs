@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { parseCliArgs, runCli } from "../ai-project-maintainer/scripts/cli.mjs";
+import { parseCliArgs, runCli, runCliAsync } from "../ai-project-maintainer/scripts/cli.mjs";
 
 test("package exposes ai-project-maintainer npm bin", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
@@ -62,7 +62,12 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
 
   assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project"]), {
     command: "init-audit",
-    args: { projectRoot: "E:\\my-project" },
+    args: { projectRoot: "E:\\my-project", wizard: false, dryRun: false, lang: "en" },
+  });
+
+  assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project", "--wizard", "--dry-run", "--lang", "zh-CN"]), {
+    command: "init-audit",
+    args: { projectRoot: "E:\\my-project", wizard: true, dryRun: true, lang: "zh-CN" },
   });
 
   assert.deepEqual(parseCliArgs(["audit-plan", "E:\\my-project", "--output", "reports/audit-plan.json"]), {
@@ -78,7 +83,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "0.5.1");
+  assert.equal(pkg.version, "0.6.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";
@@ -92,6 +97,40 @@ test("CLI version flags print the package version", () => {
     assert.equal(stdout.trim(), pkg.version);
     assert.equal(stderr, "");
   }
+});
+
+test("CLI wizard dry-run previews intake without writing files", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-cli-wizard-dry-"));
+  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "wizard-dry-run" }));
+  let stdout = "";
+  let stderr = "";
+  const code = runCli(["init-audit", root, "--wizard", "--dry-run", "--lang", "zh-CN"], {
+    stdout: { write: (chunk) => { stdout += chunk; } },
+    stderr: { write: (chunk) => { stderr += chunk; } },
+  });
+  const result = JSON.parse(stdout);
+
+  assert.equal(code, 0);
+  assert.equal(stderr, "");
+  assert.equal(result.dryRun, true);
+  assert.match(result.summary, /项目画像摘要/);
+  assert.equal(fs.existsSync(path.join(root, ".ai-maintainer")), false);
+});
+
+test("CLI wizard reports non-interactive terminals clearly", async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-cli-wizard-non-tty-"));
+  let stdout = "";
+  let stderr = "";
+  const code = await runCliAsync(["init-audit", root, "--wizard"], {
+    stdout: { write: (chunk) => { stdout += chunk; } },
+    stderr: { write: (chunk) => { stderr += chunk; } },
+    input: { isTTY: false },
+  });
+
+  assert.equal(code, 2);
+  assert.equal(stdout, "");
+  assert.match(stderr, /interactive terminal/);
+  assert.equal(fs.existsSync(path.join(root, ".ai-maintainer", "project-profile.yml")), false);
 });
 
 test("unknown commands still print usage and fail with code 2", () => {

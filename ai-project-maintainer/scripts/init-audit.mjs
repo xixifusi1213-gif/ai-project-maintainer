@@ -9,6 +9,7 @@ import {
   defaultProjectProfile,
   defaultRiskPolicy,
 } from "./lib/intake.mjs";
+import { runIntakeWizard } from "./lib/intake-wizard.mjs";
 
 const markdownTemplates = {
   ".ai-maintainer/threat-model.md": `# Threat Model
@@ -82,6 +83,10 @@ function safeWrite(root, relativePath, content, result) {
   result.created.push(relativePath);
 }
 
+function firstPositional(args, optionValueNames = []) {
+  return args.find((arg, index) => !arg.startsWith("--") && !optionValueNames.includes(args[index - 1]));
+}
+
 export function initAudit(projectRoot) {
   const root = path.resolve(projectRoot || process.cwd());
   const result = { root, created: [], skipped: [] };
@@ -95,11 +100,35 @@ export function initAudit(projectRoot) {
   return result;
 }
 
-function main() {
-  const projectRoot = process.argv.slice(2).find((arg) => !arg.startsWith("--")) || process.cwd();
-  console.log(JSON.stringify(initAudit(projectRoot), null, 2));
+export async function initAuditWizard(projectRoot, options = {}) {
+  const root = path.resolve(projectRoot || process.cwd());
+  if (options.dryRun) return runIntakeWizard(root, options);
+  const wizardResult = await runIntakeWizard(root, options);
+  const templateResult = initAudit(root);
+  return {
+    ...wizardResult,
+    created: [...templateResult.created, ...wizardResult.created],
+    updated: wizardResult.updated,
+    skipped: templateResult.skipped,
+  };
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  const projectRoot = firstPositional(args, ["--lang"]) || process.cwd();
+  const wizard = args.includes("--wizard");
+  const dryRun = args.includes("--dry-run");
+  const langIndex = args.indexOf("--lang");
+  const lang = langIndex === -1 ? "en" : args[langIndex + 1] || "en";
+  const result = wizard
+    ? await initAuditWizard(projectRoot, { dryRun, lang })
+    : initAudit(projectRoot);
+  console.log(JSON.stringify(result, null, 2));
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(2);
+  });
 }
