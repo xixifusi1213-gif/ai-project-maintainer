@@ -16,6 +16,8 @@ npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
 npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 npx ai-project-maintainer audit-plan "E:\我的项目" --output reports/audit-plan.json
 npx ai-project-maintainer gate "E:\我的项目" --production --strict --release --output reports/security-report.json
+npx ai-project-maintainer connectors doctor "E:\我的项目"
+npx ai-project-maintainer evidence "E:\我的项目" --output reports/evidence-report.json
 npx ai-project-maintainer summary "E:\我的项目\reports\security-report.json"
 ```
 
@@ -75,7 +77,7 @@ reports/.gitkeep
 npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 ```
 
-这会通过问答生成项目画像、证据来源、核心业务流程、风险策略、威胁模型、发布清单、事故手册、数据库迁移策略、观测性清单和 `intake-summary.md`。如果只想预览：
+这会通过问答生成项目画像、证据来源、核心业务流程、风险策略、连接器配置模板、威胁模型、发布清单、事故手册、数据库迁移策略、观测性清单和 `intake-summary.md`。如果只想预览：
 
 ```powershell
 npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN --dry-run
@@ -96,6 +98,16 @@ npx ai-project-maintainer gate "E:\我的项目" --production --strict --release
 ```
 
 默认情况下，缺少生产证据会标记为 `GAP`，不会直接失败。已经检查失败的高风险项仍然会失败，例如测试失败、secret 泄露、危险 Electron 配置、过期例外。
+
+如果你已经有 GitHub Environments、Sentry、Vercel、Grafana、Prometheus、Bytebase、Atlas、Cloudflare Pages、Render 或 Fly，可以选择接入只读连接器：
+
+```powershell
+npx ai-project-maintainer connectors doctor "E:\我的项目"
+npx ai-project-maintainer evidence "E:\我的项目" --output reports/evidence-report.json
+npx ai-project-maintainer gate "E:\我的项目" --production --connectors --strict --release --output reports/security-report.json
+```
+
+连接器只读取平台证据，不部署、不回滚、不修改环境变量、不改数据库。token 只放在环境变量或 CI secrets 中，不要写进 `.ai-maintainer/connectors.yml`。v0.7.0 完整实现 GitHub、Sentry、Vercel、Grafana、Prometheus、Bytebase、Atlas 本地迁移 lint、Cloudflare Pages、Render 和 Fly。
 
 如果希望缺少生产证据也阻断发布，在 `.ai-maintainer/risk-policy.yml` 设置：
 

@@ -24,16 +24,18 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
           cache: npm
 
       - name: Set up Go for scanner CLIs
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
         with:
           go-version: "1.25"
 
@@ -65,7 +67,8 @@ jobs:
           go install "github.com/anchore/syft/cmd/syft@$SYFT_VERSION"
           go install "github.com/anchore/grype/cmd/grype@$GRYPE_VERSION"
           go install "github.com/ossf/scorecard/v5@$SCORECARD_VERSION"
-          curl -sSfL "https://raw.githubusercontent.com/aquasecurity/trivy/$TRIVY_VERSION/contrib/install.sh" | sh -s -- -b "$HOME/.local/bin" "$TRIVY_VERSION"
+          curl -sSfL "https://raw.githubusercontent.com/aquasecurity/trivy/$TRIVY_VERSION/contrib/install.sh" -o "$RUNNER_TEMP/trivy-install.sh"
+          sh "$RUNNER_TEMP/trivy-install.sh" -b "$HOME/.local/bin" "$TRIVY_VERSION"
 
       - name: Run tests
         run: npm test
@@ -126,14 +129,14 @@ jobs:
 
       - name: Upload SARIF to code scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a
         with:
           sarif_file: reports/security-report.sarif
         continue-on-error: true
 
       - name: Upload security evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: security-evidence
           path: reports/

@@ -1,27 +1,15 @@
-# Intake 配置说明
+# Intake Schema
 
-`init-audit` 生成的文件用于告诉工具：这个项目是什么、有哪些资源、哪些风险需要重点审查。公开用户不需要提供所有资源，缺失项会作为 `GAP` 或 `USER_DECISION` 写入报告。
-
-v0.6.0 推荐先用向导：
-
-```powershell
-npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
-```
-
-只想预览时使用：
-
-```powershell
-npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN --dry-run
-```
+`.ai-maintainer/` 下的文件用于描述项目画像、生产证据、业务流程和风险策略。工具不会要求你把 token、密码、DSN 或云密钥写进仓库。
 
 ## project-profile.yml
 
-描述项目类型、生命周期和风险面。
+描述项目类型和风险面：
 
 ```yaml
 schema_version: 1
 project:
-  name: ""
+  name: my-project
   type: auto
   lifecycle: development
   production: false
@@ -36,15 +24,15 @@ risk:
   has_user_generated_content: false
 ```
 
-建议：
+常用取值：
 
-- `type` 可以保持 `auto`，工具会自动识别 Electron、Web、API、Node 或通用项目。
-- `has_database` 可以保持 `auto`，工具会根据 migration、Prisma、Drizzle、SQL 等文件推断。
-- 涉及登录、权限、支付、财务、隐私数据时，要把对应字段改为 `true`。
+- `type`: `auto`、`web`、`api`、`electron`、`node`、`generic`
+- `has_database`: `auto`、`true`、`false`
+- `production`: 项目是否已经或准备公开生产使用
 
 ## evidence-sources.yml
 
-描述证据在哪里。这里不要写密钥、token、密码、DSN 或云凭证。
+描述生产证据目前在哪里：
 
 ```yaml
 schema_version: 1
@@ -67,19 +55,66 @@ evidence:
     rollback_plan: none
 ```
 
-可以写证据类型或系统名称，例如：
+这些字段可以写 `none`、`unknown`、`present`，也可以写系统名，例如 `sentry`、`grafana`、`bytebase`。
+
+## connectors.yml
+
+连接器配置只记录“从哪个环境变量读取 token”，不记录 token 值。
 
 ```yaml
-observability:
-  errors: sentry
-  logs: vercel
-  metrics: grafana
-  alerts: email
+connectors:
+  github:
+    enabled: true
+    token_env: GITHUB_TOKEN
+    owner: your-org
+    repo: your-repo
+    environment: production
+  sentry:
+    enabled: true
+    token_env: SENTRY_AUTH_TOKEN
+    organization: your-org
+    project: your-project
+  vercel:
+    enabled: true
+    token_env: VERCEL_TOKEN
+    project_id: prj_xxx
+  grafana:
+    enabled: true
+    token_env: GRAFANA_TOKEN
+    base_url: https://grafana.example.com
+  prometheus:
+    enabled: true
+    token_env: PROMETHEUS_BEARER_TOKEN
+    base_url: https://prometheus.example.com
+  bytebase:
+    enabled: true
+    token_env: BYTEBASE_TOKEN
+    base_url: https://bytebase.example.com
+    project: projects/my-project
+  atlas:
+    enabled: true
+    migrations_dir: migrations
+    dev_url_env: ATLAS_DEV_URL
+  cloudflare:
+    enabled: true
+    token_env: CLOUDFLARE_API_TOKEN
+    account_id: xxx
+    project_name: my-pages-project
+  render:
+    enabled: true
+    token_env: RENDER_API_KEY
+    service_id: srv_xxx
+  fly:
+    enabled: true
+    token_env: FLY_API_TOKEN
+    app_name: my-app
 ```
+
+v0.7.0 支持 GitHub、Sentry、Vercel、Grafana、Prometheus、Bytebase、Atlas 本地迁移 lint、Cloudflare Pages、Render 和 Fly。所有连接器都是可选、只读、用户自带 token。
 
 ## business-flows.yml
 
-把核心业务流程写成可审查条目。
+把核心业务流程写成可审查条目：
 
 ```yaml
 business_flows:
@@ -102,34 +137,35 @@ production:
   block_on_coverage_gaps: false
   block_on_user_decisions: false
   require_intake: false
+
+production_evidence:
+  block_on_missing_release_approval: false
+  block_on_missing_error_monitoring: false
+  block_on_missing_alerting: false
+  block_on_missing_database_governance: false
+  block_on_missing_deployment_evidence: false
+  block_on_connector_auth_failure: false
 ```
 
-如果希望生产证据缺口也直接阻断发布：
+如果项目已经接近生产发布，可以逐步把关键缺口设为阻断：
 
 ```yaml
 production:
   block_on_coverage_gaps: true
-  block_on_user_decisions: true
+
+production_evidence:
+  block_on_missing_release_approval: true
+  block_on_missing_error_monitoring: true
+  block_on_missing_alerting: true
+  block_on_missing_database_governance: true
+  block_on_missing_deployment_evidence: true
 ```
-
-## intake-summary.md
-
-这是给人和 AI 看的摘要，不是配置源。
-
-它会列出：
-
-- Maintainer Confirmed：用户确认的事实。
-- AI-Inferred Signals：工具从代码中推断的信号。
-- Release Policy：当前发布阻断策略。
-- User Decisions Still Needed：仍需用户确认的事项。
-
-不要在这个文件里写 token、密码、DSN 或云凭证。
 
 ## 状态含义
 
-- `PASS`：已检查并通过。
-- `FAIL`：已检查并失败。
-- `WARN`：有风险但默认不阻断。
-- `GAP`：缺少证据，无法判断。
-- `N/A`：该项目不适用。
-- `USER_DECISION`：需要项目负责人判断。
+- `PASS`: 已检查并通过。
+- `FAIL`: 已检查并失败，会阻断。
+- `WARN`: 有风险或证据弱，默认不阻断。
+- `GAP`: 缺少证据，默认不阻断。
+- `N/A`: 不适用于该项目。
+- `USER_DECISION`: 需要维护者判断或确认。

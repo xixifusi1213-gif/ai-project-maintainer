@@ -23,10 +23,11 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 4. Generate the audit plan with `node <this-skill>/scripts/audit-plan.mjs <repo> --output reports/audit-plan.json` or `npx ai-project-maintainer audit-plan <repo> --output reports/audit-plan.json`.
 5. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --strict --release --output reports/security-report.json`.
 6. For production evidence review, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --production --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --production --strict --release --output reports/security-report.json`.
-7. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
-8. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
-9. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
-10. Read only the relevant references:
+7. For optional platform evidence, first run `npx ai-project-maintainer connectors doctor <repo>`, then run `npx ai-project-maintainer evidence <repo> --output reports/evidence-report.json`, and only then add `--connectors` to the production gate. Never ask the user to paste tokens into chat or config files; ask them to set environment variables named in `.ai-maintainer/connectors.yml`.
+8. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
+9. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
+10. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
+11. Read only the relevant references:
    - Local account-free gate: `references/local-gate.md`
    - Database and migrations: `references/database.md`
    - Electron desktop apps: `references/electron-desktop.md`
@@ -34,9 +35,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
    - Production incidents and SRE triage: `references/incident-response.md`
    - CI/CD guardrails and maintenance automation: `references/ci-guardrails.md`
    - Tool selection details: `references/tool-router.md`
-11. Build a short execution plan from the detected risk surfaces and the audit plan.
-12. Run the least invasive checks first, then deeper checks only where evidence points.
-13. Return findings first, ordered by severity, with commands/tests already run.
+12. Build a short execution plan from the detected risk surfaces and the audit plan.
+13. Run the least invasive checks first, then deeper checks only where evidence points.
+14. Return findings first, ordered by severity, with commands/tests already run.
 
 ## Modes
 
@@ -49,6 +50,7 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 - **Production incident triage**: Stay read-only. Build a timeline from deploys, migrations, metrics, logs, traces, Kubernetes events, and alerts.
 - **Guardrail setup**: Add or propose CI checks only after identifying the repo's package manager, CI provider, and deployment path.
 - **AI-assisted project intake**: When the user asks for 项目画像问答, AI-assisted intake, or production audit initialization, first run project orientation/probing, then interview the maintainer in small sections: project type, data sensitivity, auth, database, deployment, observability, core business flows, and release-blocking policy. Explain professional terms in plain language, record `unknown` when the maintainer is unsure, and never ask for tokens, passwords, DSNs, or cloud secrets. Use `init-audit --wizard --dry-run` for a deterministic preview, then write the intake files with `init-audit --wizard` or by applying confirmed answers through the CLI.
+- **Optional platform evidence connectors**: Use only when the maintainer explicitly enables connectors or asks for real production evidence. v0.7.0 supports GitHub Environments, Sentry, Vercel, Grafana, Prometheus, Bytebase, Atlas local migration lint, Cloudflare Pages, Render, and Fly. Connectors are read-only; missing tokens, 401/403, unavailable APIs, or missing local tools are `GAP` by default, not proof of safety.
 - **Production audit readiness**: If `.ai-maintainer/project-profile.yml` is missing, prefer the guided wizard instead of asking the maintainer to hand-edit YAML. Then run `audit-plan`, followed by `gate --production`. Treat `GAP` as missing evidence, not proof of safety.
 
 ## Output Contract

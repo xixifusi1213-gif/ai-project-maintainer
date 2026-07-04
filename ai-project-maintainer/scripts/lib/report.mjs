@@ -64,12 +64,13 @@ export function buildJsonReport({
   probe,
   checks,
   audit = null,
+  evidence = null,
   toolVersions = {},
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
 }) {
   const blockers = checks.filter((check) => check.blocking);
-  const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
+  const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "warn", "warning", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
   const coverageGaps = checks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
   const userDecisionCount = checks.filter((check) => statusKey(check.status) === "user_decision").length + (audit?.userDecisions || []).length;
   const exceptionUsage = checks.filter((check) => check.exception).map((check) => ({
@@ -95,6 +96,7 @@ export function buildJsonReport({
     generatedAt,
     probe,
     audit,
+    evidence,
     blockers,
     warnings,
     coverageGaps,
@@ -170,6 +172,15 @@ export function toMarkdown(report) {
     if (!(report.audit.userDecisions || []).length) lines.push("- None");
     for (const decision of report.audit.userDecisions || []) {
       lines.push(`- ${decision.title}: ${decision.summary}${decision.recommendation ? ` Recommendation: ${decision.recommendation}` : ""}`);
+    }
+    lines.push("");
+  }
+
+  if (report.evidence) {
+    lines.push("## Production Evidence");
+    if (!(report.evidence.items || []).length) lines.push("- None");
+    for (const item of report.evidence.items || []) {
+      lines.push(`- ${item.status} ${item.title}: ${item.summary}${item.recommendation ? ` Recommendation: ${item.recommendation}` : ""}`);
     }
     lines.push("");
   }

@@ -82,8 +82,10 @@ test("README first-run links are readable and not mojibake", () => {
   assert.match(readme, /\[See the demo\]\(docs\/DEMO\.md\)/);
   assert.match(readme, /\[Real OSS cases\]\(docs\/CASE-STUDIES\.md\)/);
   assert.match(readme, /\[Chinese demo\]\(docs\/DEMO\.zh-CN\.md\)/);
+  assert.match(readme, /\[Production evidence connectors\]\(docs\/CONNECTORS\.md\)/);
   assert.match(readme, /30-Second Quickstart/);
   assert.match(readme, /PASS_WITH_GAPS/);
+  assert.match(readme, /Optional Production Evidence Connectors/);
 });
 
 test("generated security workflow pins scanner versions", () => {
@@ -99,7 +101,7 @@ test("generated security workflow pins scanner versions", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.6.0");
+  assert.equal(packageJson.version, "0.7.0");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

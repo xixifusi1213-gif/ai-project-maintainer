@@ -43,6 +43,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
       noTests: false,
       jsonOnly: false,
       production: false,
+      connectors: false,
       outputPath: "reports/security-report.json",
     },
   });
@@ -56,6 +57,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
       noTests: false,
       jsonOnly: false,
       production: true,
+      connectors: false,
       outputPath: null,
     },
   });
@@ -83,7 +85,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "0.6.0");
+  assert.equal(pkg.version, "0.7.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

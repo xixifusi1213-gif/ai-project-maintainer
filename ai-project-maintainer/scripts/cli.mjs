@@ -6,8 +6,9 @@ import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { initAudit, initAuditWizard } from "./init-audit.mjs";
 import { initProject } from "./init-project.mjs";
-import { runLocalGate } from "./run-local-gate.mjs";
+import { runLocalGate, runLocalGateAsync } from "./run-local-gate.mjs";
 import { summarizeReport } from "./report-summary.mjs";
+import { runConnectorsDoctor, runEvidence, writeEvidenceReport } from "./lib/connectors.mjs";
 import { toMarkdown } from "./lib/report.mjs";
 import { planIntakeWizard } from "./lib/intake-wizard.mjs";
 
@@ -69,7 +70,31 @@ export function parseCliArgs(argv) {
         noTests: rest.includes("--no-tests"),
         jsonOnly: rest.includes("--json"),
         production: rest.includes("--production"),
+        connectors: rest.includes("--connectors"),
         outputPath: readOption(rest, "--output", null),
+      },
+    };
+  }
+
+  if (command === "connectors") {
+    const [subcommand = "help", ...connectorArgs] = rest;
+    return {
+      command,
+      args: {
+        subcommand,
+        projectRoot: firstPositional(connectorArgs) || process.cwd(),
+        jsonOnly: connectorArgs.includes("--json"),
+      },
+    };
+  }
+
+  if (command === "evidence") {
+    return {
+      command,
+      args: {
+        projectRoot: firstPositional(rest, ["--output"]) || process.cwd(),
+        outputPath: readOption(rest, "--output", null),
+        jsonOnly: rest.includes("--json"),
       },
     };
   }
@@ -155,12 +180,19 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     const report = runLocalGate(parsed.args.projectRoot, {
       strict: parsed.args.strict,
       release: parsed.args.release,
-      noTests: parsed.args.noTests,
-      production: parsed.args.production,
-      outputPath: parsed.args.outputPath,
-      writeReports: true,
-    });
+        noTests: parsed.args.noTests,
+        production: parsed.args.production,
+        connectors: false,
+        outputPath: parsed.args.outputPath,
+        writeReports: true,
+      });
     io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : toMarkdown(report)}\n`);
+    return report.passed ? 0 : 1;
+  }
+
+  if (parsed.command === "connectors" && parsed.args.subcommand === "doctor") {
+    const report = runConnectorsDoctor(parsed.args.projectRoot);
+    io.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
     return report.passed ? 0 : 1;
   }
 
@@ -193,13 +225,42 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     return 0;
   }
 
-  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|summary> [options]\n");
+  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|connectors|evidence|summary> [options]\n");
   io.stderr.write("       ai-project-maintainer --version\n");
   return 2;
 }
 
 export async function runCliAsync(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
   const parsed = parseCliArgs(argv);
+  if (parsed.command === "gate" && parsed.args.connectors) {
+    try {
+      const report = await runLocalGateAsync(parsed.args.projectRoot, {
+        strict: parsed.args.strict,
+        release: parsed.args.release,
+        noTests: parsed.args.noTests,
+        production: parsed.args.production,
+        connectors: true,
+        outputPath: parsed.args.outputPath,
+        writeReports: true,
+      });
+      io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : toMarkdown(report)}\n`);
+      return report.passed ? 0 : 1;
+    } catch (error) {
+      io.stderr.write(`${error.message}\n`);
+      return 2;
+    }
+  }
+  if (parsed.command === "evidence") {
+    try {
+      const report = await runEvidence(parsed.args.projectRoot);
+      if (parsed.args.outputPath) writeEvidenceReport(report, path.isAbsolute(parsed.args.outputPath) ? parsed.args.outputPath : path.resolve(parsed.args.projectRoot, parsed.args.outputPath));
+      io.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+      return report.failures.length ? 1 : 0;
+    } catch (error) {
+      io.stderr.write(`${error.message}\n`);
+      return 2;
+    }
+  }
   if (parsed.command === "init-audit" && parsed.args.wizard) {
     try {
       const result = await initAuditWizard(parsed.args.projectRoot, {

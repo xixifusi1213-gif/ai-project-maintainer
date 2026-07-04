@@ -10,6 +10,7 @@ import {
   defaultRiskPolicy,
 } from "./lib/intake.mjs";
 import { runIntakeWizard } from "./lib/intake-wizard.mjs";
+import { connectorsTemplate } from "./lib/connectors.mjs";
 
 const markdownTemplates = {
   ".ai-maintainer/threat-model.md": `# Threat Model
@@ -95,6 +96,7 @@ export function initAudit(projectRoot) {
   safeWrite(root, ".ai-maintainer/evidence-sources.yml", yamlTemplate(defaultEvidenceSources), result);
   safeWrite(root, ".ai-maintainer/business-flows.yml", yamlTemplate(defaultBusinessFlows), result);
   safeWrite(root, ".ai-maintainer/risk-policy.yml", yamlTemplate(defaultRiskPolicy), result);
+  safeWrite(root, ".ai-maintainer/connectors.yml", connectorsTemplate(), result);
   for (const [relativePath, content] of Object.entries(markdownTemplates)) safeWrite(root, relativePath, content, result);
 
   return result;

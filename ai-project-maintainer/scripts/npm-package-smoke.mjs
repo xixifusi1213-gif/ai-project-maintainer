@@ -89,6 +89,16 @@ if (!doctor.stdout.includes("AI Project Maintainer Doctor")) {
   throw new Error(`Doctor smoke did not print the expected report:\n${doctor.stdout}\n${doctor.stderr}`);
 }
 
+const connectorsDoctor = runBin(tempRoot, ["connectors", "doctor", projectDir]);
+if (!connectorsDoctor.stdout.includes("providers")) {
+  throw new Error(`Connectors doctor smoke did not print the expected report:\n${connectorsDoctor.stdout}\n${connectorsDoctor.stderr}`);
+}
+
+const evidence = runBin(tempRoot, ["evidence", projectDir, "--output", "reports/evidence-report.json"]);
+if (!evidence.stdout.includes("connectorsEnabled")) {
+  throw new Error(`Evidence smoke did not print the expected report:\n${evidence.stdout}\n${evidence.stderr}`);
+}
+
 const wizardDryRun = runBin(tempRoot, ["init-audit", projectDir, "--wizard", "--dry-run"], { allowNonZero: true });
 if (wizardDryRun.status !== 0 || !wizardDryRun.stdout.includes("Project Intake Summary") || fs.existsSync(path.join(projectDir, ".ai-maintainer"))) {
   throw new Error(`Wizard dry-run smoke failed:\n${wizardDryRun.stdout}\n${wizardDryRun.stderr}`);

@@ -75,6 +75,14 @@ export const defaultRiskPolicy = {
     block_on_user_decisions: false,
     require_intake: false,
   },
+  production_evidence: {
+    block_on_missing_release_approval: false,
+    block_on_missing_error_monitoring: false,
+    block_on_missing_alerting: false,
+    block_on_missing_database_governance: false,
+    block_on_missing_deployment_evidence: false,
+    block_on_connector_auth_failure: false,
+  },
 };
 
 function isPlainObject(value) {
