@@ -64,12 +64,14 @@ test("reports distinguish pass, warnings, gaps, and failures", () => {
 
   const pass = buildJsonReport({ ...base, checks: [{ name: "package test", group: "tests", status: "pass", blocking: false }] });
   const warnings = buildJsonReport({ ...base, checks: [{ name: "scorecard", group: "oss-hygiene", status: "fail", blocking: false, coverageGap: false }] });
+  const explicitWarn = buildJsonReport({ ...base, checks: [{ name: "production evidence: sentry release tracking", group: "production-evidence", status: "WARN", blocking: false, coverageGap: false }] });
   const gaps = buildJsonReport({ ...base, checks: [{ name: "production audit: alerts", group: "production-audit", status: "GAP", blocking: false, coverageGap: true }] });
   const decisions = buildJsonReport({ ...base, checks: [{ name: "production audit: core flows", group: "production-audit", status: "USER_DECISION", blocking: false }] });
   const fail = buildJsonReport({ ...base, checks: [{ name: "semgrep static scan", group: "sast", status: "fail", blocking: true }] });
 
   assert.equal(pass.overallStatus, "PASS");
   assert.equal(warnings.overallStatus, "PASS_WITH_WARNINGS");
+  assert.equal(explicitWarn.overallStatus, "PASS_WITH_WARNINGS");
   assert.equal(gaps.overallStatus, "PASS_WITH_GAPS");
   assert.equal(decisions.overallStatus, "PASS_WITH_GAPS");
   assert.equal(fail.overallStatus, "FAIL");

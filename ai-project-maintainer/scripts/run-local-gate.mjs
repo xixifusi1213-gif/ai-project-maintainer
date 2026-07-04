@@ -6,6 +6,7 @@ import { buildAuditPlan } from "./audit-plan.mjs";
 import { detectProject } from "./lib/project-detect.mjs";
 import { getToolVersions } from "./lib/command-runner.mjs";
 import { runRegisteredChecks } from "./lib/check-registry.mjs";
+import { applyEvidenceToAudit, evidenceChecks, runEvidence } from "./lib/connectors.mjs";
 import { loadIntake } from "./lib/intake.mjs";
 import { applyPolicy, loadPolicyBundle } from "./lib/policy.mjs";
 import { buildJsonReport, toMarkdown, writeReportFiles } from "./lib/report.mjs";
@@ -55,7 +56,7 @@ function productionAuditChecks(audit, intake) {
     }));
 }
 
-export function runLocalGate(projectRoot, options = {}) {
+function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) {
   const root = path.resolve(projectRoot || process.cwd());
   const outputPath = resolveOutputPath(root, options.outputPath);
   const writeReports = Boolean(options.writeReports);
@@ -64,7 +65,7 @@ export function runLocalGate(projectRoot, options = {}) {
   const project = detectProject(root);
   const policyBundle = loadPolicyBundle(root);
   const intake = options.production ? loadIntake(root, project) : null;
-  const audit = options.production ? buildAuditPlan(project, intake) : null;
+  const audit = options.production ? applyEvidenceToAudit(buildAuditPlan(project, intake), evidenceReport) : null;
   const checks = runRegisteredChecks(project, {
     strict: Boolean(options.strict),
     release: Boolean(options.release),
@@ -72,7 +73,9 @@ export function runLocalGate(projectRoot, options = {}) {
     runnerOptions: options.runnerOptions || {},
     sbomOutputPath,
     policy: policyBundle.policy,
-  }).concat(productionAuditChecks(audit, intake));
+  })
+    .concat(productionAuditChecks(audit, intake))
+    .concat(evidenceChecks(evidenceReport, intake?.riskPolicy || {}));
   const policyResult = applyPolicy(checks, policyBundle);
   const toolVersions = getToolVersions(versionedTools, options.runnerOptions || {});
   const report = buildJsonReport({
@@ -89,6 +92,7 @@ export function runLocalGate(projectRoot, options = {}) {
     toolVersions,
     invalidExceptions: policyResult.invalidExceptions,
     audit,
+    evidence: evidenceReport,
   });
 
   if (writeReports) {
@@ -99,6 +103,22 @@ export function runLocalGate(projectRoot, options = {}) {
   return report;
 }
 
+export function runLocalGate(projectRoot, options = {}) {
+  if (options.connectors) {
+    throw new Error("runLocalGate is synchronous; use runLocalGateAsync for --connectors.");
+  }
+  return buildLocalGateReport(projectRoot, options, null);
+}
+
+export async function runLocalGateAsync(projectRoot, options = {}) {
+  if (!options.connectors) return runLocalGate(projectRoot, options);
+  const evidenceReport = await runEvidence(projectRoot || process.cwd(), {
+    env: options.env || process.env,
+    fetch: options.fetch || globalThis.fetch,
+  });
+  return buildLocalGateReport(projectRoot, options, evidenceReport);
+}
+
 function parseArgs(args) {
   const positional = [];
   const parsed = {
@@ -107,6 +127,7 @@ function parseArgs(args) {
     jsonOnly: false,
     noTests: false,
     production: false,
+    connectors: false,
     outputPath: null,
   };
 
@@ -117,6 +138,7 @@ function parseArgs(args) {
     else if (arg === "--json") parsed.jsonOnly = true;
     else if (arg === "--no-tests") parsed.noTests = true;
     else if (arg === "--production") parsed.production = true;
+    else if (arg === "--connectors") parsed.connectors = true;
     else if (arg === "--output") parsed.outputPath = args[++i];
     else if (arg.startsWith("--output=")) parsed.outputPath = arg.slice("--output=".length);
     else if (!arg.startsWith("--")) positional.push(arg);
@@ -126,13 +148,14 @@ function parseArgs(args) {
   return parsed;
 }
 
-function main() {
+async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const report = runLocalGate(args.projectRoot, {
+  const report = await runLocalGateAsync(args.projectRoot, {
     strict: args.strict,
     release: args.release,
     noTests: args.noTests,
     production: args.production,
+    connectors: args.connectors,
     outputPath: args.outputPath,
     writeReports: true,
   });
@@ -147,5 +170,8 @@ function main() {
 }
 
 if (import.meta.url === pathToFileURL(fileURLToPath(import.meta.url)).href && process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(2);
+  });
 }

@@ -155,6 +155,40 @@ npx ai-project-maintainer init-audit "E:\my-project" --wizard --dry-run
 
 The CLI asks deterministic questions and writes YAML. It does not call OpenAI APIs. When used from Codex, the `ai-project-maintainer` skill can explain each question, ask follow-ups, and then let the CLI write the same files.
 
+## Optional Production Evidence Connectors
+
+By default, the tool is account-free and does not call production platforms. v0.7.0 adds optional read-only connectors for projects that want stronger production evidence:
+
+```powershell
+npx ai-project-maintainer connectors doctor "E:\my-project"
+npx ai-project-maintainer evidence "E:\my-project" --output reports/evidence-report.json
+npx ai-project-maintainer gate "E:\my-project" --production --connectors --strict --release --output reports/security-report.json
+```
+
+v0.7.0 implements GitHub Environments, Sentry, Vercel, Grafana, Prometheus, Bytebase, Atlas local migration lint, Cloudflare Pages, Render, and Fly. Each connector is opt-in and read-only. Missing tokens or unreadable APIs become `GAP` by default, not hidden success.
+
+Tokens stay in environment variables, never in `.ai-maintainer/connectors.yml`:
+
+```yaml
+connectors:
+  github:
+    enabled: true
+    token_env: GITHUB_TOKEN
+    owner: your-org
+    repo: your-repo
+    environment: production
+  grafana:
+    enabled: true
+    token_env: GRAFANA_TOKEN
+    base_url: https://grafana.example.com
+  atlas:
+    enabled: true
+    migrations_dir: migrations
+    dev_url_env: ATLAS_DEV_URL
+```
+
+The connectors only read evidence. They do not deploy, roll back, change environment variables, modify databases, or create alerts. Missing tokens or unavailable APIs become `GAP` by default, unless your risk policy explicitly blocks missing production evidence.
+
 The user supplies business facts and evidence locations. The tool decides which checks apply and labels every item clearly:
 
 ```text
@@ -225,6 +259,7 @@ node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile 
 node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project" --wizard
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --connectors --strict --release --output reports/security-report.json
 node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
 ```
 
@@ -239,6 +274,9 @@ It is designed for the practical middle ground: a personal developer or small te
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
 - [Real OSS case studies](docs/CASE-STUDIES.md)
+- [Production evidence connectors](docs/CONNECTORS.md)
+- [生产证据连接器](docs/CONNECTORS.zh-CN.md)
+- [Live connector validation](docs/LIVE-CONNECTOR-VALIDATION.zh-CN.md)
 - [Before/after case](docs/demo-output/before-after-case.md)
 - [Security workflow](docs/SECURITY-WORKFLOW.md)
 - [Production audit workflow](docs/PRODUCTION-AUDIT.zh-CN.md)

@@ -21,6 +21,7 @@ test("initAudit creates production audit templates without secrets", () => {
     ".ai-maintainer/evidence-sources.yml",
     ".ai-maintainer/business-flows.yml",
     ".ai-maintainer/risk-policy.yml",
+    ".ai-maintainer/connectors.yml",
     ".ai-maintainer/threat-model.md",
     ".ai-maintainer/release-checklist.yml",
     ".ai-maintainer/incident-runbook.md",
@@ -40,6 +41,10 @@ test("initAudit creates production audit templates without secrets", () => {
 
   const evidenceText = fs.readFileSync(path.join(root, ".ai-maintainer", "evidence-sources.yml"), "utf8");
   assert.doesNotMatch(evidenceText, /token|password|secret|dsn/i);
+
+  const connectorsText = fs.readFileSync(path.join(root, ".ai-maintainer", "connectors.yml"), "utf8");
+  assert.match(connectorsText, /token_env: GITHUB_TOKEN/);
+  assert.doesNotMatch(connectorsText, /ghp_|xoxb-|password:/i);
 });
 
 test("initAudit does not overwrite user-maintained intake files", () => {

@@ -1,6 +1,6 @@
 {
   "name": "ai-project-maintainer",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Production-readiness audit and CI gate for AI-coded projects.",
   "type": "module",
   "license": "MIT",
@@ -48,7 +48,8 @@
     "test": "node --test",
     "check": "node ai-project-maintainer/scripts/check-syntax.mjs",
     "cases:verify": "node examples/oss-case-studies/run-oss-case-studies.mjs --verify",
-    "smoke:npm": "node ai-project-maintainer/scripts/npm-package-smoke.mjs"
+    "smoke:npm": "node ai-project-maintainer/scripts/npm-package-smoke.mjs",
+    "smoke:connectors:live": "node ai-project-maintainer/scripts/live-connector-smoke.mjs"
   },
   "dependencies": {
     "yaml": "2.9.0"
