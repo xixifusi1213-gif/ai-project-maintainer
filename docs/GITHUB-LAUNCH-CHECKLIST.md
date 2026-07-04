@@ -9,7 +9,7 @@ Open the repository page and click the gear icon in the About panel.
 Description:
 
 ```text
-Production-readiness audit and CI gate for AI-coded projects.
+Release readiness gate for AI-coded projects.
 ```
 
 Topics:

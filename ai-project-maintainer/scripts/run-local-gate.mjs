@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { buildAuditPlan } from "./audit-plan.mjs";
+import { scanAgentRisk } from "./lib/agent-risk.mjs";
 import { detectProject } from "./lib/project-detect.mjs";
 import { getToolVersions } from "./lib/command-runner.mjs";
 import { runRegisteredChecks } from "./lib/check-registry.mjs";
@@ -66,10 +67,13 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
   const policyBundle = loadPolicyBundle(root);
   const intake = options.production ? loadIntake(root, project) : null;
   const audit = options.production ? applyEvidenceToAudit(buildAuditPlan(project, intake), evidenceReport) : null;
+  const agentRisk = options.agentRisk ? scanAgentRisk(project) : null;
   const checks = runRegisteredChecks(project, {
     strict: Boolean(options.strict),
     release: Boolean(options.release),
     noTests: Boolean(options.noTests),
+    agentRisk: Boolean(options.agentRisk),
+    agentRiskReport: agentRisk,
     runnerOptions: options.runnerOptions || {},
     sbomOutputPath,
     policy: policyBundle.policy,
@@ -85,6 +89,7 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
       release: Boolean(options.release),
       noTests: Boolean(options.noTests),
       production: Boolean(options.production),
+      agentRisk: Boolean(options.agentRisk),
       policy: policyBundle.policy.mode,
     },
     probe: project,
@@ -93,6 +98,7 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
     invalidExceptions: policyResult.invalidExceptions,
     audit,
     evidence: evidenceReport,
+    agentRisk,
   });
 
   if (writeReports) {
@@ -128,6 +134,7 @@ function parseArgs(args) {
     noTests: false,
     production: false,
     connectors: false,
+    agentRisk: false,
     outputPath: null,
   };
 
@@ -139,6 +146,7 @@ function parseArgs(args) {
     else if (arg === "--no-tests") parsed.noTests = true;
     else if (arg === "--production") parsed.production = true;
     else if (arg === "--connectors") parsed.connectors = true;
+    else if (arg === "--agent-risk") parsed.agentRisk = true;
     else if (arg === "--output") parsed.outputPath = args[++i];
     else if (arg.startsWith("--output=")) parsed.outputPath = arg.slice("--output=".length);
     else if (!arg.startsWith("--")) positional.push(arg);
@@ -156,6 +164,7 @@ async function main() {
     noTests: args.noTests,
     production: args.production,
     connectors: args.connectors,
+    agentRisk: args.agentRisk,
     outputPath: args.outputPath,
     writeReports: true,
   });

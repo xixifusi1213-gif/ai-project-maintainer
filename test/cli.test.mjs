@@ -13,7 +13,7 @@ test("package exposes ai-project-maintainer npm bin", () => {
   assert.equal(pkg.bin["ai-project-maintainer"], "ai-project-maintainer/scripts/cli.mjs");
 });
 
-test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
+test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands", () => {
   assert.deepEqual(parseCliArgs(["--version"]), {
     command: "version",
     args: {},
@@ -44,6 +44,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
       jsonOnly: false,
       production: false,
       connectors: false,
+      agentRisk: false,
       outputPath: "reports/security-report.json",
     },
   });
@@ -58,7 +59,32 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
       jsonOnly: false,
       production: true,
       connectors: false,
+      agentRisk: false,
       outputPath: null,
+    },
+  });
+
+  assert.deepEqual(parseCliArgs(["gate", "E:\\my-project", "--agent-risk", "--strict"]), {
+    command: "gate",
+    args: {
+      projectRoot: "E:\\my-project",
+      strict: true,
+      release: false,
+      noTests: false,
+      jsonOnly: false,
+      production: false,
+      connectors: false,
+      agentRisk: true,
+      outputPath: null,
+    },
+  });
+
+  assert.deepEqual(parseCliArgs(["agent-risk", "E:\\my-project", "--output", "reports/agent-risk-report.json"]), {
+    command: "agent-risk",
+    args: {
+      projectRoot: "E:\\my-project",
+      outputPath: "reports/agent-risk-report.json",
+      jsonOnly: false,
     },
   });
 
@@ -85,7 +111,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "0.8.0");
+  assert.equal(pkg.version, "0.9.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

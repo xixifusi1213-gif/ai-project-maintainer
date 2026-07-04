@@ -59,6 +59,18 @@ export const standardsSources = [
     url: "https://dora.dev/research/",
     summary: "Software delivery and operational performance research, including continuous delivery and recovery capabilities.",
   },
+  {
+    id: "owasp-llm-top-10",
+    title: "OWASP Top 10 for LLM Applications",
+    url: "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+    summary: "LLM application risk categories including prompt injection, sensitive information disclosure, supply-chain risk, and excessive agency.",
+  },
+  {
+    id: "owasp-agentic-ai",
+    title: "OWASP Agentic AI Threats and Mitigations",
+    url: "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+    summary: "Threat model and mitigations for agents that can use tools, access resources, and take actions.",
+  },
 ];
 
 const refs = new Map(standardsSources.map((source) => [source.id, source]));
@@ -99,6 +111,7 @@ const groupMappings = {
     ref("cis-control-11"),
     ref("nist-sp-800-34"),
   ],
+  "agent-risk": [ref("owasp-llm-top-10"), ref("owasp-agentic-ai"), ref("nist-ssdf"), ref("owasp-samm")],
 };
 
 const checkIdMappings = [
@@ -112,6 +125,7 @@ const checkIdMappings = [
   [/database|migration|bytebase|atlas|squawk/i, [ref("owasp-samm"), ref("google-sre-release")]],
   [/backup|rollback|recovery/i, [ref("cis-control-11"), ref("nist-sp-800-34"), ref("google-sre-release")]],
   [/deployment|runtime/i, [ref("google-sre-release"), ref("dora")]],
+  [/agent|mcp|prompt|codex|claude|cursor/i, [ref("owasp-llm-top-10"), ref("owasp-agentic-ai"), ref("nist-ssdf")]],
 ];
 
 function statusKey(status) {
@@ -145,7 +159,7 @@ export function evidenceLevelForCheck(check) {
     if (status === "user_decision") return "USER_REPORTED";
     return "INFERRED";
   }
-  if (check.command || ["tests", "secrets", "dependencies", "sast", "supply-chain", "ci-security", "iac", "database", "electron", "oss-hygiene"].includes(check.group)) {
+  if (check.command || ["tests", "secrets", "dependencies", "sast", "supply-chain", "ci-security", "iac", "database", "electron", "oss-hygiene", "agent-risk"].includes(check.group)) {
     return "TOOL_VERIFIED";
   }
   return "INFERRED";

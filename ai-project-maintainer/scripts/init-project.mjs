@@ -19,6 +19,7 @@ checks:
   scorecard: warn
   megalinter: warn
   pre-commit: warn
+  agent-risk: block
 fail_on:
   tests: true
   secrets: true
@@ -27,6 +28,7 @@ fail_on:
   trivy_unavailable: true
   electron_dangerous_settings: true
   ci_security_high: true
+  agent_high_risk: true
 warn_on:
   dev_dependency_vulnerabilities: true
   missing_optional_tools: true
@@ -137,7 +139,7 @@ jobs:
           if [ -f ".ai-maintainer/project-profile.yml" ]; then
             EXTRA_FLAGS="$EXTRA_FLAGS --production"
           fi
-          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release $EXTRA_FLAGS --output reports/security-report.json
+          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --agent-risk $EXTRA_FLAGS --output reports/security-report.json
 
       - name: Write gate summary
         if: always()

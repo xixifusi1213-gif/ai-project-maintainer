@@ -20,6 +20,7 @@ export const defaultPolicy = {
     scorecard: "warn",
     megalinter: "warn",
     "pre-commit": "warn",
+    "agent-risk": "block",
   },
   fail_on: {
     tests: true,
@@ -29,6 +30,7 @@ export const defaultPolicy = {
     trivy_unavailable: true,
     electron_dangerous_settings: true,
     ci_security_high: true,
+    agent_high_risk: true,
   },
   warn_on: {
     dev_dependency_vulnerabilities: true,
@@ -127,6 +129,7 @@ function policyKeyForCheck(check) {
   if (check.group === "sast") return "semgrep_blocking";
   if (check.group === "electron") return "electron_dangerous_settings";
   if (check.group === "ci-security") return "ci_security_high";
+  if (check.group === "agent-risk") return "agent_high_risk";
   if (check.group === "dependencies" && check.name?.includes("trivy") && ["error", "missing"].includes(check.status)) return "trivy_unavailable";
   if (check.group === "dependencies" || check.group === "supply-chain") return "dependency_high_or_critical";
   return null;

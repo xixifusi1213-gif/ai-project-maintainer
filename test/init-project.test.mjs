@@ -19,7 +19,10 @@ test("initProject creates safety gate config and workflow", () => {
   assert.equal(result.created.includes(".github/workflows/security-gate.yml"), true);
   assert.equal(result.created.includes(".pre-commit-config.yaml"), true);
   assert.equal(fs.existsSync(path.join(root, "reports", ".gitkeep")), true);
-  assert.match(fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8"), /include_coverage_gaps: false/);
+  const policy = fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8");
+  assert.match(policy, /include_coverage_gaps: false/);
+  assert.match(policy, /agent-risk: block/);
+  assert.match(policy, /agent_high_risk: true/);
 });
 
 test("initProject does not overwrite existing policy", () => {
@@ -46,10 +49,13 @@ test("initProject oss github profile creates GitHub-source CI, dependabot, and p
   assert.match(policy, /profile: oss/);
   assert.match(policy, /scorecard: warn/);
   assert.match(policy, /megalinter: warn/);
+  assert.match(policy, /agent-risk: block/);
+  assert.match(policy, /agent_high_risk: true/);
   assert.match(workflow, /git clone --depth 1 https:\/\/github\.com\/xixifusi1213-gif\/ai-project-maintainer\.git/);
   assert.match(workflow, /npm ci --omit=dev \|\| npm install --omit=dev/);
   assert.match(workflow, /EXTRA_FLAGS="\$EXTRA_FLAGS --production"/);
   assert.match(workflow, /node "\$RUNNER_TEMP\/ai-project-maintainer\/ai-project-maintainer\/scripts\/run-local-gate\.mjs"/);
+  assert.match(workflow, /--agent-risk/);
   assert.doesNotMatch(workflow, /npx ai-project-maintainer gate/);
   assert.match(workflow, /GITHUB_STEP_SUMMARY/);
   assert.match(workflow, /upload-sarif/);
