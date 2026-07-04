@@ -18,6 +18,8 @@ It is not a certification, compliance claim, audit opinion, or guarantee that a 
 | [CIS Control 11: Data Recovery](https://www.cisecurity.org/controls/data-recovery) | Backup and recovery expectations. |
 | [NIST SP 800-34 Rev. 1](https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final) | Contingency planning, recovery, and continuity practices. |
 | [DORA research](https://dora.dev/research/) | Delivery performance, recovery, and continuous delivery capabilities. |
+| [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | Prompt injection, sensitive information disclosure, supply-chain risk, and excessive agency in LLM-backed systems. |
+| [OWASP Agentic AI Threats and Mitigations](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/) | Threats and mitigations for agents that use tools, access resources, and take actions. |
 
 ## Gate Mapping
 
@@ -33,6 +35,7 @@ It is not a certification, compliance claim, audit opinion, or guarantee that a 
 | Monitoring, logs, metrics, and alerts | `production-audit`, `production-evidence` | Google SRE Monitoring, Google SRE Embracing Risk |
 | Backup, rollback, and recovery | `production-audit` | CIS Control 11, NIST SP 800-34, Google SRE Release Engineering |
 | Risk acceptance | `production-audit` `USER_DECISION` | Google SRE Embracing Risk |
+| AI agent and MCP risk | `agent-risk` | OWASP Top 10 for LLM Applications, OWASP Agentic AI, NIST SSDF, OWASP SAMM |
 
 ## How Reports Use This
 

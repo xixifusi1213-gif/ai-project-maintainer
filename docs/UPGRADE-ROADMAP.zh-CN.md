@@ -10,6 +10,14 @@
 
 ## 已完成基线
 
+### v0.9.0：AI Agent / MCP / Codex 使用风险检查
+
+- 新增 `agent-risk` 命令，生成 `reports/agent-risk-report.json` 和 `reports/agent-risk-report.md`。
+- `gate --agent-risk` 可把 AI agent 风险并入主发布门禁。
+- 检查 MCP、Codex、Claude、Cursor、agent 配置中的过宽权限、明文 token、危险指令、prompt injection 文本和危险脚本。
+- 本地只读，不调用 OpenAI/Codex API，不启动 MCP server，不执行项目脚本。
+- 报告新增 `agentRisk` 字段，并映射到 OWASP LLM Top 10、OWASP Agentic AI、NIST SSDF、OWASP SAMM。
+
 ### v0.8.0：权威标准映射与信任证据层
 
 - 新增 `TRUST.md`、`DESIGN.md`、`docs/STANDARDS-CROSSWALK.md`。
@@ -48,39 +56,6 @@
 - 明确 `PASS_WITH_GAPS` 表示“无阻断项但仍有生产证据缺口”，不是上线背书。
 
 ## 后续优先路线
-
-### v0.9.0：AI Agent / MCP / Codex 使用风险检查
-
-这是下一步最高优先级，因为它最能区别于普通安全扫描器。
-
-目标：检查“让 AI agent 维护项目”本身带来的权限和提示注入风险。
-
-建议能力：
-
-- 新增 `agent-risk` 命令：
-  ```powershell
-  npx ai-project-maintainer agent-risk "E:\my-project"
-  ```
-- `gate` 可选集成：
-  ```powershell
-  npx ai-project-maintainer gate "E:\my-project" --agent-risk --strict
-  ```
-- 检查 MCP、Codex、Claude、Cursor、agent 配置中是否存在过宽文件/网络/命令权限。
-- 检查 `.env`、MCP 配置、agent 配置、脚本里是否可能把 token 暴露给 AI 工具。
-- 检查 README、issue 模板、docs、外部抓取内容中是否有明显 prompt injection 指令。
-- 检查 package scripts、preinstall/postinstall、CI 脚本是否容易被 AI 误触发危险命令。
-- 输出：
-  ```text
-  reports/agent-risk-report.json
-  reports/agent-risk-report.md
-  ```
-
-成功标准：
-
-- 能解释哪些风险来自代码，哪些来自 agent 权限配置。
-- 不读取或输出真实 token。
-- 默认只报告风险，不自动修改 agent 权限。
-- 能被 Codex 用作“修复前安全上下文”。
 
 ### v0.10.0：项目类型 Profile 规则包
 
@@ -182,7 +157,7 @@ v1.0 不应只是再加功能，而应成为可信正式版。
 
 v1.0 宣传语：
 
-> Production maintenance evidence gate for AI-coded projects.
+> Release readiness gate for AI-coded projects.
 
 ## 暂不优先
 

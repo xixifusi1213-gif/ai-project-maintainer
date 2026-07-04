@@ -37,7 +37,7 @@
   <rect width="1280" height="720" fill="url(#bg)"/>
   <rect x="72" y="56" width="1136" height="560" rx="28" fill="#111827" opacity="0.93" stroke="#334155" stroke-width="2"/>
   <text x="120" y="124" class="label">AI Project Maintainer</text>
-  <text x="120" y="168" class="subtitle">90-second production-readiness demo for AI-coded projects</text>
+  <text x="120" y="168" class="subtitle">90-second release readiness demo for AI-coded projects</text>
 
   <g id="s1" class="panel">
     <text x="120" y="245" class="body">1. Start with project profile</text>

@@ -6,6 +6,7 @@ The tool is trusted only to the extent that its evidence is reproducible:
 
 - local commands ran and recorded their result
 - third-party scanners produced deterministic findings
+- AI agent and MCP risk checks inspected local repository configuration without executing agents
 - production platforms were queried through read-only connectors
 - missing evidence stayed visible as `GAP`
 - user-owned risk decisions stayed visible as `USER_DECISION`
@@ -29,6 +30,7 @@ Reports label checks with an evidence level:
 ## What the Tool Does Not Do
 
 - It does not host user tokens.
+- It does not start MCP servers, call model APIs, or prove that an AI provider is safe.
 - It does not deploy, roll back, create alerts, modify cloud configuration, or change databases.
 - It does not replace secure design review, penetration testing, compliance assessment, or incident response ownership.
 - It does not prove that business behavior is correct when the project has no meaningful tests.

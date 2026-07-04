@@ -16,6 +16,7 @@ import {
   runTrivyFilesystemChecks,
   runZizmorChecks,
 } from "./checks.mjs";
+import { runAgentRiskChecks as runAgentRiskChecksFromScanner } from "./agent-risk.mjs";
 
 const builtinCheckRegistry = [
   { id: "tests", group: "tests", title: "Project tests and release scripts", requiredTools: ["npm", "pnpm", "yarn", "bun"], detect: (project) => Boolean(project.packageJson), run: ({ project, options }) => runTestChecks(project, options), defaultLevel: "block" },
@@ -34,6 +35,7 @@ const builtinCheckRegistry = [
   { id: "scorecard", group: "oss-hygiene", title: "OpenSSF Scorecard", requiredTools: ["scorecard"], detect: () => true, run: ({ project, options }) => runScorecardChecks(project, options), defaultLevel: "warn" },
   { id: "pre-commit", group: "oss-hygiene", title: "pre-commit hooks", requiredTools: ["pre-commit"], detect: () => true, run: ({ project, options }) => runPreCommitChecks(project, options), defaultLevel: "warn" },
   { id: "megalinter", group: "oss-hygiene", title: "MegaLinter security profile", requiredTools: ["mega-linter-runner"], detect: () => true, run: ({ project, options }) => runMegaLinterChecks(project, options), defaultLevel: "warn" },
+  { id: "agent-risk", group: "agent-risk", title: "AI agent and MCP risk", requiredTools: [], detect: (_project, options) => Boolean(options.agentRisk), run: ({ project, options }) => runAgentRiskChecksFromScanner(project, options), defaultLevel: "block" },
 ];
 
 export function getBuiltinCheckRegistry() {

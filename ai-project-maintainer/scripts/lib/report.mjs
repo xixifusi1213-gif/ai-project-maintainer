@@ -66,6 +66,7 @@ export function buildJsonReport({
   checks,
   audit = null,
   evidence = null,
+  agentRisk = null,
   toolVersions = {},
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
@@ -99,6 +100,7 @@ export function buildJsonReport({
     probe,
     audit,
     evidence,
+    agentRisk,
     standards: buildStandardsSummary(enrichedChecks),
     blockers,
     warnings,
@@ -184,6 +186,30 @@ export function toMarkdown(report) {
     if (!(report.evidence.items || []).length) lines.push("- None");
     for (const item of report.evidence.items || []) {
       lines.push(`- ${item.status} ${item.title}: ${item.summary}${item.recommendation ? ` Recommendation: ${item.recommendation}` : ""}`);
+    }
+    lines.push("");
+  }
+
+  if (report.agentRisk) {
+    lines.push("## AI Agent Risk");
+    lines.push(`Status: ${report.agentRisk.status}`);
+    lines.push("");
+    lines.push("### Surfaces");
+    if (!(report.agentRisk.surfaces || []).length) lines.push("- None");
+    for (const surface of report.agentRisk.surfaces || []) {
+      lines.push(`- ${surface.type}: ${surface.path}`);
+    }
+    lines.push("");
+    lines.push("### Findings");
+    if (!(report.agentRisk.findings || []).length) lines.push("- None");
+    for (const finding of report.agentRisk.findings || []) {
+      lines.push(`- ${finding.status} ${finding.name}: ${finding.summary}`);
+    }
+    lines.push("");
+    lines.push("### Coverage Gaps");
+    if (!(report.agentRisk.coverageGaps || []).length) lines.push("- None");
+    for (const gap of report.agentRisk.coverageGaps || []) {
+      lines.push(`- ${gap.name}: ${gap.summary}`);
     }
     lines.push("");
   }

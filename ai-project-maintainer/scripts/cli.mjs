@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runAgentRisk, toAgentRiskMarkdown } from "./lib/agent-risk.mjs";
 import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { initAudit, initAuditWizard } from "./init-audit.mjs";
@@ -71,7 +72,19 @@ export function parseCliArgs(argv) {
         jsonOnly: rest.includes("--json"),
         production: rest.includes("--production"),
         connectors: rest.includes("--connectors"),
+        agentRisk: rest.includes("--agent-risk"),
         outputPath: readOption(rest, "--output", null),
+      },
+    };
+  }
+
+  if (command === "agent-risk") {
+    return {
+      command,
+      args: {
+        projectRoot: firstPositional(rest, ["--output"]) || process.cwd(),
+        outputPath: readOption(rest, "--output", null),
+        jsonOnly: rest.includes("--json"),
       },
     };
   }
@@ -182,11 +195,22 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       release: parsed.args.release,
         noTests: parsed.args.noTests,
         production: parsed.args.production,
+        agentRisk: parsed.args.agentRisk,
         connectors: false,
         outputPath: parsed.args.outputPath,
         writeReports: true,
       });
     io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : toMarkdown(report)}\n`);
+    return report.passed ? 0 : 1;
+  }
+
+  if (parsed.command === "agent-risk") {
+    const outputPath = parsed.args.outputPath || path.resolve(parsed.args.projectRoot, "reports", "agent-risk-report.json");
+    const report = runAgentRisk(parsed.args.projectRoot, {
+      outputPath,
+      writeReports: true,
+    });
+    io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : toAgentRiskMarkdown(report)}\n`);
     return report.passed ? 0 : 1;
   }
 
@@ -225,7 +249,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     return 0;
   }
 
-  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|connectors|evidence|summary> [options]\n");
+  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|agent-risk|connectors|evidence|summary> [options]\n");
   io.stderr.write("       ai-project-maintainer --version\n");
   return 2;
 }
@@ -239,6 +263,7 @@ export async function runCliAsync(argv = process.argv.slice(2), io = { stdout: p
         release: parsed.args.release,
         noTests: parsed.args.noTests,
         production: parsed.args.production,
+        agentRisk: parsed.args.agentRisk,
         connectors: true,
         outputPath: parsed.args.outputPath,
         writeReports: true,

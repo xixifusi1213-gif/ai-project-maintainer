@@ -63,6 +63,7 @@ test("connectors CLI arguments parse doctor, evidence, and gate --connectors", (
       jsonOnly: false,
       production: true,
       connectors: true,
+      agentRisk: false,
       outputPath: null,
     },
   });

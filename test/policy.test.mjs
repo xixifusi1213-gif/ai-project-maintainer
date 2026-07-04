@@ -20,6 +20,8 @@ test("missing policy uses strict defaults", () => {
 
   assert.equal(bundle.policy.mode, "strict");
   assert.equal(bundle.policy.fail_on.secrets, true);
+  assert.equal(bundle.policy.checks["agent-risk"], "block");
+  assert.equal(bundle.policy.fail_on.agent_high_risk, true);
   assert.equal(bundle.policy.reporting.code_scanning.include_coverage_gaps, false);
   assert.deepEqual(bundle.exceptions, []);
 });
@@ -173,4 +175,22 @@ test("policy check levels can warn or disable specific findings", () => {
   assert.equal(result.checks[0].policyLevel, "warn");
   assert.equal(result.checks[1].blocking, false);
   assert.equal(result.checks[1].policyLevel, "off");
+});
+
+test("policy can downgrade high-risk agent findings explicitly", () => {
+  const checks = [
+    { checkId: "agent-instruction-unsafe", name: "AI agent unsafe instruction", group: "agent-risk", status: "fail", blocking: true },
+  ];
+  const result = applyPolicy(checks, {
+    policy: {
+      mode: "strict",
+      checks: { "agent-risk": "block" },
+      fail_on: { agent_high_risk: false },
+      warn_on: {},
+    },
+    exceptions: [],
+  });
+
+  assert.equal(result.checks[0].blocking, false);
+  assert.equal(result.checks[0].policyDowngrade, "fail_on.agent_high_risk=false");
 });

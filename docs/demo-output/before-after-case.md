@@ -83,7 +83,7 @@ The repository dogfoods the workflow:
 Use this case when posting about the project:
 
 ```text
-I built a production-readiness gate for AI-coded projects.
+I built a release readiness gate for AI-coded projects.
 
 The demo shows a broken AI-coded before state, failing business tests, the fixed after state, a production gate report, and a green GitHub Security workflow.
 

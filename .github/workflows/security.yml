@@ -115,7 +115,7 @@ jobs:
         run: scorecard --local . --format json > reports/scorecard.json || true
 
       - name: Run production security gate
-        run: node ai-project-maintainer/scripts/run-local-gate.mjs . --production --strict --release --output reports/security-report.json
+        run: node ai-project-maintainer/scripts/run-local-gate.mjs . --production --strict --release --agent-risk --output reports/security-report.json
 
       - name: Write gate summary
         if: always()

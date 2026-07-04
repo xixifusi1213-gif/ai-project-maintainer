@@ -69,6 +69,7 @@ test("security workflow is parseable and includes the heavy gate", () => {
   assert.equal(workflow.permissions["security-events"], "write");
   assert.equal(steps.includes("Install scanner CLIs"), true);
   assert.equal(steps.includes("Run production security gate"), true);
+  assert.match(workflowText, /--agent-risk/);
   assert.doesNotMatch(workflowText, /@latest/);
   assert.doesNotMatch(workflowText, /pip install --user semgrep zizmor checkov/);
   assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
@@ -83,6 +84,7 @@ test("README first-run links are readable and not mojibake", () => {
   assert.match(readme, /\[Real OSS cases\]\(docs\/CASE-STUDIES\.md\)/);
   assert.match(readme, /\[Chinese demo\]\(docs\/DEMO\.zh-CN\.md\)/);
   assert.match(readme, /\[Production evidence connectors\]\(docs\/CONNECTORS\.md\)/);
+  assert.match(readme, /\[AI agent risk checks\]\(docs\/AGENT-RISK\.md\)/);
   assert.match(readme, /30-Second Quickstart/);
   assert.match(readme, /PASS_WITH_GAPS/);
   assert.match(readme, /Optional Production Evidence Connectors/);
@@ -97,11 +99,12 @@ test("generated security workflow pins scanner versions", () => {
   assert.doesNotMatch(workflowText, /pip install --user semgrep zizmor checkov/);
   assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
   assert.match(workflowText, /OSV_SCANNER_VERSION: v2\.4\.0/);
+  assert.match(workflowText, /--agent-risk/);
 });
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "0.8.0");
+  assert.equal(packageJson.version, "0.9.0");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

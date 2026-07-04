@@ -8,6 +8,7 @@ Its design goal is narrow: make release readiness explicit enough that a maintai
 
 - Treat AI-generated code as untrusted until deterministic checks pass.
 - Prefer local, account-free checks first.
+- Check AI agent permissions and instructions before giving agents broad repository access.
 - Use mature scanners and platform APIs instead of inventing custom vulnerability detection.
 - Keep production connectors read-only.
 - Keep missing evidence visible as `GAP`.
@@ -30,3 +31,9 @@ Connectors only read facts such as release approval, deployment records, monitor
 The tool is not a compliance product. The standards mapping exists to show that the gate is based on recognized engineering practices rather than arbitrary AI-generated checklists.
 
 Each report can show which checks relate to secure software development, supply-chain integrity, monitoring, release engineering, recovery, and risk acceptance.
+
+## Why Agent Risk Checks Are Local-Only
+
+Agent risk checks review repository-side configuration: MCP server definitions, Codex/Claude/Cursor instructions, prompt-injection-like content, sensitive filenames, and dangerous scripts. They do not execute agents or MCP servers because the gate should be safe to run before trust has been established.
+
+The result is a preflight check for the maintenance workflow, not a certification of any model, hosted agent product, or third-party MCP service.

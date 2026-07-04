@@ -20,7 +20,7 @@ When you later create accounts for V2EX, Hacker News, Reddit, X/Twitter, Zhihu, 
 Description:
 
 ```text
-Production-readiness audit and CI gate for AI-coded projects.
+Release readiness gate for AI-coded projects.
 ```
 
 Topics:
@@ -50,7 +50,7 @@ Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/d
 ## English Short Post
 
 ```text
-I built AI Project Maintainer: a production-readiness gate for AI-coded projects.
+I built AI Project Maintainer: a release readiness gate for AI-coded projects.
 
 AI writes code fast, but shipping safely still needs tests, security checks, release evidence, monitoring gaps, and maintainer decisions.
 
@@ -65,7 +65,7 @@ npm: https://www.npmjs.com/package/ai-project-maintainer
 Title:
 
 ```text
-Show HN: AI Project Maintainer - production-readiness gate for AI-coded projects
+Show HN: AI Project Maintainer - release readiness gate for AI-coded projects
 ```
 
 Body:
@@ -127,7 +127,7 @@ npm: https://www.npmjs.com/package/ai-project-maintainer
 Suggested title:
 
 ```text
-I built a production-readiness gate for AI-coded projects
+I built a release readiness gate for AI-coded projects
 ```
 
 ## Launch Checklist

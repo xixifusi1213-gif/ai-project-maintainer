@@ -7,11 +7,11 @@
 [![CI](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml)
 [![Security](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml)
 
-**A production maintenance evidence gate for AI-coded projects.**
+**Release readiness gate for AI-coded projects.**
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Why trust this?](TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -39,9 +39,10 @@ Requires Node.js 20+.
 ```powershell
 npx ai-project-maintainer doctor --no-trivy-db
 npx ai-project-maintainer init ".\my-project" --profile oss --ci github
+npx ai-project-maintainer agent-risk ".\my-project"
 npx ai-project-maintainer init-audit ".\my-project" --wizard --dry-run
 npx ai-project-maintainer init-audit ".\my-project" --wizard
-npx ai-project-maintainer gate ".\my-project" --production --strict --release --output reports/security-report.json
+npx ai-project-maintainer gate ".\my-project" --production --agent-risk --strict --release --output reports/security-report.json
 ```
 
 `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
@@ -61,7 +62,7 @@ npx ai-project-maintainer init-audit "E:\my-project" --wizard
 npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
 
 # 4. Run the production gate
-npx ai-project-maintainer gate "E:\my-project" --production --strict --release --output reports/security-report.json
+npx ai-project-maintainer gate "E:\my-project" --production --agent-risk --strict --release --output reports/security-report.json
 ```
 
 GitHub Actions templates can either use the npm package or clone this repository directly.
@@ -123,6 +124,7 @@ The repository stores links, metadata, and generated reports. It does not vendor
 | Static security | Semgrep blocking findings |
 | Supply chain | Syft SBOM, Grype scan |
 | CI security | actionlint, zizmor |
+| AI agent risk | MCP permissions, Codex/Claude/Cursor instructions, prompt injection content, dangerous agent-runnable scripts |
 | IaC | Checkov, Trivy config |
 | Electron apps | dangerous webPreferences, preload/IPC/file-read risks |
 | Database projects | migration, backup, rollback, review-tool gaps |
@@ -189,6 +191,17 @@ connectors:
 
 The connectors only read evidence. They do not deploy, roll back, change environment variables, modify databases, or create alerts. Missing tokens or unavailable APIs become `GAP` by default, unless your risk policy explicitly blocks missing production evidence.
 
+## AI Agent Risk Checks
+
+v0.9.0 adds a local-only gate for the risks created by giving AI agents access to a repository:
+
+```powershell
+npx ai-project-maintainer agent-risk "E:\my-project"
+npx ai-project-maintainer gate "E:\my-project" --agent-risk --strict --release --output reports/security-report.json
+```
+
+It checks MCP config, Codex/Claude/Cursor instructions, prompt-injection-like repository text, sensitive filenames, package lifecycle scripts, and runnable project scripts. It never starts MCP servers, never calls OpenAI/Codex APIs, and never writes token values into reports.
+
 The user supplies business facts and evidence locations. The tool decides which checks apply and labels every item clearly:
 
 ```text
@@ -216,6 +229,8 @@ reports/security-report.json
 reports/security-report.md
 reports/security-report.sarif
 reports/sbom.cdx.json
+reports/agent-risk-report.json
+reports/agent-risk-report.md
 ```
 
 Reports include:
@@ -226,6 +241,7 @@ Reports include:
 - `standardRefs` and top-level `standards` crosswalk data
 - blockers and warnings
 - production evidence gaps
+- AI agent and MCP risk findings
 - user decisions still needed
 - tool versions and commands
 - exception usage
@@ -262,8 +278,9 @@ node .\ai-project-maintainer\scripts\doctor.mjs
 node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
 node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project" --wizard
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
-node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --strict --release --output reports/security-report.json
-node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --connectors --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\agent-risk.mjs "E:\my-project" --output reports/agent-risk-report.json
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --agent-risk --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --connectors --agent-risk --strict --release --output reports/security-report.json
 node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
 ```
 
