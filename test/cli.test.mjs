@@ -85,7 +85,7 @@ test("CLI parses doctor, init, audit, gate, and summary subcommands", () => {
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "0.7.0");
+  assert.equal(pkg.version, "0.8.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

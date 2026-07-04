@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { buildStandardsSummary, enrichChecksWithTrustMetadata } from "./standards.mjs";
 
 function stableStatus(status) {
   return status || "unknown";
@@ -69,11 +70,12 @@ export function buildJsonReport({
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
 }) {
-  const blockers = checks.filter((check) => check.blocking);
-  const warnings = checks.filter((check) => !check.blocking && ["fail", "error", "warn", "warning", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
-  const coverageGaps = checks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
-  const userDecisionCount = checks.filter((check) => statusKey(check.status) === "user_decision").length + (audit?.userDecisions || []).length;
-  const exceptionUsage = checks.filter((check) => check.exception).map((check) => ({
+  const enrichedChecks = enrichChecksWithTrustMetadata(checks);
+  const blockers = enrichedChecks.filter((check) => check.blocking);
+  const warnings = enrichedChecks.filter((check) => !check.blocking && ["fail", "error", "warn", "warning", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
+  const coverageGaps = enrichedChecks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
+  const userDecisionCount = enrichedChecks.filter((check) => statusKey(check.status) === "user_decision").length + (audit?.userDecisions || []).length;
+  const exceptionUsage = enrichedChecks.filter((check) => check.exception).map((check) => ({
     check: {
       checkId: check.checkId || null,
       name: check.name,
@@ -97,11 +99,12 @@ export function buildJsonReport({
     probe,
     audit,
     evidence,
+    standards: buildStandardsSummary(enrichedChecks),
     blockers,
     warnings,
     coverageGaps,
     toolVersions,
-    checks,
+    checks: enrichedChecks,
     exceptions: {
       used: exceptionUsage,
       invalid: invalidExceptions,
@@ -185,6 +188,27 @@ export function toMarkdown(report) {
     lines.push("");
   }
 
+  lines.push("## Evidence Levels");
+  const evidenceCounts = (report.checks || []).reduce((counts, check) => {
+    const level = check.evidenceLevel || "INFERRED";
+    counts[level] = (counts[level] || 0) + 1;
+    return counts;
+  }, {});
+  if (!Object.keys(evidenceCounts).length) lines.push("- None");
+  for (const [level, count] of Object.entries(evidenceCounts).sort()) {
+    lines.push(`- ${level}: ${count}`);
+  }
+  lines.push("");
+
+  lines.push("## Standards Crosswalk");
+  const mappings = report.standards?.mappings || [];
+  if (!mappings.length) lines.push("- None");
+  for (const mapping of mappings) {
+    const refs = (mapping.refs || []).map((item) => item.title).join(", ") || "None";
+    lines.push(`- ${mapping.group}${mapping.checkId ? `/${mapping.checkId}` : ""}: ${refs}`);
+  }
+  lines.push("");
+
   lines.push("## Tools");
   for (const [tool, version] of Object.entries(report.toolVersions || {})) {
     lines.push(`- ${tool}: ${version}`);
@@ -194,7 +218,7 @@ export function toMarkdown(report) {
 
   lines.push("## Checks Run");
   for (const check of report.checks) {
-    lines.push(`- ${check.name}: ${check.status}${check.command ? ` (${check.command})` : ""}`);
+    lines.push(`- ${check.name}: ${check.status}${check.evidenceLevel ? ` [${check.evidenceLevel}]` : ""}${check.command ? ` (${check.command})` : ""}`);
   }
   lines.push("");
 

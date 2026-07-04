@@ -405,7 +405,29 @@ test("evidence checks can block missing evidence only when risk policy opts in",
   };
 
   assert.equal(evidenceChecks(evidenceReport, {}).at(0).blocking, false);
+  assert.equal(evidenceChecks(evidenceReport, {}).at(0).evidenceLevel, "PLATFORM_VERIFIED");
   assert.equal(evidenceChecks(evidenceReport, { production_evidence: { block_on_missing_release_approval: true } }).at(0).blocking, true);
+});
+
+test("evidence checks mark connector gaps as GAP instead of platform verified", () => {
+  const evidenceReport = {
+    items: [
+      {
+        provider: "sentry",
+        checkId: "connector-auth",
+        title: "sentry connector auth",
+        status: "GAP",
+        summary: "SENTRY_AUTH_TOKEN is not set.",
+        blockKey: "block_on_connector_auth_failure",
+        details: {},
+      },
+    ],
+  };
+
+  const check = evidenceChecks(evidenceReport, {}).at(0);
+
+  assert.equal(check.evidenceLevel, "GAP");
+  assert.equal(check.coverageGap, true);
 });
 
 test("connector PASS evidence can satisfy matching production audit gaps", () => {

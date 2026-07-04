@@ -30,6 +30,44 @@ test("reports include blockers, warnings, coverage gaps, and tool versions", () 
   assert.equal(toSarif(report).version, "2.1.0");
 });
 
+test("reports attach standards and evidence levels to core check groups", () => {
+  const checks = [
+    { name: "package test", checkId: "tests", group: "tests", status: "pass", blocking: false, command: "npm test" },
+    { name: "gitleaks secret scan", checkId: "gitleaks", group: "secrets", status: "pass", blocking: false, command: "gitleaks detect" },
+    { name: "npm production audit", checkId: "package-audit", group: "dependencies", status: "pass", blocking: false, command: "npm audit" },
+    { name: "semgrep static scan", checkId: "semgrep", group: "sast", status: "pass", blocking: false, command: "semgrep scan" },
+    { name: "syft SBOM", checkId: "syft", group: "supply-chain", status: "pass", blocking: false, command: "syft ." },
+    { name: "actionlint workflow lint", checkId: "actionlint", group: "ci-security", status: "pass", blocking: false, command: "actionlint" },
+    { name: "checkov IaC scan", checkId: "checkov", group: "iac", status: "pass", blocking: false, command: "checkov" },
+    { name: "electron baseline", checkId: "electron", group: "electron", status: "pass", blocking: false },
+    { name: "squawk SQL migration lint", checkId: "squawk", group: "database", status: "pass", blocking: false, command: "squawk" },
+    { name: "OpenSSF Scorecard", checkId: "scorecard", group: "oss-hygiene", status: "pass", blocking: false, command: "scorecard" },
+    { name: "production audit: Critical business flows", checkId: "production-business-flows", group: "production-audit", status: "USER_DECISION", blocking: false },
+    { name: "production evidence: Sentry error monitoring", checkId: "evidence-sentry-error-monitoring", group: "production-evidence", status: "PASS", blocking: false },
+  ];
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: true, release: true, production: true },
+    probe: {},
+    checks,
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+  const markdown = toMarkdown(report);
+  const sarifText = JSON.stringify(toSarif(report));
+
+  assert.equal(report.standards.sources.some((source) => source.id === "nist-ssdf"), true);
+  assert.equal(report.standards.mappings.length >= checks.length, true);
+  assert.equal(report.checks.every((check) => check.standardRefs.length > 0), true);
+  assert.equal(report.checks.find((check) => check.group === "production-evidence").evidenceLevel, "PLATFORM_VERIFIED");
+  assert.equal(report.checks.find((check) => check.status === "USER_DECISION").evidenceLevel, "USER_REPORTED");
+  assert.equal(report.checks.find((check) => check.group === "tests").evidenceLevel, "TOOL_VERIFIED");
+  assert.match(markdown, /## Evidence Levels/);
+  assert.match(markdown, /## Standards Crosswalk/);
+  assert.match(markdown, /NIST SSDF SP 800-218/);
+  assert.doesNotMatch(sarifText, /NIST SSDF|Standards Crosswalk|Evidence Levels/);
+});
+
 test("report summary accepts UTF-8 JSON with BOM", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "apm-report-"));
   const reportPath = path.join(dir, "security-report.json");

@@ -981,6 +981,7 @@ export function evidenceChecks(evidenceReport, riskPolicy = {}) {
         status: item.status,
         blocking,
         coverageGap: item.status === "GAP",
+        evidenceLevel: item.status === "GAP" ? "GAP" : (item.provider === "connectors" ? "TOOL_VERIFIED" : "PLATFORM_VERIFIED"),
         summary: item.summary,
         recommendation: item.recommendation,
         evidence: {
