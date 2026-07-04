@@ -7,11 +7,11 @@
 [![CI](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml)
 [![Security](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml)
 
-**A production-readiness gate for AI-coded projects.**
+**A production maintenance evidence gate for AI-coded projects.**
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Production audit docs](docs/PRODUCTION-AUDIT.zh-CN.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Why trust this?](TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -222,6 +222,8 @@ Reports include:
 
 - PASS/FAIL summary
 - `overallStatus`: `FAIL`, `PASS_WITH_GAPS`, `PASS_WITH_WARNINGS`, or `PASS`
+- `evidenceLevel`: `TOOL_VERIFIED`, `PLATFORM_VERIFIED`, `USER_REPORTED`, `INFERRED`, or `GAP`
+- `standardRefs` and top-level `standards` crosswalk data
 - blockers and warnings
 - production evidence gaps
 - user decisions still needed
@@ -231,6 +233,8 @@ Reports include:
 - open source maintenance score
 
 By default, SARIF only uploads actionable code/security findings to GitHub Code Scanning. Non-blocking production gaps stay in the Markdown/JSON report and Actions Summary so the public Security page does not look like a vulnerability wall for missing logs or alerts.
+
+v0.8.0 adds standards-backed trust metadata. The mapping explains which checks are supported by public frameworks such as NIST SSDF, OWASP SAMM, SLSA, OpenSSF Scorecard, Google SRE, CIS Control 11, NIST SP 800-34, and DORA research. It is not a certification or security guarantee.
 
 ## Use With Codex
 
@@ -274,6 +278,9 @@ It is designed for the practical middle ground: a personal developer or small te
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
 - [Real OSS case studies](docs/CASE-STUDIES.md)
+- [Trust model](TRUST.md)
+- [Design notes](DESIGN.md)
+- [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 - [Production evidence connectors](docs/CONNECTORS.md)
 - [生产证据连接器](docs/CONNECTORS.zh-CN.md)
 - [Live connector validation](docs/LIVE-CONNECTOR-VALIDATION.zh-CN.md)

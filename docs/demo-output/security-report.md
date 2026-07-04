@@ -44,19 +44,41 @@ CI: true
 - GAP Production alerts: production alerts evidence is missing.
 - N/A Database migration review: no database surface detected or declared.
 
+## Evidence Levels
+
+- GAP: 5
+- TOOL_VERIFIED: 10
+
+## Standards Crosswalk
+
+- tests/tests: NIST SSDF SP 800-218, DORA research, Google SRE Release Engineering
+- dependencies/package-audit: NIST SSDF SP 800-218, SLSA, OpenSSF Scorecard
+- secrets/gitleaks: NIST SSDF SP 800-218, OWASP SAMM
+- dependencies/trivy: NIST SSDF SP 800-218, SLSA, OpenSSF Scorecard
+- dependencies/osv-scanner: NIST SSDF SP 800-218, SLSA, OpenSSF Scorecard
+- sast/semgrep: NIST SSDF SP 800-218, OWASP SAMM
+- supply-chain/syft: SLSA, OpenSSF Scorecard
+- supply-chain/grype: NIST SSDF SP 800-218, SLSA, OpenSSF Scorecard
+- oss-hygiene/scorecard: SLSA, OpenSSF Scorecard
+- production-audit/production-release-approval: Google SRE Release Engineering, Google SRE Embracing Risk
+- production-audit/production-observability-errors: Google SRE Monitoring Distributed Systems, Google SRE Embracing Risk
+- production-audit/production-observability-logs: Google SRE Monitoring Distributed Systems, Google SRE Embracing Risk
+- production-audit/production-observability-metrics: Google SRE Monitoring Distributed Systems, Google SRE Embracing Risk
+- production-audit/production-observability-alerts: Google SRE Monitoring Distributed Systems, Google SRE Embracing Risk
+
 ## Checks Run
 
-- package test: pass
-- release build: pass
-- npm production audit: pass
-- gitleaks secret scan: pass
-- trivy filesystem scan: pass
-- osv-scanner dependency scan: pass
-- semgrep static scan: pass
-- syft SBOM: pass
-- grype vulnerability scan: pass
-- OpenSSF Scorecard: pass
-- production audit evidence checks: GAP items reported but not blocking by default
+- package test: pass [TOOL_VERIFIED]
+- release build: pass [TOOL_VERIFIED]
+- npm production audit: pass [TOOL_VERIFIED]
+- gitleaks secret scan: pass [TOOL_VERIFIED]
+- trivy filesystem scan: pass [TOOL_VERIFIED]
+- osv-scanner dependency scan: pass [TOOL_VERIFIED]
+- semgrep static scan: pass [TOOL_VERIFIED]
+- syft SBOM: pass [TOOL_VERIFIED]
+- grype vulnerability scan: pass [TOOL_VERIFIED]
+- OpenSSF Scorecard: pass [TOOL_VERIFIED]
+- production audit evidence checks: GAP items reported but not blocking by default [GAP]
 
 ## Next Step
 

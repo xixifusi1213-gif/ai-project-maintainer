@@ -1,7 +1,7 @@
 {
   "name": "ai-project-maintainer",
-  "version": "0.7.0",
-  "description": "Production-readiness audit and CI gate for AI-coded projects.",
+  "version": "0.8.0",
+  "description": "Production maintenance evidence gate for AI-coded projects.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -39,6 +39,8 @@
     "examples/demo-ai-app/test/",
     "examples/oss-case-studies/",
     "docs/",
+    "TRUST.md",
+    "DESIGN.md",
     "README.md"
   ],
   "bin": {

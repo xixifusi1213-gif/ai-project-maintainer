@@ -87,7 +87,7 @@ npx ai-project-maintainer evidence "E:\我的项目" --output reports/evidence-r
 npx ai-project-maintainer gate "E:\我的项目" --production --connectors --strict --release --output reports/security-report.json
 ```
 
-v0.7.0 已完整实现 GitHub Environments、Sentry、Vercel。Grafana、Prometheus、Bytebase、Atlas、Cloudflare、Render、Fly 已预留，但尚未完整实现真实 API 接入。
+v0.7.0 已完整实现 GitHub Environments、Sentry、Vercel、Grafana、Prometheus、Bytebase、Atlas 本地迁移 lint、Cloudflare Pages、Render 和 Fly。所有连接器都是可选、只读、用户自带 token；缺 token 或 API 不可读时默认记为 `GAP`。
 
 ## 5. 如何理解结果
 
