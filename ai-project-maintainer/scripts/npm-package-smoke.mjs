@@ -10,6 +10,8 @@ const root = path.resolve(scriptDir, "..", "..");
 const npmCli = process.env.npm_execpath || path.join(path.dirname(process.execPath), "node_modules", "npm", "bin", "npm-cli.js");
 
 function runProcess(file, args, options = {}) {
+  // Smoke tests execute the package's own temporary bin shim with fixed arguments.
+  // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
   const result = spawnSync(file, args, {
     cwd: options.cwd || root,
     encoding: "utf8",
@@ -32,6 +34,8 @@ function runProcess(file, args, options = {}) {
 }
 
 function runNpm(args, options = {}) {
+  // npm is invoked through the current Node executable and npm CLI path, not shell-expanded user input.
+  // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
   const result = spawnSync(process.execPath, [npmCli, ...args], {
     cwd: options.cwd || root,
     encoding: "utf8",

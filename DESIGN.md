@@ -12,6 +12,7 @@ Its design goal is narrow: make release readiness explicit enough that a maintai
 - Use mature scanners and platform APIs instead of inventing custom vulnerability detection.
 - Keep production connectors read-only.
 - Keep missing evidence visible as `GAP`.
+- Publish official releases through a traceable GitHub Actions and npm provenance chain.
 - Let AI assist with fixes, but keep risk acceptance with the human maintainer.
 
 ## Why GAP Does Not Block by Default
@@ -37,3 +38,9 @@ Each report can show which checks relate to secure software development, supply-
 Agent risk checks review repository-side configuration: MCP server definitions, Codex/Claude/Cursor instructions, prompt-injection-like content, sensitive filenames, and dangerous scripts. They do not execute agents or MCP servers because the gate should be safe to run before trust has been established.
 
 The result is a preflight check for the maintenance workflow, not a certification of any model, hosted agent product, or third-party MCP service.
+
+## Why v1.0 Uses Trusted Publishing
+
+The project is a release readiness gate, so its own releases should not depend on hidden local state.
+
+v1.0 uses GitHub Actions, npm Trusted Publishing, SBOM generation, release manifests, and published-release verification so users can connect an npm package back to a GitHub tag and workflow run.
