@@ -17,6 +17,7 @@ The following commands are stable for the `1.x` release line:
 - `connectors doctor`
 - `evidence`
 - `agent-risk`
+- `repair-pack`
 
 ## Stable Top-Level Fields
 
@@ -51,6 +52,52 @@ Each check item should keep:
 - `PASS`: no blockers, warnings, gaps, or user decisions.
 
 The legacy `passed` boolean remains compatible: only blocking findings and invalid exceptions make it `false`.
+
+## Repair Pack Schema
+
+`repair-pack` reads `reports/security-report.json` and writes a separate AI-agent task schema:
+
+```text
+reports/fix-plan.md
+reports/agent-tasks.json
+reports/codex-tasks.json
+reports/recheck-commands.ps1
+reports/recheck-commands.sh
+```
+
+`reports/agent-tasks.json` is the stable primary format. `reports/codex-tasks.json` is a compatibility adapter for Codex.
+
+Stable top-level fields:
+
+- `schemaVersion`
+- `generatedAt`
+- `sourceReport`
+- `projectRoot`
+- `overallStatus`
+- `summary`
+- `tasks`
+- `recheckCommands`
+
+Stable task fields:
+
+- `id`
+- `title`
+- `type`
+- `severity`
+- `source`
+- `evidence`
+- `targetFiles`
+- `fixStrategy`
+- `userDecisionRequired`
+- `verificationCommands`
+- `riskNotes`
+
+Stable task types:
+
+- `auto_fix_candidate`
+- `needs_maintainer_decision`
+- `manual_review_required`
+- `recheck_only`
 
 ## Compatibility Rule
 

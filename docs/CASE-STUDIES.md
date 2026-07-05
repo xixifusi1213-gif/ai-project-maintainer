@@ -23,7 +23,7 @@ Generated reports are written to `reports/oss-case-studies/`. The committed repo
 
 - The tool can explain real upstream security fixes in release-readiness language.
 - A fixed CVE is not automatically a production-ready release: monitoring, rollback, approvals, and runtime hardening may still be gaps.
-- AI/Codex can use the report as a repair loop: fix blockers, keep gaps visible, rerun.
+- AI agents can use the report as a repair loop: generate a repair pack, fix deterministic blockers, keep gaps visible, rerun.
 
 ## What This Does Not Do
 

@@ -13,7 +13,7 @@ test("package exposes ai-project-maintainer npm bin", () => {
   assert.equal(pkg.bin["ai-project-maintainer"], "ai-project-maintainer/scripts/cli.mjs");
 });
 
-test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands", () => {
+test("CLI parses doctor, init, audit, gate, agent-risk, repair-pack, and summary subcommands", () => {
   assert.deepEqual(parseCliArgs(["--version"]), {
     command: "version",
     args: {},
@@ -110,11 +110,21 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
     command: "summary",
     args: { reportPath: "reports/security-report.json" },
   });
+
+  assert.deepEqual(parseCliArgs(["repair-pack", "reports/security-report.json", "--project", "E:\\my-project", "--output", "reports", "--json"]), {
+    command: "repair-pack",
+    args: {
+      reportPath: "reports/security-report.json",
+      projectRoot: "E:\\my-project",
+      outputDir: "reports",
+      jsonOnly: true,
+    },
+  });
 });
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "1.1.0");
+  assert.equal(pkg.version, "1.2.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

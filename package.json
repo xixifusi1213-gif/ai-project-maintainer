@@ -1,6 +1,6 @@
 {
   "name": "ai-project-maintainer",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Release readiness gate for AI-coded projects.",
   "type": "module",
   "license": "MIT",
@@ -54,8 +54,8 @@
     "smoke:npm": "node ai-project-maintainer/scripts/npm-package-smoke.mjs",
     "smoke:connectors:live": "node ai-project-maintainer/scripts/live-connector-smoke.mjs",
     "release:manifest": "node ai-project-maintainer/scripts/release-manifest.mjs",
-    "release:verify:pre": "node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version 1.1.0 --tag v1.1.0",
-    "release:verify:published": "node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.1.0 --tag v1.1.0"
+    "release:verify:pre": "node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version 1.2.0 --tag v1.2.0",
+    "release:verify:published": "node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.0 --tag v1.2.0"
   },
   "dependencies": {
     "yaml": "2.9.0"

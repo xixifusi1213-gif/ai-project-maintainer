@@ -65,12 +65,12 @@ npx ai-project-maintainer gate .\examples\demo-ai-app --production --strict --re
 
 The point is not to pretend the project is perfect. The point is to make the checked failures and missing production evidence explicit before release.
 
-## 5. Let Codex Fix Blockers
+## 5. Generate AI Agent Repair Tasks
 
-Ask Codex:
+Convert the gate report into tasks for your AI coding assistant:
 
-```text
-$ai-project-maintainer run the production gate for this project, fix blockers, and rerun until it passes.
+```powershell
+npx ai-project-maintainer repair-pack reports/security-report.json --project .\examples\demo-ai-app --output reports
 ```
 
-Codex can handle deterministic blockers. The maintainer still owns business decisions such as critical flows, accepted risks, and production evidence.
+Use `reports/agent-tasks.json` with Codex, Cursor, Claude Code, Cline, or another agent. Codex users can also use `reports/codex-tasks.json`. Agents can handle deterministic blockers; the maintainer still owns business decisions such as critical flows, accepted risks, and production evidence.

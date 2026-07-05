@@ -9,9 +9,9 @@
 
 **Release readiness gate for AI-coded projects.**
 
-AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
+AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, generate AI-agent repair tasks, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -43,6 +43,7 @@ npx ai-project-maintainer agent-risk ".\my-project"
 npx ai-project-maintainer init-audit ".\my-project" --wizard --dry-run
 npx ai-project-maintainer init-audit ".\my-project" --wizard
 npx ai-project-maintainer gate ".\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
+npx ai-project-maintainer repair-pack reports/security-report.json --project ".\my-project" --output reports
 ```
 
 `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
@@ -63,6 +64,9 @@ npx ai-project-maintainer audit-plan "E:\my-project" --profile auto --output rep
 
 # 4. Run the production gate
 npx ai-project-maintainer gate "E:\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
+
+# 5. Convert the report into AI-agent repair tasks
+npx ai-project-maintainer repair-pack "E:\my-project\reports\security-report.json" --project "E:\my-project" --output "E:\my-project\reports"
 ```
 
 GitHub Actions templates can either use the npm package or clone this repository directly.
@@ -82,7 +86,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.1.0 --tag v1.1.0 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.0 --tag v1.2.0 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates
@@ -238,6 +242,26 @@ npx ai-project-maintainer gate "E:\my-project" --agent-risk --strict --release -
 
 It checks MCP config, Codex/Claude/Cursor instructions, prompt-injection-like repository text, sensitive filenames, package lifecycle scripts, and runnable project scripts. It never starts MCP servers, never calls OpenAI/Codex APIs, and never writes token values into reports.
 
+## AI Agent Repair Pack
+
+v1.2.0 converts a gate report into repair tasks that any AI coding assistant can consume. Codex is supported through a compatibility file, but the primary format is generic:
+
+```powershell
+npx ai-project-maintainer repair-pack "E:\my-project\reports\security-report.json" --project "E:\my-project" --output "E:\my-project\reports"
+```
+
+It writes:
+
+```text
+reports/fix-plan.md
+reports/agent-tasks.json
+reports/codex-tasks.json
+reports/recheck-commands.ps1
+reports/recheck-commands.sh
+```
+
+Tasks are separated into `auto_fix_candidate`, `needs_maintainer_decision`, `manual_review_required`, and `recheck_only`, so an AI agent can fix the right things while leaving business risk acceptance to the maintainer. See [AI repair pack](docs/REPAIR-PACK.md).
+
 The user supplies business facts and evidence locations. The tool decides which checks apply and labels every item clearly:
 
 ```text
@@ -267,6 +291,11 @@ reports/security-report.sarif
 reports/sbom.cdx.json
 reports/agent-risk-report.json
 reports/agent-risk-report.md
+reports/fix-plan.md
+reports/agent-tasks.json
+reports/codex-tasks.json
+reports/recheck-commands.ps1
+reports/recheck-commands.sh
 ```
 
 Reports include:
@@ -317,6 +346,7 @@ node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output rep
 node .\ai-project-maintainer\scripts\agent-risk.mjs "E:\my-project" --output reports/agent-risk-report.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --agent-risk --strict --release --output reports/security-report.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\my-project" --production --connectors --agent-risk --strict --release --output reports/security-report.json
+node .\ai-project-maintainer\scripts\repair-pack.mjs "E:\my-project\reports\security-report.json" --project "E:\my-project" --output "E:\my-project\reports"
 node .\ai-project-maintainer\scripts\report-summary.mjs "E:\my-project\reports\security-report.json"
 ```
 
@@ -336,6 +366,7 @@ It is designed for the practical middle ground: a personal developer or small te
 - [Release trust](docs/RELEASE-TRUST.md)
 - [Report schema](docs/REPORT-SCHEMA.md)
 - [Security policy](SECURITY.md)
+- [AI repair pack](docs/REPAIR-PACK.md)
 - [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 - [Production evidence connectors](docs/CONNECTORS.md)
 - [生产证据连接器](docs/CONNECTORS.zh-CN.md)

@@ -74,7 +74,7 @@ This check is a local static review. It cannot prove that a hosted AI product, M
 The practical workflow is:
 
 ```text
-agent-risk -> fix blocking permission/instruction issues -> run gate -> let Codex fix blockers -> rerun
+agent-risk -> fix blocking permission/instruction issues -> run gate -> generate repair pack -> AI agent fixes selected tasks -> rerun
 ```
 
 For deeper security review, pair this with Codex Security, Semgrep, Gitleaks, Trivy, and human review for high-risk production systems.

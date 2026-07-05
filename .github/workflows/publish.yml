@@ -139,7 +139,10 @@ jobs:
         run: |
           set -euo pipefail
           notes_file="docs/releases/${RELEASE_TAG}.md"
-          title="${RELEASE_TAG}: Trusted release chain"
+          title="$(grep -m 1 '^# ' "$notes_file" | sed 's/^# //')"
+          if [ -z "$title" ]; then
+            title="$RELEASE_TAG"
+          fi
           assets=(
             "$TARBALL"
             "dist/sbom.cdx.json"

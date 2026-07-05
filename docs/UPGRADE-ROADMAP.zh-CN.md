@@ -93,16 +93,18 @@ npx ai-project-maintainer audit-plan "E:\my-project" --profile nextjs-web
 - Static site：构建、依赖、CSP、部署回滚。
 - Browser extension：manifest 权限、content script、外部连接、token 存储。
 
-### v1.2.0：Codex 修复任务包
+### v1.2.0：AI Agent 修复任务包
 
-目标：把报告从“发现问题”升级为“可交给 AI 修复的任务包”。
+目标：把报告从“发现问题”升级为“可交给 AI coding assistant 执行的修复任务包”。Codex 是一等支持对象，但不是唯一对象；主格式应面向 Cursor、Claude Code、Cline、Codex 等通用 AI agent。
 
 新增输出：
 
 ```text
 reports/fix-plan.md
+reports/agent-tasks.json
 reports/codex-tasks.json
 reports/recheck-commands.ps1
+reports/recheck-commands.sh
 ```
 
 每个 blocker / high-value GAP 应包含：
@@ -113,11 +115,13 @@ reports/recheck-commands.ps1
 - 推荐验证命令。
 - 是否需要用户判断。
 - 修复后复跑命令。
+- 任务类型：`auto_fix_candidate`、`needs_maintainer_decision`、`manual_review_required`、`recheck_only`。
 
 原则：
 
 - 生成任务，不自动修。
-- AI 可以按任务修复，工具负责复验。
+- AI 可以按 `auto_fix_candidate` 任务修复，工具负责给出复验命令。
+- `needs_maintainer_decision` 和 `manual_review_required` 不能被 AI 猜测通过，必须由维护者确认。
 - 用户负责业务判断和风险接受。
 
 ### v1.3.0：真实案例库和公开 benchmark
@@ -164,5 +168,5 @@ npm run benchmark:cases
 1. AI agent 维护项目时的权限风险。
 2. 生产证据可信度分层。
 3. 项目类型专用审查规则。
-4. 报告到 Codex 修复任务的闭环。
+4. 报告到 AI Agent 修复任务的闭环。
 5. 真实案例库和可复现 benchmark。
