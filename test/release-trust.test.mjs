@@ -136,6 +136,7 @@ test("publish workflow uses OIDC trusted publishing and avoids long-lived npm to
   assert.match(workflowText, /python -m pip install --user "semgrep==\$SEMGREP_VERSION"/);
   assert.match(workflowText, /npm publish "\.\/\$TARBALL" --access public/);
   assert.match(workflowText, /GH_TOKEN: \$\{\{ github\.token \}\}/);
+  assert.match(workflowText, /--commit "\$\(git rev-parse HEAD\)"/);
   assert.match(workflowText, /attest-build-provenance/);
 });
 

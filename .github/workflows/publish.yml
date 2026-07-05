@@ -103,7 +103,7 @@ jobs:
       - name: Generate release manifest
         env:
           TARBALL: ${{ steps.pack.outputs.tarball }}
-        run: node ai-project-maintainer/scripts/release-manifest.mjs --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --tarball "$TARBALL" --sbom dist/sbom.cdx.json --report reports/security-report.json --output dist/release-manifest.json
+        run: node ai-project-maintainer/scripts/release-manifest.mjs --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --commit "$(git rev-parse HEAD)" --tarball "$TARBALL" --sbom dist/sbom.cdx.json --report reports/security-report.json --output dist/release-manifest.json
 
       - name: Attest release artifacts
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
