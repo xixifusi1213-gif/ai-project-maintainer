@@ -9,6 +9,7 @@ import YAML from "yaml";
 
 import { createBeforeState } from "../examples/demo-ai-app/scripts/create-before-state.mjs";
 import { runDemoGate } from "../examples/demo-ai-app/scripts/run-demo-gate.mjs";
+import { runRepairLoopDemo } from "../examples/demo-ai-app/scripts/run-repair-loop-demo.mjs";
 import { initProject } from "../ai-project-maintainer/scripts/init-project.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -76,6 +77,15 @@ test("security workflow is parseable and includes the heavy gate", () => {
   assert.match(workflowText, /TRIVY_VERSION: v0\.71\.2/);
 });
 
+test("CI workflow runs repair-loop smoke", () => {
+  const workflowText = fs.readFileSync(path.join(repoRoot, ".github", "workflows", "ci.yml"), "utf8");
+  const workflow = YAML.parse(workflowText);
+  const steps = workflow.jobs.test.steps.map((step) => step.name);
+
+  assert.equal(steps.includes("Run repair loop smoke test"), true);
+  assert.match(workflowText, /npm run smoke:repair-loop/);
+});
+
 test("README first-run links are readable and not mojibake", () => {
   const readme = fs.readFileSync(path.resolve("README.md"), "utf8");
 
@@ -103,9 +113,33 @@ test("generated security workflow pins scanner versions", () => {
   assert.match(workflowText, /--agent-risk/);
 });
 
+test("Codex skill quick start numbering is monotonic", () => {
+  const skill = fs.readFileSync(path.join(repoRoot, "ai-project-maintainer", "SKILL.md"), "utf8");
+  const numbers = [...skill.matchAll(/^(\d+)\. /gm)].map((match) => Number(match[1]));
+  const quickStartNumbers = numbers.slice(0, 17);
+
+  assert.deepEqual(quickStartNumbers, Array.from({ length: 17 }, (_, index) => index + 1));
+});
+
+test("demo repair loop proves gate to repair-pack to recheck to gate", () => {
+  const { summary } = runRepairLoopDemo();
+
+  assert.equal(summary.before.overallStatus, "FAIL");
+  assert.equal(summary.before.passed, false);
+  assert.equal(summary.repairPack.autoFixCount > 0, true);
+  assert.match(summary.repairPack.agentTasks, /agent-tasks\.json$/);
+  assert.match(summary.repairPack.codexTasks, /codex-tasks\.json$/);
+  assert.deepEqual(summary.simulatedAiRepair.copiedFiles, [path.join("src", "order-risk.js")]);
+  assert.equal(summary.recheck.command, "npm test");
+  assert.equal(summary.recheck.status, 0);
+  assert.equal(summary.after.overallStatus, "PASS_WITH_GAPS");
+  assert.equal(summary.after.passed, true);
+  assert.equal(summary.after.coverageGapCount > 0, true);
+});
+
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "1.2.0");
+  assert.equal(packageJson.version, "1.2.1");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

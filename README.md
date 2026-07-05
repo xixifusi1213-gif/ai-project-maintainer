@@ -86,7 +86,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.0 --tag v1.2.0 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.1 --tag v1.2.1 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates
@@ -132,6 +132,16 @@ node .\examples\demo-ai-app\scripts\create-before-state.mjs
 ```
 
 It writes a broken copy under the OS temp directory, where the business tests fail.
+
+## Repair Loop Demo
+
+v1.2.1 dogfoods the full repair loop without calling an external AI model:
+
+```powershell
+npm run smoke:repair-loop
+```
+
+The script creates a broken temp copy of `examples/demo-ai-app`, runs the gate to get `FAIL`, generates `agent-tasks.json` and `codex-tasks.json`, applies a deterministic "simulated AI repair", runs `npm test`, and runs the gate again. The expected final state is `PASS_WITH_GAPS`: deterministic blockers are fixed, while production evidence gaps remain visible.
 
 More demo material:
 

@@ -98,8 +98,21 @@ Use `agent-tasks.json` as the default format for general AI tools.
 
 Use `codex-tasks.json` when working in Codex; it includes the same tasks plus Codex-oriented instructions.
 
+Use `agent-tasks.json` with Cursor, Claude Code, Cline, or other AI coding assistants. Add `fix-plan.md` as human-readable context when the tool accepts extra files or prompt context.
+
+Recommended file choice:
+
+| Agent | Primary input |
+| --- | --- |
+| Codex | `reports/codex-tasks.json` |
+| Cursor | `reports/agent-tasks.json` plus `reports/fix-plan.md` |
+| Claude Code | `reports/agent-tasks.json` plus `reports/fix-plan.md` |
+| Cline | `reports/agent-tasks.json` plus `reports/fix-plan.md` |
+
 For other agents, pass the same rule:
 
 ```text
 Fix auto_fix_candidate tasks first. Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks. After each fix, run the task verificationCommands before rerunning the full gate.
 ```
+
+Do not let an agent treat production `GAP`, `needs_maintainer_decision`, or `manual_review_required` tasks as permission to invent evidence or accept risk. Those tasks require the maintainer to answer, provide evidence, or explicitly accept the risk.

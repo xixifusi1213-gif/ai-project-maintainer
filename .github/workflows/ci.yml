@@ -50,6 +50,9 @@ jobs:
       - name: Run packed npm CLI smoke test
         run: npm run smoke:npm
 
+      - name: Run repair loop smoke test
+        run: npm run smoke:repair-loop
+
       - name: Probe local tool availability
         continue-on-error: true
         run: node ai-project-maintainer/scripts/doctor.mjs --no-trivy-db
