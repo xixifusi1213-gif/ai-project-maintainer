@@ -124,7 +124,7 @@ jobs:
         if: steps.npm_status.outputs.published != 'true'
         env:
           TARBALL: ${{ steps.pack.outputs.tarball }}
-        run: npm publish "$TARBALL" --access public --provenance --registry=https://registry.npmjs.org/
+        run: npm publish "./$TARBALL" --access public --provenance --registry=https://registry.npmjs.org/
 
       - name: Create or update GitHub Release
         env:
