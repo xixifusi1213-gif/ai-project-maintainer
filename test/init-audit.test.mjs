@@ -47,6 +47,16 @@ test("initAudit creates production audit templates without secrets", () => {
   assert.doesNotMatch(connectorsText, /ghp_|xoxb-|password:/i);
 });
 
+test("initAudit can write an explicit project profile rule pack", () => {
+  const root = tempProject();
+  initAudit(root, { profile: "database-prisma" });
+
+  const profile = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "project-profile.yml"), "utf8"));
+
+  assert.equal(profile.project.type, "auto");
+  assert.equal(profile.project.profile, "database-prisma");
+});
+
 test("initAudit does not overwrite user-maintained intake files", () => {
   const root = tempProject();
   fs.mkdirSync(path.join(root, ".ai-maintainer"));
@@ -121,6 +131,7 @@ test("intake wizard writes professional project profile and summary", async () =
 
   assert.equal(result.created.includes(".ai-maintainer/project-profile.yml"), true);
   assert.equal(profile.project.type, "api");
+  assert.equal(profile.project.profile, "node-api");
   assert.equal(profile.project.production, true);
   assert.equal(profile.risk.handles_auth, true);
   assert.equal(profile.risk.has_database, true);

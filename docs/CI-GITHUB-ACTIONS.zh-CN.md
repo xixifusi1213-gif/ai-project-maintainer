@@ -5,7 +5,7 @@
 如果已经发布到 npm，可以用：
 
 ```powershell
-npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
+npx ai-project-maintainer init "E:\我的项目" --profile auto --ci github
 ```
 
 如果还没有 npm 账号或还没有发布 npm 包，也可以从源码运行初始化脚本：
@@ -14,7 +14,7 @@ npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
 git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
 cd .\ai-project-maintainer
 npm install
-node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile oss --ci github
+node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile auto --ci github
 ```
 
 会生成：

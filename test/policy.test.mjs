@@ -19,6 +19,8 @@ test("missing policy uses strict defaults", () => {
   const bundle = loadPolicyBundle(root);
 
   assert.equal(bundle.policy.mode, "strict");
+  assert.equal(bundle.policy.profile, "oss-library");
+  assert.equal(bundle.profile.source, "fallback");
   assert.equal(bundle.policy.fail_on.secrets, true);
   assert.equal(bundle.policy.checks["agent-risk"], "block");
   assert.equal(bundle.policy.fail_on.agent_high_risk, true);
@@ -150,7 +152,8 @@ test("policy loads real YAML maps and lists", () => {
 
   const bundle = loadPolicyBundle(root);
 
-  assert.equal(bundle.policy.profile, "oss");
+  assert.equal(bundle.policy.profile, "oss-library");
+  assert.equal(bundle.profile.source, "policy");
   assert.deepEqual(bundle.policy.tool_groups, ["oss-hygiene"]);
   assert.equal(bundle.policy.checks.semgrep, "warn");
   assert.equal(bundle.policy.checks.scorecard, "off");

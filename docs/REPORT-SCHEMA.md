@@ -29,6 +29,7 @@ The following fields are stable in `reports/security-report.json`:
 - `blockers`
 - `warnings`
 - `coverageGaps`
+- `profile`
 - `audit`
 - `agentRisk`
 - `standards`

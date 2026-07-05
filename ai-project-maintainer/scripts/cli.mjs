@@ -53,8 +53,8 @@ export function parseCliArgs(argv) {
     return {
       command,
       args: {
-        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
-        profile: readOption(rest, "--profile", "oss"),
+        projectRoot: firstPositional(rest, ["--profile", "--ci"]) || process.cwd(),
+        profile: readOption(rest, "--profile", "auto"),
         ci: readOption(rest, "--ci", "github"),
         preCommit: rest.includes("--pre-commit"),
       },
@@ -65,7 +65,7 @@ export function parseCliArgs(argv) {
     return {
       command,
       args: {
-        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
+        projectRoot: firstPositional(rest, ["--output", "--profile"]) || process.cwd(),
         strict: rest.includes("--strict"),
         release: rest.includes("--release"),
         noTests: rest.includes("--no-tests"),
@@ -73,6 +73,7 @@ export function parseCliArgs(argv) {
         production: rest.includes("--production"),
         connectors: rest.includes("--connectors"),
         agentRisk: rest.includes("--agent-risk"),
+        profile: readOption(rest, "--profile", "auto"),
         outputPath: readOption(rest, "--output", null),
       },
     };
@@ -117,10 +118,11 @@ export function parseCliArgs(argv) {
     return {
       command,
       args: {
-        projectRoot: firstPositional(rest, ["--lang"]) || process.cwd(),
+        projectRoot: firstPositional(rest, ["--lang", "--profile"]) || process.cwd(),
         wizard: rest.includes("--wizard"),
         dryRun: rest.includes("--dry-run"),
         lang: langIndex === -1 ? "en" : rest[langIndex + 1] || "en",
+        profile: readOption(rest, "--profile", "auto"),
       },
     };
   }
@@ -129,9 +131,10 @@ export function parseCliArgs(argv) {
     return {
       command,
       args: {
-        projectRoot: rest.find((arg) => !arg.startsWith("--")) || process.cwd(),
+        projectRoot: firstPositional(rest, ["--output", "--profile"]) || process.cwd(),
         outputPath: readOption(rest, "--output", null),
         jsonOnly: rest.includes("--json"),
+        profile: readOption(rest, "--profile", "auto"),
       },
     };
   }
@@ -193,13 +196,14 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     const report = runLocalGate(parsed.args.projectRoot, {
       strict: parsed.args.strict,
       release: parsed.args.release,
-        noTests: parsed.args.noTests,
-        production: parsed.args.production,
-        agentRisk: parsed.args.agentRisk,
-        connectors: false,
-        outputPath: parsed.args.outputPath,
-        writeReports: true,
-      });
+      noTests: parsed.args.noTests,
+      production: parsed.args.production,
+      agentRisk: parsed.args.agentRisk,
+      connectors: false,
+      profile: parsed.args.profile,
+      outputPath: parsed.args.outputPath,
+      writeReports: true,
+    });
     io.stdout.write(`${parsed.args.jsonOnly ? JSON.stringify(report, null, 2) : toMarkdown(report)}\n`);
     return report.passed ? 0 : 1;
   }
@@ -229,17 +233,18 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       const result = planIntakeWizard(parsed.args.projectRoot, {
         dryRun: true,
         lang: parsed.args.lang,
+        profile: parsed.args.profile,
       });
       io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;
     }
-    const result = initAudit(parsed.args.projectRoot);
+    const result = initAudit(parsed.args.projectRoot, { profile: parsed.args.profile });
     io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return 0;
   }
 
   if (parsed.command === "audit-plan") {
-    const audit = runAuditPlan(parsed.args.projectRoot, { outputPath: parsed.args.outputPath });
+    const audit = runAuditPlan(parsed.args.projectRoot, { outputPath: parsed.args.outputPath, profile: parsed.args.profile });
     io.stdout.write(`${JSON.stringify(audit, null, 2)}\n`);
     return 0;
   }
@@ -265,6 +270,7 @@ export async function runCliAsync(argv = process.argv.slice(2), io = { stdout: p
         production: parsed.args.production,
         agentRisk: parsed.args.agentRisk,
         connectors: true,
+        profile: parsed.args.profile,
         outputPath: parsed.args.outputPath,
         writeReports: true,
       });
@@ -291,6 +297,7 @@ export async function runCliAsync(argv = process.argv.slice(2), io = { stdout: p
       const result = await initAuditWizard(parsed.args.projectRoot, {
         dryRun: parsed.args.dryRun,
         lang: parsed.args.lang,
+        profile: parsed.args.profile,
         input: io.input || process.stdin,
         output: io.promptOutput || process.stdout,
       });

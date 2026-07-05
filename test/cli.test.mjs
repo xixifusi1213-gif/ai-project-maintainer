@@ -45,11 +45,12 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
       production: false,
       connectors: false,
       agentRisk: false,
+      profile: "auto",
       outputPath: "reports/security-report.json",
     },
   });
 
-  assert.deepEqual(parseCliArgs(["gate", "E:\\my-project", "--production", "--strict"]), {
+  assert.deepEqual(parseCliArgs(["gate", "E:\\my-project", "--production", "--strict", "--profile", "database-prisma"]), {
     command: "gate",
     args: {
       projectRoot: "E:\\my-project",
@@ -60,6 +61,7 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
       production: true,
       connectors: false,
       agentRisk: false,
+      profile: "database-prisma",
       outputPath: null,
     },
   });
@@ -75,6 +77,7 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
       production: false,
       connectors: false,
       agentRisk: true,
+      profile: "auto",
       outputPath: null,
     },
   });
@@ -90,17 +93,17 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
 
   assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project"]), {
     command: "init-audit",
-    args: { projectRoot: "E:\\my-project", wizard: false, dryRun: false, lang: "en" },
+    args: { projectRoot: "E:\\my-project", wizard: false, dryRun: false, lang: "en", profile: "auto" },
   });
 
-  assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project", "--wizard", "--dry-run", "--lang", "zh-CN"]), {
+  assert.deepEqual(parseCliArgs(["init-audit", "E:\\my-project", "--wizard", "--dry-run", "--lang", "zh-CN", "--profile", "nextjs-web"]), {
     command: "init-audit",
-    args: { projectRoot: "E:\\my-project", wizard: true, dryRun: true, lang: "zh-CN" },
+    args: { projectRoot: "E:\\my-project", wizard: true, dryRun: true, lang: "zh-CN", profile: "nextjs-web" },
   });
 
   assert.deepEqual(parseCliArgs(["audit-plan", "E:\\my-project", "--output", "reports/audit-plan.json"]), {
     command: "audit-plan",
-    args: { projectRoot: "E:\\my-project", outputPath: "reports/audit-plan.json", jsonOnly: false },
+    args: { projectRoot: "E:\\my-project", outputPath: "reports/audit-plan.json", jsonOnly: false, profile: "auto" },
   });
 
   assert.deepEqual(parseCliArgs(["summary", "reports/security-report.json"]), {
@@ -111,7 +114,7 @@ test("CLI parses doctor, init, audit, gate, agent-risk, and summary subcommands"
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "1.0.0");
+  assert.equal(pkg.version, "1.1.0");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

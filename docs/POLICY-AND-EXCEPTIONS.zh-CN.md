@@ -11,7 +11,7 @@
 默认策略面向开源项目和 AI coding 项目维护：
 
 ```yaml
-profile: oss
+profile: auto
 mode: strict
 checks:
   gitleaks: block

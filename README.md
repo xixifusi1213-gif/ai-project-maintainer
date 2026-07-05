@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -38,11 +38,11 @@ Requires Node.js 20+.
 
 ```powershell
 npx ai-project-maintainer doctor --no-trivy-db
-npx ai-project-maintainer init ".\my-project" --profile oss --ci github
+npx ai-project-maintainer init ".\my-project" --profile auto --ci github
 npx ai-project-maintainer agent-risk ".\my-project"
 npx ai-project-maintainer init-audit ".\my-project" --wizard --dry-run
 npx ai-project-maintainer init-audit ".\my-project" --wizard
-npx ai-project-maintainer gate ".\my-project" --production --agent-risk --strict --release --output reports/security-report.json
+npx ai-project-maintainer gate ".\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
 ```
 
 `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
@@ -53,16 +53,16 @@ Requires Node.js 20+.
 
 ```powershell
 # 1. Add local and CI guardrails
-npx ai-project-maintainer init "E:\my-project" --profile oss --ci github
+npx ai-project-maintainer init "E:\my-project" --profile auto --ci github
 
 # 2. Answer the guided production audit intake
 npx ai-project-maintainer init-audit "E:\my-project" --wizard
 
 # 3. Generate the project-specific audit plan
-npx ai-project-maintainer audit-plan "E:\my-project" --output reports/audit-plan.json
+npx ai-project-maintainer audit-plan "E:\my-project" --profile auto --output reports/audit-plan.json
 
 # 4. Run the production gate
-npx ai-project-maintainer gate "E:\my-project" --production --agent-risk --strict --release --output reports/security-report.json
+npx ai-project-maintainer gate "E:\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
 ```
 
 GitHub Actions templates can either use the npm package or clone this repository directly.
@@ -82,8 +82,26 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.0.0 --tag v1.0.0 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.1.0 --tag v1.1.0 --manifest dist/release-manifest.json
 ```
+
+## Profile-Aware Gates
+
+v1.1.0 adds project type rule packs. The default `--profile auto` detects the main risk surface and applies a matching review focus:
+
+- `electron-desktop`: IPC/preload, local file access, shell/openExternal, updates, packaged release trust
+- `nextjs-web`: auth middleware, API routes, Server Actions, public env vars, CORS/uploads, deployment evidence
+- `node-api`: authz, input validation, rate limits, CORS, log redaction, API tests
+- `database-prisma`: Prisma schema, migrations, destructive changes, backups, rollback, transactions
+- `oss-library`: package metadata, license, CI, Scorecard, SBOM, provenance, SemVer
+
+Override auto-detection when needed:
+
+```powershell
+npx ai-project-maintainer gate "E:\my-project" --profile database-prisma --production --strict --release
+```
+
+See [Project profiles](docs/PROJECT-PROFILES.md) and [中文说明](docs/PROJECT-PROFILES.zh-CN.md).
 
 ## Real Demo
 
@@ -293,7 +311,7 @@ If you are using the repository directly instead of npm:
 
 ```powershell
 node .\ai-project-maintainer\scripts\doctor.mjs
-node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile oss --ci github
+node .\ai-project-maintainer\scripts\init-project.mjs "E:\my-project" --profile auto --ci github
 node .\ai-project-maintainer\scripts\init-audit.mjs "E:\my-project" --wizard
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\my-project" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\agent-risk.mjs "E:\my-project" --output reports/agent-risk-report.json

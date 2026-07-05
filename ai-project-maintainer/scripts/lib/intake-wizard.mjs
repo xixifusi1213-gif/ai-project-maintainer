@@ -11,6 +11,7 @@ import {
   defaultRiskPolicy,
   loadIntake,
 } from "./intake.mjs";
+import { normalizeProfileId, profileIds } from "./profiles.mjs";
 
 const summaryPath = ".ai-maintainer/intake-summary.md";
 const yesValues = new Set(["yes", "y", "true", "1", "present"]);
@@ -61,6 +62,7 @@ function hasEvidence(value) {
 }
 
 function projectKind(project, intake) {
+  if (intake.profile.derived?.profileId) return intake.profile.derived.profileId;
   if (intake.profile.project?.type && intake.profile.project.type !== "auto") return intake.profile.project.type;
   return intake.profile.derived?.projectType || (project.electron?.detected ? "electron" : "generic");
 }
@@ -91,10 +93,14 @@ export function buildWizardQuestions(project, intake, options = {}) {
   const observability = evidence.observability || {};
   const database = evidence.database || {};
   const hasDeployment = Boolean(intake.profile.derived?.hasDeployment);
+  const resolvedProfile = intake.profile.derived?.profile;
+  const electronProfileIds = new Set(["electron", "electron-desktop"]);
+  const webOrApiProfileIds = new Set(["web", "api", "fullstack", "nextjs-web", "node-api"]);
+  const databaseProfileIds = new Set(["database-prisma"]);
 
-  return [
+  const questions = [
     { id: "project_name", kind: "text", default: intake.profile.project?.name || packageName(project, project.root), prompt: localized(lang, "Project name", "项目名称") },
-    { id: "project_type", kind: "choice", choices: ["electron", "web", "api", "fullstack", "cli", "library", "node", "generic"], default: typeDefault, prompt: localized(lang, "Project type", "项目类型") },
+    { id: "project_type", kind: "choice", choices: profileIds(), default: typeDefault, prompt: localized(lang, "Project profile", "项目规则包") },
     { id: "lifecycle", kind: "choice", choices: ["development", "pre-production", "production", "maintenance"], default: intake.profile.project?.lifecycle || "development", prompt: localized(lang, "Lifecycle stage", "项目阶段") },
     { id: "handles_auth", kind: "yes-no", default: boolDefault(intake.profile.risk?.handles_auth), prompt: localized(lang, "Does it have login, sessions, or user accounts?", "是否有登录、会话或用户账号？") },
     { id: "handles_sensitive_data", kind: "yes-no", default: boolDefault(intake.profile.risk?.handles_sensitive_data), prompt: localized(lang, "Does it handle private or sensitive user data?", "是否处理隐私或敏感用户数据？") },
@@ -116,22 +122,32 @@ export function buildWizardQuestions(project, intake, options = {}) {
     { id: "business_flow_tests", kind: "yes-no", default: "unknown", prompt: localized(lang, "Do critical flows already have automated tests?", "核心业务流程是否已有自动化测试？") },
     { id: "strict_production", kind: "yes-no", default: "no", prompt: localized(lang, "Should missing production evidence block release?", "缺少生产证据时是否阻断发布？") },
 
-    { id: "electron_ipc", kind: "yes-no", default: detectedElectron ? "yes" : "unknown", when: (answers) => detectedElectron || answers.project_type === "electron", prompt: localized(lang, "Does the Electron app expose IPC APIs?", "Electron 应用是否暴露 IPC API？") },
-    { id: "electron_file_access", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || answers.project_type === "electron", prompt: localized(lang, "Does it read local files selected or provided by users?", "是否读取用户选择或提供的本地文件？") },
-    { id: "electron_auto_update", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || answers.project_type === "electron", prompt: localized(lang, "Does it have an auto-update mechanism?", "是否有自动更新机制？") },
-    { id: "electron_signed_updates", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || answers.project_type === "electron", prompt: localized(lang, "Are updates signed or integrity-verified?", "更新是否签名或做完整性校验？") },
+    { id: "electron_ipc", kind: "yes-no", default: detectedElectron ? "yes" : "unknown", when: (answers) => detectedElectron || electronProfileIds.has(answers.project_type), prompt: localized(lang, "Does the Electron app expose IPC APIs?", "Electron 应用是否暴露 IPC API？") },
+    { id: "electron_file_access", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || electronProfileIds.has(answers.project_type), prompt: localized(lang, "Does it read local files selected or provided by users?", "是否读取用户选择或提供的本地文件？") },
+    { id: "electron_auto_update", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || electronProfileIds.has(answers.project_type), prompt: localized(lang, "Does it have an auto-update mechanism?", "是否有自动更新机制？") },
+    { id: "electron_signed_updates", kind: "yes-no", default: "unknown", when: (answers) => detectedElectron || electronProfileIds.has(answers.project_type), prompt: localized(lang, "Are updates signed or integrity-verified?", "更新是否签名或做完整性校验？") },
 
-    { id: "public_api", kind: "yes-no", default: "unknown", when: (answers) => ["web", "api", "fullstack"].includes(answers.project_type), prompt: localized(lang, "Does it expose public API routes?", "是否暴露公开 API 路由？") },
-    { id: "file_uploads", kind: "yes-no", default: "unknown", when: (answers) => ["web", "api", "fullstack"].includes(answers.project_type), prompt: localized(lang, "Does it accept file uploads?", "是否接受文件上传？") },
-    { id: "admin_roles", kind: "yes-no", default: "unknown", when: (answers) => ["web", "api", "fullstack"].includes(answers.project_type), prompt: localized(lang, "Does it have admin or privileged roles?", "是否有管理员或高权限角色？") },
-    { id: "cross_origin", kind: "yes-no", default: "unknown", when: (answers) => ["web", "api", "fullstack"].includes(answers.project_type), prompt: localized(lang, "Does it allow cross-origin browser access?", "是否允许跨域浏览器访问？") },
+    { id: "public_api", kind: "yes-no", default: "unknown", when: (answers) => webOrApiProfileIds.has(answers.project_type), prompt: localized(lang, "Does it expose public API routes?", "是否暴露公开 API 路由？") },
+    { id: "file_uploads", kind: "yes-no", default: "unknown", when: (answers) => webOrApiProfileIds.has(answers.project_type), prompt: localized(lang, "Does it accept file uploads?", "是否接受文件上传？") },
+    { id: "admin_roles", kind: "yes-no", default: "unknown", when: (answers) => webOrApiProfileIds.has(answers.project_type), prompt: localized(lang, "Does it have admin or privileged roles?", "是否有管理员或高权限角色？") },
+    { id: "cross_origin", kind: "yes-no", default: "unknown", when: (answers) => webOrApiProfileIds.has(answers.project_type), prompt: localized(lang, "Does it allow cross-origin browser access?", "是否允许跨域浏览器访问？") },
 
-    { id: "db_migrations", kind: "yes-no", default: hasEvidence(database.migrations), when: (answers) => yesNo(answers.has_database) || detectedDatabase, prompt: localized(lang, "Are database changes managed by migrations?", "数据库变更是否通过迁移管理？") },
-    { id: "db_backup", kind: "yes-no", default: hasEvidence(database.backup_policy), when: (answers) => yesNo(answers.has_database) || detectedDatabase, prompt: localized(lang, "Is there a backup policy before production data changes?", "生产数据变更前是否有备份策略？") },
-    { id: "db_rollback", kind: "yes-no", default: hasEvidence(database.rollback_plan), when: (answers) => yesNo(answers.has_database) || detectedDatabase, prompt: localized(lang, "Is there a rollback or forward-fix plan for migrations?", "数据库迁移是否有回滚或 forward-fix 方案？") },
-    { id: "db_concurrency", kind: "yes-no", default: "unknown", when: (answers) => yesNo(answers.has_database) || detectedDatabase, prompt: localized(lang, "Can concurrent writes affect correctness?", "并发写入是否可能影响数据正确性？") },
-    { id: "db_audit_log", kind: "yes-no", default: "unknown", when: (answers) => yesNo(answers.has_database) || detectedDatabase, prompt: localized(lang, "Is there audit logging for important data changes?", "关键数据变更是否有审计日志？") },
+    { id: "db_migrations", kind: "yes-no", default: hasEvidence(database.migrations), when: (answers) => yesNo(answers.has_database) || detectedDatabase || databaseProfileIds.has(answers.project_type), prompt: localized(lang, "Are database changes managed by migrations?", "数据库变更是否通过迁移管理？") },
+    { id: "db_backup", kind: "yes-no", default: hasEvidence(database.backup_policy), when: (answers) => yesNo(answers.has_database) || detectedDatabase || databaseProfileIds.has(answers.project_type), prompt: localized(lang, "Is there a backup policy before production data changes?", "生产数据变更前是否有备份策略？") },
+    { id: "db_rollback", kind: "yes-no", default: hasEvidence(database.rollback_plan), when: (answers) => yesNo(answers.has_database) || detectedDatabase || databaseProfileIds.has(answers.project_type), prompt: localized(lang, "Is there a rollback or forward-fix plan for migrations?", "数据库迁移是否有回滚或 forward-fix 方案？") },
+    { id: "db_concurrency", kind: "yes-no", default: "unknown", when: (answers) => yesNo(answers.has_database) || detectedDatabase || databaseProfileIds.has(answers.project_type), prompt: localized(lang, "Can concurrent writes affect correctness?", "并发写入是否可能影响数据正确性？") },
+    { id: "db_audit_log", kind: "yes-no", default: "unknown", when: (answers) => yesNo(answers.has_database) || detectedDatabase || databaseProfileIds.has(answers.project_type), prompt: localized(lang, "Is there audit logging for important data changes?", "关键数据变更是否有审计日志？") },
   ];
+
+  const profileQuestions = (resolvedProfile?.wizardQuestions || []).map((question) => ({
+    id: question.id,
+    kind: question.kind || "yes-no",
+    default: question.default || "unknown",
+    prompt: localized(lang, question.prompt, question.promptZh || question.prompt),
+    profileQuestion: true,
+  }));
+
+  return [...questions, ...profileQuestions];
 }
 
 function defaultAnswers(questions) {
@@ -182,17 +198,24 @@ function buildBusinessFlows(answers) {
   };
 }
 
+function profileRiskAnswers(intake, answers) {
+  const questions = intake.profile.derived?.profile?.wizardQuestions || [];
+  return Object.fromEntries(questions.map((question) => [question.riskKey || question.id, yesNo(answers[question.id])]));
+}
+
 function buildDocuments(root, project, intake, answers, options = {}) {
   const detectedDatabase = Boolean(project.riskSurfaces?.database?.length);
   const detectedElectron = Boolean(project.electron?.detected);
   const confirmedDatabase = yesNo(answers.has_database, detectedDatabase);
   const confirmedDeployment = yesNo(answers.has_deployment, false);
   const hasProduction = confirmedDeployment && yesNo(answers.has_production, false);
+  const selectedProfile = normalizeProfileId(answers.project_type || intake.profile.derived?.profileId || "auto") || "auto";
   const profile = deepMerge(intake.profile, {
     schema_version: 1,
     project: {
       name: answers.project_name || packageName(project, root),
       type: answers.project_type || projectKind(project, intake),
+      profile: selectedProfile,
       lifecycle: answers.lifecycle || "development",
       production: hasProduction,
     },
@@ -215,6 +238,7 @@ function buildDocuments(root, project, intake, answers, options = {}) {
       electron_signed_updates: yesNo(answers.electron_signed_updates),
       database_concurrent_writes: yesNo(answers.db_concurrency),
       database_audit_log: yesNo(answers.db_audit_log),
+      ...profileRiskAnswers(intake, answers),
     },
   });
 
@@ -254,8 +278,10 @@ function buildDocuments(root, project, intake, answers, options = {}) {
 
   const businessFlows = buildBusinessFlows(answers);
   const summary = buildIntakeSummary(root, project, { profile, evidence, businessFlows, riskPolicy }, answers, options);
+  const persistedProfile = { ...profile };
+  delete persistedProfile.derived;
 
-  return { profile, evidence, businessFlows, riskPolicy, summary };
+  return { profile: persistedProfile, evidence, businessFlows, riskPolicy, summary };
 }
 
 function detectedSignals(project) {
@@ -292,7 +318,9 @@ function userDecisionItems(project, answers) {
 
 export function buildIntakeSummary(root, project, documents, answers, options = {}) {
   const lang = options.lang || "en";
+  const profileInfo = documents.profile.derived?.profile || {};
   const confirmed = [
+    `Profile: ${documents.profile.project.profile || profileInfo.id || "auto"}`,
     `Project type: ${documents.profile.project.type}`,
     `Lifecycle: ${documents.profile.project.lifecycle}`,
     `Production/public release: ${documents.profile.project.production ? "yes" : "no"}`,
@@ -304,6 +332,7 @@ export function buildIntakeSummary(root, project, documents, answers, options = 
   const policy = documents.riskPolicy.production || {};
   const decisions = userDecisionItems(project, answers);
   const signals = detectedSignals(project);
+  const riskFocus = profileInfo.riskFocus || documents.profile.derived?.profileRiskFocus || [];
   const title = localized(lang, "Project Intake Summary", "项目画像摘要");
   const confirmedTitle = localized(lang, "Maintainer Confirmed", "用户已确认");
   const inferredTitle = localized(lang, "AI-Inferred Signals", "AI 推断信号");
@@ -320,6 +349,9 @@ export function buildIntakeSummary(root, project, documents, answers, options = 
     "",
     `## ${inferredTitle}`,
     ...(signals.length ? signals.map((item) => `- ${item}`) : ["- No strong local signals detected."]),
+    "",
+    "## Profile Risk Focus",
+    ...(riskFocus.length ? riskFocus.map((item) => `- ${item}`) : ["- No profile-specific risk focus selected."]),
     "",
     `## ${policyTitle}`,
     `- Block on coverage gaps: ${Boolean(policy.block_on_coverage_gaps)}`,
@@ -352,7 +384,7 @@ function writeText(root, relativePath, value, result) {
 export function planIntakeWizard(projectRoot, options = {}) {
   const root = path.resolve(projectRoot || process.cwd());
   const project = detectProject(root);
-  const intake = loadIntake(root, project);
+  const intake = loadIntake(root, project, { profile: options.profile });
   const questions = buildWizardQuestions(project, intake, { lang: options.lang });
   const answers = { ...defaultAnswers(questions), ...(options.answers || {}) };
   const documents = buildDocuments(root, project, intake, answers, options);
@@ -371,7 +403,7 @@ export function planIntakeWizard(projectRoot, options = {}) {
 export async function runIntakeWizard(projectRoot, options = {}) {
   const root = path.resolve(projectRoot || process.cwd());
   const project = detectProject(root);
-  const intake = loadIntake(root, project);
+  const intake = loadIntake(root, project, { profile: options.profile });
   const questions = buildWizardQuestions(project, intake, { lang: options.lang });
   const initialAnswers = { ...defaultAnswers(questions), ...(options.answers || {}) };
   const answers = options.dryRun || options.interactive === false

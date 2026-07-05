@@ -67,6 +67,7 @@ export function buildJsonReport({
   audit = null,
   evidence = null,
   agentRisk = null,
+  profile = null,
   toolVersions = {},
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
@@ -98,6 +99,7 @@ export function buildJsonReport({
     maintenance: buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExceptions }),
     generatedAt,
     probe,
+    profile,
     audit,
     evidence,
     agentRisk,
@@ -121,12 +123,30 @@ export function toMarkdown(report) {
   lines.push("");
   lines.push(`Root: ${report.root}`);
   lines.push(`Mode: strict=${Boolean(report.mode?.strict)}, release=${Boolean(report.mode?.release)}, production=${Boolean(report.mode?.production)}`);
+  if (report.profile) {
+    lines.push(`Profile: ${report.profile.id} (${report.profile.source})`);
+  }
   lines.push(`Generated: ${report.generatedAt}`);
   if (report.maintenance) {
     lines.push(`Open Source Maintenance Score: ${report.maintenance.score}/100 (${report.maintenance.grade})`);
   }
   lines.push(`Code Scanning Results: ${countSarifResults(report)} (non-blocking production gaps stay in this report and artifacts)`);
   lines.push("");
+
+  if (report.profile) {
+    lines.push("## Project Profile");
+    lines.push(`- Profile: ${report.profile.id}`);
+    lines.push(`- Source: ${report.profile.source}`);
+    const matched = report.profile.matchedProfiles || [];
+    lines.push(`- Matched profiles: ${matched.length ? matched.join(", ") : "none"}`);
+    lines.push("- Risk focus:");
+    for (const item of report.profile.riskFocus || []) lines.push(`  - ${item}`);
+    const signals = Object.entries(report.profile.signals || {}).flatMap(([id, items]) => (items || []).map((item) => `${id}: ${item.evidence}`));
+    lines.push("- Signals:");
+    if (!signals.length) lines.push("  - none");
+    for (const item of signals) lines.push(`  - ${item}`);
+    lines.push("");
+  }
 
   lines.push("## Blocking Checks");
   if (!report.blockers.length && !report.exceptions.invalid.length) lines.push("- None");
