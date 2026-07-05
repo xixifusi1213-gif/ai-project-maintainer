@@ -126,6 +126,11 @@ test("publish workflow uses OIDC trusted publishing and avoids long-lived npm to
   assert.doesNotMatch(workflowText, /cache:\s*npm/);
   assert.doesNotMatch(workflowText, /run:[^\n]*\$\{\{\s*steps\.pack\.outputs\.tarball\s*\}\}/);
   assert.match(workflowText, /find dist -maxdepth 1 -type f -name 'ai-project-maintainer-\*\.tgz'/);
+  assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
+  assert.match(workflowText, /TRIVY_VERSION: v0\.71\.2/);
+  assert.match(workflowText, /SEMGREP_VERSION: 1\.168\.0/);
+  assert.match(workflowText, /go install "github\.com\/zricethezav\/gitleaks\/v8@\$GITLEAKS_VERSION"/);
+  assert.match(workflowText, /python -m pip install --user "semgrep==\$SEMGREP_VERSION"/);
   assert.match(workflowText, /npm publish .*--access public/);
   assert.match(workflowText, /attest-build-provenance/);
 });
