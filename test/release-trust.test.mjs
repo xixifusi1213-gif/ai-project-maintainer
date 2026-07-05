@@ -125,6 +125,9 @@ test("publish workflow uses OIDC trusted publishing and avoids long-lived npm to
   assert.doesNotMatch(workflowText, /NPM_TOKEN|NODE_AUTH_TOKEN/);
   assert.doesNotMatch(workflowText, /cache:\s*npm/);
   assert.doesNotMatch(workflowText, /run:[^\n]*\$\{\{\s*steps\.pack\.outputs\.tarball\s*\}\}/);
+  assert.match(workflowText, /node-version: "24"/);
+  assert.match(workflowText, /registry-url: "https:\/\/registry\.npmjs\.org"/);
+  assert.match(workflowText, /npm install -g npm@11\.9\.0/);
   assert.match(workflowText, /find dist -maxdepth 1 -type f -name 'ai-project-maintainer-\*\.tgz'/);
   assert.match(workflowText, /GITLEAKS_VERSION: v8\.30\.0/);
   assert.match(workflowText, /TRIVY_VERSION: v0\.71\.2/);
