@@ -22,20 +22,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
     steps:
       - name: Check out release tag
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ inputs.tag || github.ref_name }}
           persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
-          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -67,14 +66,18 @@ jobs:
         run: |
           set -euo pipefail
           npm pack --pack-destination dist
-          tarball="$(ls dist/ai-project-maintainer-*.tgz | head -n 1)"
+          tarball="$(find dist -maxdepth 1 -type f -name 'ai-project-maintainer-*.tgz' -print -quit)"
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
 
       - name: Verify prepublish alignment
-        run: node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --tarball "${{ steps.pack.outputs.tarball }}"
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --tarball "$TARBALL"
 
       - name: Generate release manifest
-        run: node ai-project-maintainer/scripts/release-manifest.mjs --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --tarball "${{ steps.pack.outputs.tarball }}" --sbom dist/sbom.cdx.json --report reports/security-report.json --output dist/release-manifest.json
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: node ai-project-maintainer/scripts/release-manifest.mjs --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --tarball "$TARBALL" --sbom dist/sbom.cdx.json --report reports/security-report.json --output dist/release-manifest.json
 
       - name: Attest release artifacts
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
@@ -98,18 +101,21 @@ jobs:
 
       - name: Publish to npm with trusted publishing
         if: steps.npm_status.outputs.published != 'true'
-        run: npm publish "${{ steps.pack.outputs.tarball }}" --access public --provenance --registry=https://registry.npmjs.org/
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: npm publish "$TARBALL" --access public --provenance --registry=https://registry.npmjs.org/
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          TARBALL: ${{ steps.pack.outputs.tarball }}
         shell: bash
         run: |
           set -euo pipefail
           notes_file="docs/releases/${RELEASE_TAG}.md"
           title="${RELEASE_TAG}: Trusted release chain"
           assets=(
-            "${{ steps.pack.outputs.tarball }}"
+            "$TARBALL"
             "dist/sbom.cdx.json"
             "dist/release-manifest.json"
             "dist/release-manifest.md"
@@ -129,6 +135,7 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in {1..12}; do
+            echo "Published release verification attempt $attempt"
             if node ai-project-maintainer/scripts/verify-release.mjs --published --version "${RELEASE_TAG#v}" --tag "$RELEASE_TAG" --manifest dist/release-manifest.json; then
               exit 0
             fi
