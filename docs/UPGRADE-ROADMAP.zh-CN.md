@@ -10,6 +10,14 @@
 
 ## 已完成基线
 
+### v1.0.0：发布可信链与稳定接口
+
+- 发布方式升级为 GitHub Actions + npm Trusted Publishing，不再依赖本机 `npm publish`。
+- 新增发布 manifest、SBOM、GitHub artifact attestation 和发布后三方对齐验证。
+- 新增 `SECURITY.md`、`docs/RELEASE-TRUST.md`、`docs/REPORT-SCHEMA.md`。
+- 明确 1.x 稳定 CLI 命令和报告字段兼容策略。
+- v1.0 宣传语保持：`Release readiness gate for AI-coded projects.`
+
 ### v0.9.0：AI Agent / MCP / Codex 使用风险检查
 
 - 新增 `agent-risk` 命令，生成 `reports/agent-risk-report.json` 和 `reports/agent-risk-report.md`。
@@ -57,7 +65,7 @@
 
 ## 后续优先路线
 
-### v0.10.0：项目类型 Profile 规则包
+### v1.1.0：项目类型 Profile 规则包
 
 目标：从通用门禁升级为“按项目类型审查”。
 
@@ -86,7 +94,7 @@ npx ai-project-maintainer audit-plan "E:\my-project" --profile nextjs-saas
 - Static site：构建、依赖、CSP、部署回滚。
 - Browser extension：manifest 权限、content script、外部连接、token 存储。
 
-### v0.11.0：Codex 修复任务包
+### v1.2.0：Codex 修复任务包
 
 目标：把报告从“发现问题”升级为“可交给 AI 修复的任务包”。
 
@@ -113,7 +121,7 @@ reports/recheck-commands.ps1
 - AI 可以按任务修复，工具负责复验。
 - 用户负责业务判断和风险接受。
 
-### v0.12.0：真实案例库和公开 benchmark
+### v1.3.0：真实案例库和公开 benchmark
 
 目标：用可复现案例证明工具不是口号。
 
@@ -139,25 +147,6 @@ npm run benchmark:cases
 - 最终是 `PASS`、`PASS_WITH_GAPS` 还是 `FAIL`。
 - 工具漏了什么。
 - 哪些必须人工判断。
-
-### v1.0.0：发布可信链与稳定接口
-
-v1.0 不应只是再加功能，而应成为可信正式版。
-
-目标：
-
-- npm provenance。
-- SLSA GitHub Actions provenance。
-- SBOM 和 npm 包内容对齐。
-- signed tag，或至少明确 tag / GitHub Release / npm 三方对齐验证。
-- 报告 schema 稳定。
-- CLI 命令稳定。
-- 自己 dogfood 自己的 gate。
-- `TRUST.md`、`DESIGN.md`、`STANDARDS-CROSSWALK.md` 完整并持续维护。
-
-v1.0 宣传语：
-
-> Release readiness gate for AI-coded projects.
 
 ## 暂不优先
 

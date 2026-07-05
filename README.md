@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, let Codex fix blockers, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -66,6 +66,24 @@ npx ai-project-maintainer gate "E:\my-project" --production --agent-risk --stric
 ```
 
 GitHub Actions templates can either use the npm package or clone this repository directly.
+
+## How releases are trusted
+
+Starting with v1.0.0, project releases are designed to be published by GitHub Actions through npm Trusted Publishing, not from a maintainer laptop.
+
+The release chain is:
+
+```text
+Git tag -> GitHub Actions gate -> npm provenance -> SBOM -> release manifest -> GitHub Release assets
+```
+
+Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`, and the security report used for the release decision. See [Release trust](docs/RELEASE-TRUST.md), [Report schema](docs/REPORT-SCHEMA.md), and [Security policy](SECURITY.md).
+
+Published-release alignment can be checked with:
+
+```powershell
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.0.0 --tag v1.0.0 --manifest dist/release-manifest.json
+```
 
 ## Real Demo
 
@@ -297,6 +315,9 @@ It is designed for the practical middle ground: a personal developer or small te
 - [Real OSS case studies](docs/CASE-STUDIES.md)
 - [Trust model](TRUST.md)
 - [Design notes](DESIGN.md)
+- [Release trust](docs/RELEASE-TRUST.md)
+- [Report schema](docs/REPORT-SCHEMA.md)
+- [Security policy](SECURITY.md)
 - [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 - [Production evidence connectors](docs/CONNECTORS.md)
 - [生产证据连接器](docs/CONNECTORS.zh-CN.md)

@@ -341,6 +341,8 @@ function isHealthyDeploymentStatus(value) {
 
 function runCommand(command, args, options = {}) {
   if (typeof options.runCommand === "function") return options.runCommand(command, args, options);
+  // This helper is only used for fixed local connector commands such as `atlas migrate lint`.
+  // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
   return spawnSync(command, args, {
     cwd: options.cwd,
     encoding: "utf8",

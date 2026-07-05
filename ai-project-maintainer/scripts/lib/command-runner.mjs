@@ -108,8 +108,8 @@ export function runCommand(command, commandArgs = [], options = {}) {
 
   const started = Date.now();
   // Commands are resolved from an allowlist; Windows .cmd/.bat shims are routed through cmd.exe call.
-  // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
   const target = spawnTarget(resolved, commandArgs);
+  // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
   const result = spawnSync(target.file, target.args, {
     cwd: options.cwd || process.cwd(),
     encoding: "utf8",

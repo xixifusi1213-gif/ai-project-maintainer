@@ -29,6 +29,7 @@ It is not a certification, compliance claim, audit opinion, or guarantee that a 
 | Secrets and static analysis | `secrets`, `sast` | NIST SSDF, OWASP SAMM |
 | Dependencies and SBOM | `dependencies`, `supply-chain` | NIST SSDF, SLSA, OpenSSF Scorecard |
 | CI security | `ci-security` | OpenSSF Scorecard, SLSA, Google SRE Release Engineering |
+| Release trust chain | npm provenance, GitHub attestation, release manifest | SLSA, OpenSSF Scorecard, Google SRE Release Engineering |
 | Infrastructure and app configuration | `iac`, `electron` | NIST SSDF, OWASP SAMM |
 | Database migration risk | `database`, `production-evidence` migration checks | OWASP SAMM Operations, Google SRE Release Engineering |
 | Release approval and deployment evidence | `production-audit`, `production-evidence` | Google SRE Release Engineering, Google SRE Embracing Risk, DORA |

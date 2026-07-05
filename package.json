@@ -1,6 +1,6 @@
 {
   "name": "ai-project-maintainer",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "Release readiness gate for AI-coded projects.",
   "type": "module",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "examples/demo-ai-app/test/",
     "examples/oss-case-studies/",
     "docs/",
+    "SECURITY.md",
     "TRUST.md",
     "DESIGN.md",
     "README.md"
@@ -51,7 +52,10 @@
     "check": "node ai-project-maintainer/scripts/check-syntax.mjs",
     "cases:verify": "node examples/oss-case-studies/run-oss-case-studies.mjs --verify",
     "smoke:npm": "node ai-project-maintainer/scripts/npm-package-smoke.mjs",
-    "smoke:connectors:live": "node ai-project-maintainer/scripts/live-connector-smoke.mjs"
+    "smoke:connectors:live": "node ai-project-maintainer/scripts/live-connector-smoke.mjs",
+    "release:manifest": "node ai-project-maintainer/scripts/release-manifest.mjs",
+    "release:verify:pre": "node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version 1.0.0 --tag v1.0.0",
+    "release:verify:published": "node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.0.0 --tag v1.0.0"
   },
   "dependencies": {
     "yaml": "2.9.0"
