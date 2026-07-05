@@ -7,6 +7,7 @@ import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { initAudit, initAuditWizard } from "./init-audit.mjs";
 import { initProject } from "./init-project.mjs";
+import { runRepairPack } from "./repair-pack.mjs";
 import { runLocalGate, runLocalGateAsync } from "./run-local-gate.mjs";
 import { summarizeReport } from "./report-summary.mjs";
 import { runConnectorsDoctor, runEvidence, writeEvidenceReport } from "./lib/connectors.mjs";
@@ -148,6 +149,18 @@ export function parseCliArgs(argv) {
     };
   }
 
+  if (command === "repair-pack") {
+    return {
+      command,
+      args: {
+        reportPath: firstPositional(rest, ["--project", "--output"]) || "reports/security-report.json",
+        projectRoot: readOption(rest, "--project", null),
+        outputDir: readOption(rest, "--output", null),
+        jsonOnly: rest.includes("--json"),
+      },
+    };
+  }
+
   return { command: "help", args: {} };
 }
 
@@ -254,7 +267,26 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     return 0;
   }
 
-  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|agent-risk|connectors|evidence|summary> [options]\n");
+  if (parsed.command === "repair-pack") {
+    try {
+      const result = runRepairPack(parsed.args.reportPath, {
+        projectRoot: parsed.args.projectRoot,
+        outputDir: parsed.args.outputDir,
+      });
+      if (parsed.args.jsonOnly) {
+        io.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      } else {
+        io.stdout.write(`AI Agent Repair Pack generated: ${result.repairPack.summary.total} task(s)\n`);
+        for (const file of Object.values(result.files)) io.stdout.write(`- ${file}\n`);
+      }
+      return 0;
+    } catch (error) {
+      io.stderr.write(`${error.message}\n`);
+      return 2;
+    }
+  }
+
+  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|agent-risk|connectors|evidence|summary|repair-pack> [options]\n");
   io.stderr.write("       ai-project-maintainer --version\n");
   return 2;
 }

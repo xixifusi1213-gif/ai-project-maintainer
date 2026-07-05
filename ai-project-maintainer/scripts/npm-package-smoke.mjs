@@ -122,4 +122,24 @@ expectFile(path.join(projectDir, ".ai-maintainer", "exceptions.yml"));
 expectFile(path.join(projectDir, ".github", "workflows", "security-gate.yml"));
 expectFile(path.join(projectDir, "reports", ".gitkeep"));
 
+const securityReportPath = path.join(projectDir, "reports", "security-report.json");
+fs.writeFileSync(securityReportPath, JSON.stringify({
+  schemaVersion: 1,
+  root: projectDir,
+  mode: { strict: true, release: true, production: true, agentRisk: true, profile: "auto" },
+  overallStatus: "FAIL",
+  passed: false,
+  checks: [{ checkId: "tests", group: "tests", name: "tests", status: "fail", blocking: true, summary: "test failure" }],
+  exceptions: { invalid: [] },
+}, null, 2));
+const repairPack = runBin(tempRoot, ["repair-pack", securityReportPath, "--project", projectDir, "--output", path.join(projectDir, "reports")]);
+if (!repairPack.stdout.includes("AI Agent Repair Pack generated")) {
+  throw new Error(`Repair-pack smoke failed:\n${repairPack.stdout}\n${repairPack.stderr}`);
+}
+expectFile(path.join(projectDir, "reports", "fix-plan.md"));
+expectFile(path.join(projectDir, "reports", "agent-tasks.json"));
+expectFile(path.join(projectDir, "reports", "codex-tasks.json"));
+expectFile(path.join(projectDir, "reports", "recheck-commands.ps1"));
+expectFile(path.join(projectDir, "reports", "recheck-commands.sh"));
+
 console.log(`npm package smoke passed for ai-project-maintainer@${pkg.version}`);

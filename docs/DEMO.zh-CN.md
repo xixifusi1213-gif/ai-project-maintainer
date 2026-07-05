@@ -64,12 +64,12 @@ npx ai-project-maintainer gate .\examples\demo-ai-app --production --strict --re
 
 这个工具不是为了假装项目完美，而是把已经检查失败的项和缺少的生产证据在发布前明确展示出来。
 
-## 5. 让 Codex 修阻断项
+## 5. 生成 AI Agent 修复任务
 
-可以这样要求 Codex：
+把 gate 报告转换成 AI coding assistant 可以执行的任务包：
 
-```text
-$ai-project-maintainer run the production gate for this project, fix blockers, and rerun until it passes.
+```powershell
+npx ai-project-maintainer repair-pack reports/security-report.json --project .\examples\demo-ai-app --output reports
 ```
 
-Codex 适合处理确定性的阻断项。维护者仍然负责业务决策、风险接受和生产证据确认。
+通用入口是 `reports/agent-tasks.json`，Codex 适配入口是 `reports/codex-tasks.json`。Codex、Cursor、Claude Code、Cline 等工具都可以按任务处理确定性的阻断项；维护者仍然负责业务决策、风险接受和生产证据确认。
