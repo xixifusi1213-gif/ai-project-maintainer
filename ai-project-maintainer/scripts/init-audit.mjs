@@ -11,6 +11,7 @@ import {
 } from "./lib/intake.mjs";
 import { runIntakeWizard } from "./lib/intake-wizard.mjs";
 import { connectorsTemplate } from "./lib/connectors.mjs";
+import { normalizeProfileId } from "./lib/profiles.mjs";
 
 const markdownTemplates = {
   ".ai-maintainer/threat-model.md": `# Threat Model
@@ -73,6 +74,18 @@ function yamlTemplate(value) {
   return YAML.stringify(value);
 }
 
+function projectProfileTemplate(profile = "auto") {
+  const normalizedProfile = normalizeProfileId(profile) || "auto";
+  if (normalizedProfile === "auto") return defaultProjectProfile;
+  return {
+    ...defaultProjectProfile,
+    project: {
+      ...defaultProjectProfile.project,
+      profile: normalizedProfile,
+    },
+  };
+}
+
 function safeWrite(root, relativePath, content, result) {
   const full = path.join(root, ...relativePath.split("/"));
   fs.mkdirSync(path.dirname(full), { recursive: true });
@@ -88,11 +101,18 @@ function firstPositional(args, optionValueNames = []) {
   return args.find((arg, index) => !arg.startsWith("--") && !optionValueNames.includes(args[index - 1]));
 }
 
-export function initAudit(projectRoot) {
+function readOption(args, name, fallback = null) {
+  const index = args.indexOf(name);
+  if (index !== -1) return args[index + 1] || fallback;
+  const inline = args.find((arg) => arg.startsWith(`${name}=`));
+  return inline ? inline.slice(name.length + 1) : fallback;
+}
+
+export function initAudit(projectRoot, options = {}) {
   const root = path.resolve(projectRoot || process.cwd());
   const result = { root, created: [], skipped: [] };
 
-  safeWrite(root, ".ai-maintainer/project-profile.yml", yamlTemplate(defaultProjectProfile), result);
+  safeWrite(root, ".ai-maintainer/project-profile.yml", yamlTemplate(projectProfileTemplate(options.profile)), result);
   safeWrite(root, ".ai-maintainer/evidence-sources.yml", yamlTemplate(defaultEvidenceSources), result);
   safeWrite(root, ".ai-maintainer/business-flows.yml", yamlTemplate(defaultBusinessFlows), result);
   safeWrite(root, ".ai-maintainer/risk-policy.yml", yamlTemplate(defaultRiskPolicy), result);
@@ -106,7 +126,7 @@ export async function initAuditWizard(projectRoot, options = {}) {
   const root = path.resolve(projectRoot || process.cwd());
   if (options.dryRun) return runIntakeWizard(root, options);
   const wizardResult = await runIntakeWizard(root, options);
-  const templateResult = initAudit(root);
+  const templateResult = initAudit(root, { profile: options.profile });
   return {
     ...wizardResult,
     created: [...templateResult.created, ...wizardResult.created],
@@ -117,14 +137,15 @@ export async function initAuditWizard(projectRoot, options = {}) {
 
 async function main() {
   const args = process.argv.slice(2);
-  const projectRoot = firstPositional(args, ["--lang"]) || process.cwd();
+  const projectRoot = firstPositional(args, ["--lang", "--profile"]) || process.cwd();
   const wizard = args.includes("--wizard");
   const dryRun = args.includes("--dry-run");
   const langIndex = args.indexOf("--lang");
   const lang = langIndex === -1 ? "en" : args[langIndex + 1] || "en";
+  const profile = readOption(args, "--profile", "auto");
   const result = wizard
-    ? await initAuditWizard(projectRoot, { dryRun, lang })
-    : initAudit(projectRoot);
+    ? await initAuditWizard(projectRoot, { dryRun, lang, profile })
+    : initAudit(projectRoot, { profile });
   console.log(JSON.stringify(result, null, 2));
 }
 

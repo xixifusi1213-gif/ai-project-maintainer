@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
+import { buildProfilePolicy, normalizeProfileId, resolveProjectProfile } from "./profiles.mjs";
 
 export const defaultPolicy = {
-  profile: "oss",
+  profile: "auto",
   mode: "strict",
   tool_groups: [],
   checks: {
@@ -52,25 +53,29 @@ function parseYamlFile(filePath, fallback) {
   }
 }
 
-function mergePolicy(customPolicy) {
+function mergePolicy(customPolicy, profilePolicy, resolvedProfileId) {
   return {
     ...defaultPolicy,
+    ...profilePolicy,
     ...customPolicy,
-    checks: { ...defaultPolicy.checks, ...(customPolicy.checks || {}) },
-    fail_on: { ...defaultPolicy.fail_on, ...(customPolicy.fail_on || {}) },
-    warn_on: { ...defaultPolicy.warn_on, ...(customPolicy.warn_on || {}) },
+    profile: resolvedProfileId,
+    checks: { ...defaultPolicy.checks, ...(profilePolicy.checks || {}), ...(customPolicy.checks || {}) },
+    fail_on: { ...defaultPolicy.fail_on, ...(profilePolicy.fail_on || {}), ...(customPolicy.fail_on || {}) },
+    warn_on: { ...defaultPolicy.warn_on, ...(profilePolicy.warn_on || {}), ...(customPolicy.warn_on || {}) },
     reporting: {
       ...defaultPolicy.reporting,
+      ...(profilePolicy.reporting || {}),
       ...(customPolicy.reporting || {}),
       code_scanning: {
         ...defaultPolicy.reporting.code_scanning,
+        ...((profilePolicy.reporting || {}).code_scanning || {}),
         ...((customPolicy.reporting || {}).code_scanning || {}),
       },
     },
   };
 }
 
-export function loadPolicyBundle(projectRoot) {
+export function loadPolicyBundle(projectRoot, options = {}) {
   const root = path.resolve(projectRoot);
   const policyPath = path.join(root, ".ai-maintainer", "policy.yml");
   const exceptionsPath = path.join(root, ".ai-maintainer", "exceptions.yml");
@@ -79,9 +84,17 @@ export function loadPolicyBundle(projectRoot) {
   const exceptions = fs.existsSync(exceptionsPath)
     ? (Array.isArray(exceptionDocument.exceptions) ? exceptionDocument.exceptions : [])
     : [];
+  const profile = resolveProjectProfile(options.project || {}, {
+    cliProfile: options.profile,
+    policyProfile: normalizeProfileId(customPolicy.profile || defaultPolicy.profile),
+    projectProfile: options.projectProfile,
+  });
+  const profilePolicy = buildProfilePolicy(profile);
 
   return {
-    policy: mergePolicy(customPolicy),
+    policy: mergePolicy(customPolicy, profilePolicy, profile.id),
+    profile,
+    customPolicy,
     exceptions,
     paths: { policyPath, exceptionsPath },
   };

@@ -82,6 +82,7 @@ test("README first-run links are readable and not mojibake", () => {
   assert.doesNotMatch(readme, /涓|枃|路|·/);
   assert.match(readme, /\[See the demo\]\(docs\/DEMO\.md\)/);
   assert.match(readme, /\[Real OSS cases\]\(docs\/CASE-STUDIES\.md\)/);
+  assert.match(readme, /\[Project profiles\]\(docs\/PROJECT-PROFILES\.md\)/);
   assert.match(readme, /\[Chinese demo\]\(docs\/DEMO\.zh-CN\.md\)/);
   assert.match(readme, /\[Production evidence connectors\]\(docs\/CONNECTORS\.md\)/);
   assert.match(readme, /\[AI agent risk checks\]\(docs\/AGENT-RISK\.md\)/);
@@ -104,7 +105,7 @@ test("generated security workflow pins scanner versions", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "1.0.0");
+  assert.equal(packageJson.version, "1.1.0");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

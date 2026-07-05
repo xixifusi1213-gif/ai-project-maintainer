@@ -2,8 +2,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeProfileId } from "./lib/profiles.mjs";
 
-const policyTemplate = `profile: oss
+function policyTemplate(profile = "auto") {
+  const normalizedProfile = normalizeProfileId(profile) || "auto";
+  return `profile: ${normalizedProfile}
 mode: strict
 checks:
   gitleaks: block
@@ -36,6 +39,7 @@ reporting:
   code_scanning:
     include_coverage_gaps: false
 `;
+}
 
 const exceptionsTemplate = `exceptions:
   - id: "example-dev-only-vuln"
@@ -139,7 +143,7 @@ jobs:
           if [ -f ".ai-maintainer/project-profile.yml" ]; then
             EXTRA_FLAGS="$EXTRA_FLAGS --production"
           fi
-          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --strict --release --agent-risk $EXTRA_FLAGS --output reports/security-report.json
+          node "$RUNNER_TEMP/ai-project-maintainer/ai-project-maintainer/scripts/run-local-gate.mjs" "$GITHUB_WORKSPACE" --profile auto --strict --release --agent-risk $EXTRA_FLAGS --output reports/security-report.json
 
       - name: Write gate summary
         if: always()
@@ -206,7 +210,7 @@ export function initProject(projectRoot, options = {}) {
   const root = path.resolve(projectRoot || process.cwd());
   const result = { root, created: [], skipped: [] };
 
-  safeWrite(root, ".ai-maintainer/policy.yml", policyTemplate, result);
+  safeWrite(root, ".ai-maintainer/policy.yml", policyTemplate(options.profile), result);
   safeWrite(root, ".ai-maintainer/exceptions.yml", exceptionsTemplate, result);
   if ((options.ci || "github") === "github") {
     safeWrite(root, ".github/workflows/security-gate.yml", workflowTemplate, result);
@@ -228,8 +232,8 @@ function parseArgs(args) {
     return inline ? inline.slice(name.length + 1) : fallback;
   };
   return {
-    projectRoot: args.find((arg) => !arg.startsWith("--")) || process.cwd(),
-    profile: readOption("--profile", "oss"),
+    projectRoot: args.find((arg, index) => !arg.startsWith("--") && !["--profile", "--ci"].includes(args[index - 1])) || process.cwd(),
+    profile: readOption("--profile", "auto"),
     ci: readOption("--ci", "github"),
     preCommit: args.includes("--pre-commit"),
   };

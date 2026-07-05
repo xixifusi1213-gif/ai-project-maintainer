@@ -12,7 +12,7 @@
 
 ```powershell
 npx ai-project-maintainer doctor
-npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github
+npx ai-project-maintainer init "E:\我的项目" --profile auto --ci github
 npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
 npx ai-project-maintainer audit-plan "E:\我的项目" --output reports/audit-plan.json
 npx ai-project-maintainer gate "E:\我的项目" --production --strict --release --output reports/security-report.json
@@ -30,7 +30,7 @@ git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
 cd .\ai-project-maintainer
 npm install
 node .\ai-project-maintainer\scripts\doctor.mjs
-node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile oss --ci github
+node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile auto --ci github
 node .\ai-project-maintainer\scripts\init-audit.mjs "E:\我的项目" --wizard --lang zh-CN
 node .\ai-project-maintainer\scripts\audit-plan.mjs "E:\我的项目" --output reports/audit-plan.json
 node .\ai-project-maintainer\scripts\run-local-gate.mjs "E:\我的项目" --production --strict --release --output reports/security-report.json
@@ -53,7 +53,7 @@ $ai-project-maintainer 先为这个项目生成生产审查画像，再生成审
 ## 初始化项目
 
 ```powershell
-npx ai-project-maintainer init "E:\我的项目" --profile oss --ci github --pre-commit
+npx ai-project-maintainer init "E:\我的项目" --profile auto --ci github --pre-commit
 ```
 
 会生成：

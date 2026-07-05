@@ -20,6 +20,7 @@ test("initProject creates safety gate config and workflow", () => {
   assert.equal(result.created.includes(".pre-commit-config.yaml"), true);
   assert.equal(fs.existsSync(path.join(root, "reports", ".gitkeep")), true);
   const policy = fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8");
+  assert.match(policy, /profile: auto/);
   assert.match(policy, /include_coverage_gaps: false/);
   assert.match(policy, /agent-risk: block/);
   assert.match(policy, /agent_high_risk: true/);
@@ -37,7 +38,7 @@ test("initProject does not overwrite existing policy", () => {
   assert.equal(result.skipped.includes(".ai-maintainer/policy.yml"), true);
 });
 
-test("initProject oss github profile creates GitHub-source CI, dependabot, and pre-commit templates", () => {
+test("initProject oss alias creates oss-library policy and GitHub-source CI templates", () => {
   const root = tempProject();
   const result = initProject(root, { profile: "oss", ci: "github", preCommit: true });
   const policy = fs.readFileSync(path.join(root, ".ai-maintainer", "policy.yml"), "utf8");
@@ -46,7 +47,7 @@ test("initProject oss github profile creates GitHub-source CI, dependabot, and p
   const preCommit = fs.readFileSync(path.join(root, ".pre-commit-config.yaml"), "utf8");
 
   assert.equal(result.created.includes(".github/dependabot.yml"), true);
-  assert.match(policy, /profile: oss/);
+  assert.match(policy, /profile: oss-library/);
   assert.match(policy, /scorecard: warn/);
   assert.match(policy, /megalinter: warn/);
   assert.match(policy, /agent-risk: block/);
@@ -55,6 +56,7 @@ test("initProject oss github profile creates GitHub-source CI, dependabot, and p
   assert.match(workflow, /npm ci --omit=dev \|\| npm install --omit=dev/);
   assert.match(workflow, /EXTRA_FLAGS="\$EXTRA_FLAGS --production"/);
   assert.match(workflow, /node "\$RUNNER_TEMP\/ai-project-maintainer\/ai-project-maintainer\/scripts\/run-local-gate\.mjs"/);
+  assert.match(workflow, /--profile auto/);
   assert.match(workflow, /--agent-risk/);
   assert.doesNotMatch(workflow, /npx ai-project-maintainer gate/);
   assert.match(workflow, /GITHUB_STEP_SUMMARY/);

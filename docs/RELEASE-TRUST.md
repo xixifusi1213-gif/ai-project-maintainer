@@ -54,8 +54,8 @@ After the GitHub publish workflow completes:
 
 ```powershell
 npm view ai-project-maintainer version dist-tags --registry=https://registry.npmjs.org/ --json
-npx ai-project-maintainer@1.0.0 --version
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.0.0 --tag v1.0.0 --manifest dist/release-manifest.json
+npx ai-project-maintainer@1.1.0 --version
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.1.0 --tag v1.1.0 --manifest dist/release-manifest.json
 ```
 
 ## What This Does Not Prove

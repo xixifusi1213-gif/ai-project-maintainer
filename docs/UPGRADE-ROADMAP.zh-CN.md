@@ -72,17 +72,16 @@
 第一批 profile：
 
 - `electron-desktop`
-- `nextjs-saas`
-- `api-database`
-- `cli-tool`
-- `static-site`
-- `browser-extension`
+- `nextjs-web`
+- `node-api`
+- `database-prisma`
+- `oss-library`
 
 建议接口：
 
 ```powershell
 npx ai-project-maintainer init "E:\my-project" --profile electron-desktop
-npx ai-project-maintainer audit-plan "E:\my-project" --profile nextjs-saas
+npx ai-project-maintainer audit-plan "E:\my-project" --profile nextjs-web
 ```
 
 各 profile 的重点：

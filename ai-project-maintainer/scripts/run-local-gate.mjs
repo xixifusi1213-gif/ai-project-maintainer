@@ -64,8 +64,16 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
   const sbomOutputPath = writeReports ? path.join(path.dirname(outputPath), "sbom.cdx.json") : null;
   if (writeReports) fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   const project = detectProject(root);
-  const policyBundle = loadPolicyBundle(root);
-  const intake = options.production ? loadIntake(root, project) : null;
+  const preliminaryPolicyBundle = loadPolicyBundle(root, { project, profile: options.profile });
+  const intake = loadIntake(root, project, {
+    profile: options.profile,
+    policyProfile: preliminaryPolicyBundle.customPolicy?.profile,
+  });
+  const policyBundle = loadPolicyBundle(root, {
+    project,
+    profile: options.profile,
+    projectProfile: intake.profile.project?.profile || intake.profile.project?.type,
+  });
   const audit = options.production ? applyEvidenceToAudit(buildAuditPlan(project, intake), evidenceReport) : null;
   const agentRisk = options.agentRisk ? scanAgentRisk(project) : null;
   const checks = runRegisteredChecks(project, {
@@ -91,6 +99,7 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
       production: Boolean(options.production),
       agentRisk: Boolean(options.agentRisk),
       policy: policyBundle.policy.mode,
+      profile: policyBundle.profile.id,
     },
     probe: project,
     checks: policyResult.checks,
@@ -99,6 +108,7 @@ function buildLocalGateReport(projectRoot, options = {}, evidenceReport = null) 
     audit,
     evidence: evidenceReport,
     agentRisk,
+    profile: policyBundle.profile,
   });
 
   if (writeReports) {
@@ -135,6 +145,7 @@ function parseArgs(args) {
     production: false,
     connectors: false,
     agentRisk: false,
+    profile: "auto",
     outputPath: null,
   };
 
@@ -147,6 +158,8 @@ function parseArgs(args) {
     else if (arg === "--production") parsed.production = true;
     else if (arg === "--connectors") parsed.connectors = true;
     else if (arg === "--agent-risk") parsed.agentRisk = true;
+    else if (arg === "--profile") parsed.profile = args[++i] || "auto";
+    else if (arg.startsWith("--profile=")) parsed.profile = arg.slice("--profile=".length);
     else if (arg === "--output") parsed.outputPath = args[++i];
     else if (arg.startsWith("--output=")) parsed.outputPath = arg.slice("--output=".length);
     else if (!arg.startsWith("--")) positional.push(arg);
@@ -165,6 +178,7 @@ async function main() {
     production: args.production,
     connectors: args.connectors,
     agentRisk: args.agentRisk,
+    profile: args.profile,
     outputPath: args.outputPath,
     writeReports: true,
   });

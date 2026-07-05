@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
+import { normalizeProfileId, resolveProjectProfile } from "./profiles.mjs";
 
 export const intakeRelativePaths = {
   profile: ".ai-maintainer/project-profile.yml",
@@ -135,7 +136,7 @@ function inferProjectType(project, configuredType) {
   return "generic";
 }
 
-export function loadIntake(projectRoot, project = {}) {
+export function loadIntake(projectRoot, project = {}, options = {}) {
   const root = path.resolve(projectRoot);
   const parseErrors = [];
   const profileDocument = readYaml(root, intakeRelativePaths.profile, defaultProjectProfile, parseErrors);
@@ -150,6 +151,14 @@ export function loadIntake(projectRoot, project = {}) {
 
   const detectedDatabase = Boolean(project?.riskSurfaces?.database?.length);
   const detectedCi = Boolean(project?.riskSurfaces?.ci?.length);
+  const configuredProfile = profile.project?.profile && profile.project.profile !== "auto"
+    ? profile.project.profile
+    : profile.project?.type;
+  const resolvedProfile = options.resolvedProfile || resolveProjectProfile(project, {
+    cliProfile: options.profile,
+    policyProfile: options.policyProfile,
+    projectProfile: normalizeProfileId(configuredProfile),
+  });
   const projectType = inferProjectType(project, profile.project?.type);
   const hasDatabase = booleanFrom(profile.risk?.has_database, detectedDatabase);
   const hasCi = booleanFrom(evidence.evidence?.github_actions, detectedCi);
@@ -162,6 +171,11 @@ export function loadIntake(projectRoot, project = {}) {
     hasElectron: Boolean(project?.electron?.detected),
     hasDeployment: Boolean(profile.risk?.has_deployment || deployment.has_staging || deployment.has_production),
     hasObservability: ["errors", "logs", "metrics", "alerts"].some((key) => hasExternalEvidence(evidence.evidence?.observability?.[key])),
+    profile: resolvedProfile,
+    profileId: resolvedProfile.id,
+    profileSource: resolvedProfile.source,
+    profileSignals: resolvedProfile.signals,
+    profileRiskFocus: resolvedProfile.riskFocus,
   };
 
   return {

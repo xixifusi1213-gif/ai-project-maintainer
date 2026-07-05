@@ -19,6 +19,15 @@ test("reports include blockers, warnings, coverage gaps, and tool versions", () 
     ],
     toolVersions: { node: "v24.0.0" },
     invalidExceptions: [],
+    profile: {
+      id: "nextjs-web",
+      source: "detected",
+      matchedProfiles: ["nextjs-web"],
+      riskFocus: ["auth middleware and route protection"],
+      signals: {
+        "nextjs-web": [{ id: "next-dependency", evidence: "Next.js dependency detected" }],
+      },
+    },
   });
 
   assert.equal(report.passed, false);
@@ -26,6 +35,9 @@ test("reports include blockers, warnings, coverage gaps, and tool versions", () 
   assert.equal(report.blockers.length, 1);
   assert.equal(report.coverageGaps.length, 1);
   assert.equal(report.toolVersions.node, "v24.0.0");
+  assert.equal(report.profile.id, "nextjs-web");
+  assert.match(toMarkdown(report), /Project Profile/);
+  assert.match(toMarkdown(report), /auth middleware and route protection/);
   assert.match(toMarkdown(report), /Local Security Gate: FAIL/);
   assert.equal(toSarif(report).version, "2.1.0");
 });
