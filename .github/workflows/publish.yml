@@ -157,6 +157,8 @@ jobs:
           fi
 
       - name: Verify published release alignment
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
