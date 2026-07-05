@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { runLocalGate } from "../../../ai-project-maintainer/scripts/run-local-gate.mjs";
 import { toMarkdown } from "../../../ai-project-maintainer/scripts/lib/report.mjs";
 
-function writeMockTool(toolsDir) {
+export function writeMockTool(toolsDir) {
   const scriptPath = path.join(toolsDir, "mock-tool.mjs");
   fs.writeFileSync(
     scriptPath,

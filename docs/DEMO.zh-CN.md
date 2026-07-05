@@ -73,3 +73,13 @@ npx ai-project-maintainer repair-pack reports/security-report.json --project .\e
 ```
 
 通用入口是 `reports/agent-tasks.json`，Codex 适配入口是 `reports/codex-tasks.json`。Codex、Cursor、Claude Code、Cline 等工具都可以按任务处理确定性的阻断项；维护者仍然负责业务决策、风险接受和生产证据确认。
+
+## 6. 跑完整修复闭环 demo
+
+运行确定性的 repair-loop demo：
+
+```powershell
+npm run smoke:repair-loop
+```
+
+它会创建一个临时的 broken 项目副本，运行 gate，生成 `agent-tasks.json` 和 `codex-tasks.json`，执行一次“模拟 AI 修复”，运行 `npm test` 复验，然后再次运行 gate。最终预期状态是 `PASS_WITH_GAPS`：确定性的阻断项已经修复，但生产证据缺口仍然可见。

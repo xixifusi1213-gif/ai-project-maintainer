@@ -28,8 +28,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 9. Convert a gate report into AI-agent repair tasks with `node <this-skill>/scripts/repair-pack.mjs <repo>/reports/security-report.json --project <repo> --output <repo>/reports` or `npx ai-project-maintainer repair-pack <repo>/reports/security-report.json --project <repo> --output <repo>/reports`.
 10. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
 11. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
-11. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
-12. Read only the relevant references:
+12. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
+13. Use `node <this-skill>/../examples/demo-ai-app/scripts/run-repair-loop-demo.mjs --json` from a source checkout when you need to dogfood the full gate -> repair-pack -> simulated AI repair -> recheck -> gate loop.
+14. Read only the relevant references:
    - Local account-free gate: `references/local-gate.md`
    - Database and migrations: `references/database.md`
    - Electron desktop apps: `references/electron-desktop.md`
@@ -37,9 +38,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
    - Production incidents and SRE triage: `references/incident-response.md`
    - CI/CD guardrails and maintenance automation: `references/ci-guardrails.md`
    - Tool selection details: `references/tool-router.md`
-13. Build a short execution plan from the detected risk surfaces and the audit plan.
-14. Run the least invasive checks first, then deeper checks only where evidence points.
-15. Return findings first, ordered by severity, with commands/tests already run.
+15. Build a short execution plan from the detected risk surfaces and the audit plan.
+16. Run the least invasive checks first, then deeper checks only where evidence points.
+17. Return findings first, ordered by severity, with commands/tests already run.
 
 ## Modes
 

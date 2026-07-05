@@ -74,3 +74,13 @@ npx ai-project-maintainer repair-pack reports/security-report.json --project .\e
 ```
 
 Use `reports/agent-tasks.json` with Codex, Cursor, Claude Code, Cline, or another agent. Codex users can also use `reports/codex-tasks.json`. Agents can handle deterministic blockers; the maintainer still owns business decisions such as critical flows, accepted risks, and production evidence.
+
+## 6. Dogfood The Repair Loop
+
+Run the deterministic repair-loop demo:
+
+```powershell
+npm run smoke:repair-loop
+```
+
+It creates a broken temp copy, runs the gate, generates `agent-tasks.json` and `codex-tasks.json`, applies a simulated AI repair, runs `npm test`, and runs the gate again. The final expected status is `PASS_WITH_GAPS`, proving blockers can be fixed while production gaps stay visible.
