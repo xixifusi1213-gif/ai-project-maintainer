@@ -1,6 +1,6 @@
 {
   "name": "ai-project-maintainer",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Release readiness gate for AI-coded projects.",
   "type": "module",
   "license": "MIT",
@@ -38,6 +38,7 @@
     "examples/demo-ai-app/src/",
     "examples/demo-ai-app/test/",
     "examples/oss-case-studies/",
+    "examples/benchmark-cases/",
     "docs/",
     "SECURITY.md",
     "TRUST.md",
@@ -51,12 +52,13 @@
     "test": "node --test",
     "check": "node ai-project-maintainer/scripts/check-syntax.mjs",
     "cases:verify": "node examples/oss-case-studies/run-oss-case-studies.mjs --verify",
+    "benchmark:verify": "node examples/benchmark-cases/run-benchmark-cases.mjs --verify",
     "smoke:npm": "node ai-project-maintainer/scripts/npm-package-smoke.mjs",
     "smoke:repair-loop": "node examples/demo-ai-app/scripts/run-repair-loop-demo.mjs --json",
     "smoke:connectors:live": "node ai-project-maintainer/scripts/live-connector-smoke.mjs",
     "release:manifest": "node ai-project-maintainer/scripts/release-manifest.mjs",
-    "release:verify:pre": "node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version 1.2.1 --tag v1.2.1",
-    "release:verify:published": "node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.1 --tag v1.2.1"
+    "release:verify:pre": "node ai-project-maintainer/scripts/verify-release.mjs --prepublish --version 1.3.0 --tag v1.3.0",
+    "release:verify:published": "node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.3.0 --tag v1.3.0"
   },
   "dependencies": {
     "yaml": "2.9.0"

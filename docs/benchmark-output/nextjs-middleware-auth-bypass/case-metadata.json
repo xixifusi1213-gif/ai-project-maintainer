@@ -1,0 +1,17 @@
+{
+  "id": "nextjs-middleware-auth-bypass",
+  "title": "Next.js middleware authorization bypass advisory",
+  "category": "web-api",
+  "repo": "vercel/next.js",
+  "advisory": "GHSA-f82v-jwr5-mffw",
+  "advisoryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+  "cve": "CVE-2025-29927",
+  "vulnerableRef": "15.2.2",
+  "fixedRef": "15.2.3",
+  "patchCommit": "15.2.3",
+  "patchUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+  "expected": {
+    "before": "FAIL",
+    "after": "PASS_WITH_GAPS"
+  }
+}

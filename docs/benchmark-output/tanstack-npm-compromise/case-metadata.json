@@ -1,0 +1,17 @@
+{
+  "id": "tanstack-npm-compromise",
+  "title": "TanStack npm package compromise postmortem",
+  "category": "oss-library",
+  "repo": "TanStack/query",
+  "advisory": "TanStack npm compromise postmortem",
+  "advisoryUrl": "https://tanstack.com/blog/npm-supply-chain-compromise-postmortem",
+  "cve": null,
+  "vulnerableRef": "pre-postmortem release workflow",
+  "fixedRef": "postmortem release hardening",
+  "patchCommit": "release-trust-hardening",
+  "patchUrl": "https://tanstack.com/blog/npm-supply-chain-compromise-postmortem",
+  "expected": {
+    "before": "FAIL",
+    "after": "PASS_WITH_GAPS"
+  }
+}

@@ -2,12 +2,20 @@
 
 These case studies use public open source advisories, releases, and patch commits. They are not synthetic demo bugs.
 
+v1.3.0 keeps these pages as the readable case-study subset of the broader [public benchmark](BENCHMARK.md). Run `npm run benchmark:verify` to generate the full Electron, Web/API, database, CI/supply-chain, and OSS library benchmark matrix.
+
 The repository does not vendor the upstream projects. The runner reads only pinned metadata and the small relevant upstream file path into a temporary workspace, then writes APM-style before/after reports.
 
 Run them locally:
 
 ```powershell
 npm run cases:verify
+```
+
+Run the full benchmark:
+
+```powershell
+npm run benchmark:verify
 ```
 
 Generated reports are written to `reports/oss-case-studies/`. The committed reports under `docs/cases/` are the launch snapshots for readers who do not want to run anything first.

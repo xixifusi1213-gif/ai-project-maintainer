@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, generate AI-agent repair tasks, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Benchmark](docs/BENCHMARK.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -86,7 +86,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.2.1 --tag v1.2.1 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.3.0 --tag v1.3.0 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates
@@ -142,6 +142,26 @@ npm run smoke:repair-loop
 ```
 
 The script creates a broken temp copy of `examples/demo-ai-app`, runs the gate to get `FAIL`, generates `agent-tasks.json` and `codex-tasks.json`, applies a deterministic "simulated AI repair", runs `npm test`, and runs the gate again. The expected final state is `PASS_WITH_GAPS`: deterministic blockers are fixed, while production evidence gaps remain visible.
+
+## Public Benchmark
+
+v1.3.0 expands the real case studies into a reproducible benchmark across five project-risk categories:
+
+```powershell
+npm run benchmark:verify
+```
+
+Launch snapshot: [Benchmark summary](docs/benchmark-output/benchmark-summary.md)
+
+| Category | Case | Before | After |
+| --- | --- | --- | --- |
+| Electron desktop | SiYuan Electron RCE | FAIL | PASS_WITH_GAPS |
+| Database | Ghost SQL injection | FAIL | PASS_WITH_GAPS |
+| Web/API | Next.js middleware authorization bypass | FAIL | PASS_WITH_GAPS |
+| CI / supply chain | tj-actions/changed-files compromise | FAIL | PASS_WITH_GAPS |
+| OSS npm library | TanStack npm package compromise | FAIL | PASS_WITH_GAPS |
+
+The benchmark also writes `before-repair-pack/agent-tasks.json` and `fix-plan.md` for each case, so users can inspect how reports become AI-agent repair tasks. See [Benchmark](docs/BENCHMARK.md).
 
 More demo material:
 
@@ -371,6 +391,8 @@ It is designed for the practical middle ground: a personal developer or small te
 - [Demo](docs/DEMO.md)
 - [中文演示](docs/DEMO.zh-CN.md)
 - [Real OSS case studies](docs/CASE-STUDIES.md)
+- [Benchmark](docs/BENCHMARK.md)
+- [公开 Benchmark](docs/BENCHMARK.zh-CN.md)
 - [Trust model](TRUST.md)
 - [Design notes](DESIGN.md)
 - [Release trust](docs/RELEASE-TRUST.md)

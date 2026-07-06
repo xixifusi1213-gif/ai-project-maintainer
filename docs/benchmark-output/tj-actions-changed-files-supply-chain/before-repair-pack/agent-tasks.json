@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-05T20:57:42.491Z",
+  "sourceReport": "before-security-report.json",
+  "projectRoot": "tj-actions/changed-files@before",
+  "overallStatus": "FAIL",
+  "summary": {
+    "total": 2,
+    "byType": {
+      "auto_fix_candidate": 2
+    },
+    "bySeverity": {
+      "P2": 2
+    }
+  },
+  "tasks": [
+    {
+      "id": "fix-001",
+      "title": "Compromised GitHub Action dependency",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "tj-actions-changed-files-compromise",
+        "group": "ci-security"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Workflow uses the compromised changed-files action version with broad workflow permissions.",
+        "command: zizmor .github/workflows"
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Harden the workflow or action configuration, then rerun actionlint/zizmor and the gate.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "zizmor .github/workflows",
+        "npx ai-project-maintainer gate 'tj-actions/changed-files@before' --profile ci-supply-chain --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Workflow uses the compromised changed-files action version with broad workflow permissions."
+    },
+    {
+      "id": "fix-002",
+      "title": "Compromised GitHub Action dependency",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "tj-actions-changed-files-compromise",
+        "group": "ci-security"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Workflow uses the compromised changed-files action version with broad workflow permissions.",
+        "command: zizmor .github/workflows"
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Harden the workflow or action configuration, then rerun actionlint/zizmor and the gate.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "zizmor .github/workflows",
+        "npx ai-project-maintainer gate 'tj-actions/changed-files@before' --profile ci-supply-chain --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Workflow uses the compromised changed-files action version with broad workflow permissions."
+    }
+  ],
+  "recheckCommands": [
+    "zizmor .github/workflows",
+    "npx ai-project-maintainer gate 'tj-actions/changed-files@before' --profile ci-supply-chain --production --strict --release --output reports/security-report.json"
+  ]
+}

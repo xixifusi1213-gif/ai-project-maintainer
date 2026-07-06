@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "root": "tj-actions/changed-files@before",
+  "mode": {
+    "strict": true,
+    "release": true,
+    "production": true,
+    "benchmark": true,
+    "profile": "ci-supply-chain"
+  },
+  "overallStatus": "FAIL",
+  "passed": false,
+  "blockerCount": 1,
+  "warningCount": 0,
+  "coverageGapCount": 0,
+  "maintenance": {
+    "score": 75,
+    "grade": "B",
+    "basis": {
+      "blockers": 1,
+      "warnings": 0,
+      "coverageGaps": 0,
+      "invalidExceptions": 0
+    }
+  },
+  "generatedAt": "2026-07-06T00:00:00.000Z",
+  "probe": {
+    "caseId": "tj-actions-changed-files-supply-chain",
+    "category": "ci-supply-chain",
+    "stage": "before",
+    "advisory": "GHSA-mrrh-fwg8-r2c3",
+    "source": "offline-pinned-metadata"
+  },
+  "profile": {
+    "id": "ci-supply-chain",
+    "source": "benchmark",
+    "signals": {
+      "benchmark": [
+        {
+          "evidence": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3"
+        }
+      ]
+    },
+    "riskFocus": [
+      "tj-actions/changed-files supply-chain compromise"
+    ]
+  },
+  "audit": {
+    "profile": {
+      "projectType": "ci-supply-chain",
+      "hasDatabase": false,
+      "hasCi": true
+    },
+    "plan": [
+      {
+        "status": "PASS",
+        "title": "Pinned public evidence",
+        "summary": "tj-actions/changed-files is represented by pinned advisory, release, postmortem, or hardening metadata."
+      },
+      {
+        "status": "FAIL",
+        "title": "Benchmark risk transition",
+        "summary": "The before state intentionally models the public failure signal."
+      }
+    ],
+    "coverageGaps": [],
+    "userDecisions": [],
+    "evidence": [
+      {
+        "repo": "tj-actions/changed-files",
+        "advisory": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+        "patchCommit": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction",
+        "release": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3"
+      }
+    ]
+  },
+  "evidence": null,
+  "agentRisk": null,
+  "standards": {
+    "sources": [
+      {
+        "id": "nist-ssdf",
+        "title": "NIST SSDF SP 800-218",
+        "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+        "summary": "Secure software development practices for design, implementation, verification, release, and vulnerability response."
+      },
+      {
+        "id": "owasp-samm",
+        "title": "OWASP SAMM",
+        "url": "https://owasp.org/www-project-samm/",
+        "summary": "Software assurance maturity model covering governance, design, implementation, verification, and operations."
+      },
+      {
+        "id": "slsa",
+        "title": "SLSA",
+        "url": "https://slsa.dev/",
+        "summary": "Supply-chain integrity framework for source, build, provenance, and artifact trust."
+      },
+      {
+        "id": "openssf-scorecard",
+        "title": "OpenSSF Scorecard",
+        "url": "https://scorecard.dev/",
+        "summary": "Automated checks for open source project security posture and supply-chain hygiene."
+      },
+      {
+        "id": "google-sre-release",
+        "title": "Google SRE Release Engineering",
+        "url": "https://sre.google/sre-book/release-engineering/",
+        "summary": "Release engineering practices for repeatable builds, automation, policy enforcement, audit trails, and rollback."
+      },
+      {
+        "id": "google-sre-monitoring",
+        "title": "Google SRE Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+        "summary": "Monitoring and alerting practices for detecting production failure and paging humans only when action is needed."
+      },
+      {
+        "id": "google-sre-risk",
+        "title": "Google SRE Embracing Risk",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "summary": "Explicit reliability risk management and owner-approved risk acceptance."
+      },
+      {
+        "id": "cis-control-11",
+        "title": "CIS Control 11: Data Recovery",
+        "url": "https://www.cisecurity.org/controls/data-recovery",
+        "summary": "Backup and recovery controls for restoring data after destructive events or operational failures."
+      },
+      {
+        "id": "nist-sp-800-34",
+        "title": "NIST SP 800-34 Rev. 1",
+        "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+        "summary": "Contingency planning guidance for backup, recovery, and continuity of operations."
+      },
+      {
+        "id": "dora",
+        "title": "DORA research",
+        "url": "https://dora.dev/research/",
+        "summary": "Software delivery and operational performance research, including continuous delivery and recovery capabilities."
+      },
+      {
+        "id": "owasp-llm-top-10",
+        "title": "OWASP Top 10 for LLM Applications",
+        "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+        "summary": "LLM application risk categories including prompt injection, sensitive information disclosure, supply-chain risk, and excessive agency."
+      },
+      {
+        "id": "owasp-agentic-ai",
+        "title": "OWASP Agentic AI Threats and Mitigations",
+        "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+        "summary": "Threat model and mitigations for agents that can use tools, access resources, and take actions."
+      }
+    ],
+    "mappings": [
+      {
+        "group": "case-study",
+        "checkId": "benchmark-upstream-evidence",
+        "name": "Benchmark upstream evidence",
+        "refs": []
+      },
+      {
+        "group": "ci-security",
+        "checkId": "tj-actions-changed-files-compromise",
+        "name": "Compromised GitHub Action dependency",
+        "refs": [
+          {
+            "id": "nist-ssdf",
+            "title": "NIST SSDF SP 800-218",
+            "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+            "relationship": "supports"
+          },
+          {
+            "id": "slsa",
+            "title": "SLSA",
+            "url": "https://slsa.dev/",
+            "relationship": "supports"
+          },
+          {
+            "id": "openssf-scorecard",
+            "title": "OpenSSF Scorecard",
+            "url": "https://scorecard.dev/",
+            "relationship": "supports"
+          }
+        ]
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "checkId": "tj-actions-changed-files-compromise",
+      "name": "Compromised GitHub Action dependency",
+      "group": "ci-security",
+      "status": "fail",
+      "blocking": true,
+      "command": "zizmor .github/workflows",
+      "summary": "Workflow uses the compromised changed-files action version with broad workflow permissions.",
+      "evidence": {
+        "source": "offline-pinned-metadata",
+        "advisory": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+        "cisa": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction"
+      },
+      "evidenceLevel": "TOOL_VERIFIED",
+      "standardRefs": [
+        {
+          "id": "nist-ssdf",
+          "title": "NIST SSDF SP 800-218",
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+          "relationship": "supports"
+        },
+        {
+          "id": "slsa",
+          "title": "SLSA",
+          "url": "https://slsa.dev/",
+          "relationship": "supports"
+        },
+        {
+          "id": "openssf-scorecard",
+          "title": "OpenSSF Scorecard",
+          "url": "https://scorecard.dev/",
+          "relationship": "supports"
+        }
+      ]
+    }
+  ],
+  "warnings": [],
+  "coverageGaps": [],
+  "toolVersions": {
+    "ai-project-maintainer": "1.3.0-benchmark"
+  },
+  "checks": [
+    {
+      "checkId": "benchmark-upstream-evidence",
+      "name": "Benchmark upstream evidence",
+      "group": "case-study",
+      "status": "pass",
+      "blocking": false,
+      "summary": "tj-actions/changed-files supply-chain compromise is pinned to public upstream evidence.",
+      "evidence": {
+        "repo": "tj-actions/changed-files",
+        "advisory": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+        "cve": "CVE-2025-30066",
+        "vulnerableRef": "v45.0.7",
+        "fixedRef": "pinned-safe-replacement",
+        "patchCommit": "workflow-hardening"
+      },
+      "evidenceLevel": "INFERRED",
+      "standardRefs": []
+    },
+    {
+      "checkId": "tj-actions-changed-files-compromise",
+      "name": "Compromised GitHub Action dependency",
+      "group": "ci-security",
+      "status": "fail",
+      "blocking": true,
+      "command": "zizmor .github/workflows",
+      "summary": "Workflow uses the compromised changed-files action version with broad workflow permissions.",
+      "evidence": {
+        "source": "offline-pinned-metadata",
+        "advisory": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+        "cisa": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction"
+      },
+      "evidenceLevel": "TOOL_VERIFIED",
+      "standardRefs": [
+        {
+          "id": "nist-ssdf",
+          "title": "NIST SSDF SP 800-218",
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+          "relationship": "supports"
+        },
+        {
+          "id": "slsa",
+          "title": "SLSA",
+          "url": "https://slsa.dev/",
+          "relationship": "supports"
+        },
+        {
+          "id": "openssf-scorecard",
+          "title": "OpenSSF Scorecard",
+          "url": "https://scorecard.dev/",
+          "relationship": "supports"
+        }
+      ]
+    }
+  ],
+  "exceptions": {
+    "used": [],
+    "invalid": []
+  }
+}

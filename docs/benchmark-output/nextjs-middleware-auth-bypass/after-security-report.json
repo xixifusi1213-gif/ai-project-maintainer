@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 1,
+  "root": "vercel/next.js@after",
+  "mode": {
+    "strict": true,
+    "release": true,
+    "production": true,
+    "benchmark": true,
+    "profile": "web-api"
+  },
+  "overallStatus": "PASS_WITH_GAPS",
+  "passed": true,
+  "blockerCount": 0,
+  "warningCount": 1,
+  "coverageGapCount": 1,
+  "maintenance": {
+    "score": 95,
+    "grade": "A",
+    "basis": {
+      "blockers": 0,
+      "warnings": 1,
+      "coverageGaps": 1,
+      "invalidExceptions": 0
+    }
+  },
+  "generatedAt": "2026-07-06T00:00:00.000Z",
+  "probe": {
+    "caseId": "nextjs-middleware-auth-bypass",
+    "category": "web-api",
+    "stage": "after",
+    "advisory": "GHSA-f82v-jwr5-mffw",
+    "source": "offline-pinned-metadata"
+  },
+  "profile": {
+    "id": "web-api",
+    "source": "benchmark",
+    "signals": {
+      "benchmark": [
+        {
+          "evidence": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw"
+        }
+      ]
+    },
+    "riskFocus": [
+      "Next.js middleware authorization bypass advisory"
+    ]
+  },
+  "audit": {
+    "profile": {
+      "projectType": "web-api",
+      "hasDatabase": false,
+      "hasCi": true
+    },
+    "plan": [
+      {
+        "status": "PASS",
+        "title": "Pinned public evidence",
+        "summary": "vercel/next.js is represented by pinned advisory, release, postmortem, or hardening metadata."
+      },
+      {
+        "status": "PASS",
+        "title": "Benchmark risk transition",
+        "summary": "The after state models the public patch, replacement, or hardening signal."
+      }
+    ],
+    "coverageGaps": [
+      {
+        "id": "production-evidence",
+        "title": "Production evidence",
+        "summary": "Benchmark reports cannot prove a downstream project's live monitoring, backups, approvals, or rollback path.",
+        "recommendation": "Keep these as explicit GAP items until the maintainer provides evidence."
+      }
+    ],
+    "userDecisions": [
+      {
+        "id": "risk-acceptance",
+        "title": "Maintainer risk acceptance",
+        "summary": "The maintainer must decide whether remaining evidence gaps block their production release.",
+        "recommendation": "Document the decision in the project intake or risk policy."
+      }
+    ],
+    "evidence": [
+      {
+        "repo": "vercel/next.js",
+        "advisory": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+        "patchCommit": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+        "release": "https://github.com/vercel/next.js/releases/tag/v15.2.3"
+      }
+    ]
+  },
+  "evidence": null,
+  "agentRisk": null,
+  "standards": {
+    "sources": [
+      {
+        "id": "nist-ssdf",
+        "title": "NIST SSDF SP 800-218",
+        "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+        "summary": "Secure software development practices for design, implementation, verification, release, and vulnerability response."
+      },
+      {
+        "id": "owasp-samm",
+        "title": "OWASP SAMM",
+        "url": "https://owasp.org/www-project-samm/",
+        "summary": "Software assurance maturity model covering governance, design, implementation, verification, and operations."
+      },
+      {
+        "id": "slsa",
+        "title": "SLSA",
+        "url": "https://slsa.dev/",
+        "summary": "Supply-chain integrity framework for source, build, provenance, and artifact trust."
+      },
+      {
+        "id": "openssf-scorecard",
+        "title": "OpenSSF Scorecard",
+        "url": "https://scorecard.dev/",
+        "summary": "Automated checks for open source project security posture and supply-chain hygiene."
+      },
+      {
+        "id": "google-sre-release",
+        "title": "Google SRE Release Engineering",
+        "url": "https://sre.google/sre-book/release-engineering/",
+        "summary": "Release engineering practices for repeatable builds, automation, policy enforcement, audit trails, and rollback."
+      },
+      {
+        "id": "google-sre-monitoring",
+        "title": "Google SRE Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+        "summary": "Monitoring and alerting practices for detecting production failure and paging humans only when action is needed."
+      },
+      {
+        "id": "google-sre-risk",
+        "title": "Google SRE Embracing Risk",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "summary": "Explicit reliability risk management and owner-approved risk acceptance."
+      },
+      {
+        "id": "cis-control-11",
+        "title": "CIS Control 11: Data Recovery",
+        "url": "https://www.cisecurity.org/controls/data-recovery",
+        "summary": "Backup and recovery controls for restoring data after destructive events or operational failures."
+      },
+      {
+        "id": "nist-sp-800-34",
+        "title": "NIST SP 800-34 Rev. 1",
+        "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+        "summary": "Contingency planning guidance for backup, recovery, and continuity of operations."
+      },
+      {
+        "id": "dora",
+        "title": "DORA research",
+        "url": "https://dora.dev/research/",
+        "summary": "Software delivery and operational performance research, including continuous delivery and recovery capabilities."
+      },
+      {
+        "id": "owasp-llm-top-10",
+        "title": "OWASP Top 10 for LLM Applications",
+        "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+        "summary": "LLM application risk categories including prompt injection, sensitive information disclosure, supply-chain risk, and excessive agency."
+      },
+      {
+        "id": "owasp-agentic-ai",
+        "title": "OWASP Agentic AI Threats and Mitigations",
+        "url": "https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/",
+        "summary": "Threat model and mitigations for agents that can use tools, access resources, and take actions."
+      }
+    ],
+    "mappings": [
+      {
+        "group": "case-study",
+        "checkId": "benchmark-upstream-evidence",
+        "name": "Benchmark upstream evidence",
+        "refs": []
+      },
+      {
+        "group": "web-api",
+        "checkId": "nextjs-cve-2025-29927",
+        "name": "Next.js middleware authorization bypass",
+        "refs": []
+      },
+      {
+        "group": "production-audit",
+        "checkId": "web-api-production-evidence-gap",
+        "name": "Production evidence still required",
+        "refs": [
+          {
+            "id": "google-sre-monitoring",
+            "title": "Google SRE Monitoring Distributed Systems",
+            "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+            "relationship": "supports"
+          },
+          {
+            "id": "google-sre-release",
+            "title": "Google SRE Release Engineering",
+            "url": "https://sre.google/sre-book/release-engineering/",
+            "relationship": "supports"
+          },
+          {
+            "id": "google-sre-risk",
+            "title": "Google SRE Embracing Risk",
+            "url": "https://sre.google/sre-book/embracing-risk/",
+            "relationship": "supports"
+          },
+          {
+            "id": "cis-control-11",
+            "title": "CIS Control 11: Data Recovery",
+            "url": "https://www.cisecurity.org/controls/data-recovery",
+            "relationship": "supports"
+          },
+          {
+            "id": "nist-sp-800-34",
+            "title": "NIST SP 800-34 Rev. 1",
+            "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+            "relationship": "supports"
+          }
+        ]
+      }
+    ]
+  },
+  "blockers": [],
+  "warnings": [
+    {
+      "checkId": "web-api-production-evidence-gap",
+      "name": "Production evidence still required",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.",
+      "recommendation": "Collect production evidence in the consuming project before treating the release as production-ready.",
+      "evidenceLevel": "GAP",
+      "standardRefs": [
+        {
+          "id": "google-sre-monitoring",
+          "title": "Google SRE Monitoring Distributed Systems",
+          "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-release",
+          "title": "Google SRE Release Engineering",
+          "url": "https://sre.google/sre-book/release-engineering/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-risk",
+          "title": "Google SRE Embracing Risk",
+          "url": "https://sre.google/sre-book/embracing-risk/",
+          "relationship": "supports"
+        },
+        {
+          "id": "cis-control-11",
+          "title": "CIS Control 11: Data Recovery",
+          "url": "https://www.cisecurity.org/controls/data-recovery",
+          "relationship": "supports"
+        },
+        {
+          "id": "nist-sp-800-34",
+          "title": "NIST SP 800-34 Rev. 1",
+          "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+          "relationship": "supports"
+        }
+      ]
+    }
+  ],
+  "coverageGaps": [
+    {
+      "checkId": "web-api-production-evidence-gap",
+      "name": "Production evidence still required",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.",
+      "recommendation": "Collect production evidence in the consuming project before treating the release as production-ready.",
+      "evidenceLevel": "GAP",
+      "standardRefs": [
+        {
+          "id": "google-sre-monitoring",
+          "title": "Google SRE Monitoring Distributed Systems",
+          "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-release",
+          "title": "Google SRE Release Engineering",
+          "url": "https://sre.google/sre-book/release-engineering/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-risk",
+          "title": "Google SRE Embracing Risk",
+          "url": "https://sre.google/sre-book/embracing-risk/",
+          "relationship": "supports"
+        },
+        {
+          "id": "cis-control-11",
+          "title": "CIS Control 11: Data Recovery",
+          "url": "https://www.cisecurity.org/controls/data-recovery",
+          "relationship": "supports"
+        },
+        {
+          "id": "nist-sp-800-34",
+          "title": "NIST SP 800-34 Rev. 1",
+          "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+          "relationship": "supports"
+        }
+      ]
+    }
+  ],
+  "toolVersions": {
+    "ai-project-maintainer": "1.3.0-benchmark"
+  },
+  "checks": [
+    {
+      "checkId": "benchmark-upstream-evidence",
+      "name": "Benchmark upstream evidence",
+      "group": "case-study",
+      "status": "pass",
+      "blocking": false,
+      "summary": "Next.js middleware authorization bypass advisory is pinned to public upstream evidence.",
+      "evidence": {
+        "repo": "vercel/next.js",
+        "advisory": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+        "cve": "CVE-2025-29927",
+        "vulnerableRef": "15.2.2",
+        "fixedRef": "15.2.3",
+        "patchCommit": "15.2.3"
+      },
+      "evidenceLevel": "INFERRED",
+      "standardRefs": []
+    },
+    {
+      "checkId": "nextjs-cve-2025-29927",
+      "name": "Next.js middleware authorization bypass",
+      "group": "web-api",
+      "status": "pass",
+      "blocking": false,
+      "summary": "Next.js 15.2.3 is represented as the patched baseline with edge header hardening.",
+      "evidence": {
+        "source": "offline-pinned-metadata",
+        "version": "15.2.3",
+        "advisory": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw"
+      },
+      "evidenceLevel": "INFERRED",
+      "standardRefs": []
+    },
+    {
+      "checkId": "web-api-production-evidence-gap",
+      "name": "Production evidence still required",
+      "group": "production-audit",
+      "status": "gap",
+      "blocking": false,
+      "coverageGap": true,
+      "summary": "The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.",
+      "recommendation": "Collect production evidence in the consuming project before treating the release as production-ready.",
+      "evidenceLevel": "GAP",
+      "standardRefs": [
+        {
+          "id": "google-sre-monitoring",
+          "title": "Google SRE Monitoring Distributed Systems",
+          "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-release",
+          "title": "Google SRE Release Engineering",
+          "url": "https://sre.google/sre-book/release-engineering/",
+          "relationship": "supports"
+        },
+        {
+          "id": "google-sre-risk",
+          "title": "Google SRE Embracing Risk",
+          "url": "https://sre.google/sre-book/embracing-risk/",
+          "relationship": "supports"
+        },
+        {
+          "id": "cis-control-11",
+          "title": "CIS Control 11: Data Recovery",
+          "url": "https://www.cisecurity.org/controls/data-recovery",
+          "relationship": "supports"
+        },
+        {
+          "id": "nist-sp-800-34",
+          "title": "NIST SP 800-34 Rev. 1",
+          "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+          "relationship": "supports"
+        }
+      ]
+    }
+  ],
+  "exceptions": {
+    "used": [],
+    "invalid": []
+  }
+}

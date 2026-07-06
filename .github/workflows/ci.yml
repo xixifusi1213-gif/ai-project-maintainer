@@ -53,6 +53,9 @@ jobs:
       - name: Run repair loop smoke test
         run: npm run smoke:repair-loop
 
+      - name: Verify benchmark cases
+        run: npm run benchmark:verify
+
       - name: Probe local tool availability
         continue-on-error: true
         run: node ai-project-maintainer/scripts/doctor.mjs --no-trivy-db

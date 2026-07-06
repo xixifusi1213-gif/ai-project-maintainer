@@ -10,6 +10,21 @@
 
 ## 已完成基线
 
+### v1.3.0：真实案例库和公开 benchmark
+
+- 新增 `npm run benchmark:verify`。
+- 新增 `examples/benchmark-cases/`，覆盖 Electron、Web/API、数据库、CI/供应链、OSS npm library 五类风险。
+- 每个案例生成 before 报告、repair-pack、after 报告和 case summary。
+- 新增 `docs/BENCHMARK.md`、`docs/BENCHMARK.zh-CN.md` 和 `docs/benchmark-output/` 首版快照。
+- 保留 `npm run cases:verify` 兼容旧真实 OSS case 入口。
+
+### v1.2.1：Repair Pack dogfood 闭环验证
+
+- 新增 `npm run smoke:repair-loop`。
+- 在 demo 项目上证明 `gate -> repair-pack -> simulated AI repair -> recheck -> gate` 可跑通。
+- CI 增加 repair-loop smoke。
+- `PASS_WITH_GAPS` 继续保留生产证据缺口，不把 demo 误包装成生产安全证明。
+
 ### v1.0.0：发布可信链与稳定接口
 
 - 发布方式升级为 GitHub Actions + npm Trusted Publishing，不再依赖本机 `npm publish`。
