@@ -48,7 +48,7 @@ CI: true
 - web-api/nextjs-cve-2025-29927: None
 
 ## Tools
-- ai-project-maintainer: 1.3.0-benchmark
+- ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]

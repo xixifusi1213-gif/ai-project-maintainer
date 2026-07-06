@@ -2,7 +2,7 @@
 
 Source report: before-security-report.json
 Project root: siyuan-note/siyuan@before
-Generated: 2026-07-05T20:57:42.360Z
+Generated: 2026-07-06T04:39:21.212Z
 
 ## Summary
 - Total tasks: 2

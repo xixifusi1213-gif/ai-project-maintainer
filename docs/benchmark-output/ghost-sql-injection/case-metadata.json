@@ -5,6 +5,7 @@
   "repo": "TryGhost/Ghost",
   "advisory": "GHSA-w52v-v783-gw97",
   "advisoryUrl": "https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97",
+  "evidenceType": "advisory + patch commit + patched version",
   "cve": null,
   "vulnerableRef": "ebf4bb79cb45e487e277318df61c6c559752fd0a",
   "fixedRef": "30868d632b2252b638bc8a4c8ebf73964592ed91",

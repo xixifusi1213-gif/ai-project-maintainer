@@ -60,6 +60,7 @@ test("benchmark metadata covers five project risk categories", () => {
     assert.ok(caseStudy.vulnerableRef);
     assert.ok(caseStudy.fixedRef);
     assert.ok(caseStudy.patchCommit);
+    assert.ok(caseStudy.evidenceType);
     assert.equal(caseStudy.expected.before, "FAIL");
     assert.equal(Object.values(caseStudy.expected).includes("PASS_WITH_GAPS"), true);
   }
@@ -84,7 +85,11 @@ test("benchmark runner generates reports and repair packs for every case", async
       assert.notEqual(task.type === "auto_fix_candidate" && task.source.group === "production-audit", true);
     }
   }
-  assert.match(read(path.join(outputDir, "benchmark-summary.md")), /AI Project Maintainer Benchmark Summary/);
+  const summary = read(path.join(outputDir, "benchmark-summary.md"));
+  assert.match(summary, /AI Project Maintainer Benchmark Summary/);
+  assert.match(summary, /Evidence type/);
+  assert.match(read(path.join(outputDir, "siyuan-electron-rce", "case-summary.md")), /Evidence type: advisory \+ patched release \+ hardening model/);
+  assert.match(read(path.join(outputDir, "siyuan-electron-rce", "case-summary.md")), /does not modify upstream projects/);
   assertNoSensitiveText(outputDir);
 });
 
@@ -92,9 +97,13 @@ test("committed benchmark docs expose launch snapshot", () => {
   const packageJson = JSON.parse(read(path.resolve("package.json")));
   assert.equal(packageJson.files.includes("examples/benchmark-cases/"), true);
   assert.match(read(path.resolve("README.md")), /Public Benchmark/);
+  assert.match(read(path.resolve("README.md")), /does not claim upstream fixes were made by this tool/);
   assert.match(read(path.resolve("docs", "BENCHMARK.md")), /npm run benchmark:verify/);
+  assert.match(read(path.resolve("docs", "BENCHMARK.md")), /Evidence type/);
+  assert.match(read(path.resolve("docs", "BENCHMARK.md")), /does not modify upstream projects/);
   assert.match(read(path.resolve("docs", "BENCHMARK.zh-CN.md")), /公开 Benchmark/);
   assert.match(read(path.resolve("docs", "benchmark-output", "benchmark-summary.md")), /TanStack npm package compromise/);
+  assert.match(read(path.resolve("docs", "benchmark-output", "benchmark-summary.md")), /Evidence type/);
 });
 
 test("CI and publish workflows verify benchmark cases", () => {

@@ -47,30 +47,28 @@ If GitHub asks for PNG/JPG, export the SVG to PNG at `1280x640`.
 
 ## Release
 
-Create release:
+Current release:
 
 ```text
-Tag: v0.3.0
-Title: v0.3.0: Production audit intake and gate for AI-coded projects
+Tag: v1.4.0
+Title: v1.4.0: Quickstart first-run experience
 ```
 
-Release notes:
+Release URL:
 
 ```text
-## Highlights
-
-- Added `init-audit` to generate project profile and production evidence templates.
-- Added `audit-plan` to produce project-specific production-readiness plans.
-- Added `gate --production` to combine scanner evidence with production audit evidence.
-- GitHub Actions can automatically enable production mode when `.ai-maintainer/project-profile.yml` exists.
-- Reports now include `GAP`, `N/A`, and `USER_DECISION` production audit states.
-
-## Verification
-
-- npm test
-- npm run check
-- npm pack --dry-run
+https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.0
 ```
+
+Release asset checklist:
+
+- [x] npm tarball
+- [x] SBOM
+- [x] `release-manifest.json`
+- [x] `release-manifest.md`
+- [x] security report JSON
+- [x] security report Markdown
+- [x] SARIF
 
 ## First Launch Posts
 

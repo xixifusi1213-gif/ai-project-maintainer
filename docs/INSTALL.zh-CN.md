@@ -11,6 +11,7 @@
 发布到 npm 后，可以这样使用：
 
 ```powershell
+npx ai-project-maintainer quickstart "E:\我的项目"
 npx ai-project-maintainer doctor
 npx ai-project-maintainer init "E:\我的项目" --profile auto --ci github
 npx ai-project-maintainer init-audit "E:\我的项目" --wizard --lang zh-CN
@@ -29,6 +30,7 @@ npx ai-project-maintainer summary "E:\我的项目\reports\security-report.json"
 git clone https://github.com/xixifusi1213-gif/ai-project-maintainer.git
 cd .\ai-project-maintainer
 npm install
+node .\ai-project-maintainer\scripts\cli.mjs quickstart "E:\我的项目"
 node .\ai-project-maintainer\scripts\doctor.mjs
 node .\ai-project-maintainer\scripts\init-project.mjs "E:\我的项目" --profile auto --ci github
 node .\ai-project-maintainer\scripts\init-audit.mjs "E:\我的项目" --wizard --lang zh-CN

@@ -5,6 +5,7 @@
   "repo": "tj-actions/changed-files",
   "advisory": "GHSA-mrrh-fwg8-r2c3",
   "advisoryUrl": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+  "evidenceType": "advisory + CISA alert + hardening model",
   "cve": "CVE-2025-30066",
   "vulnerableRef": "v45.0.7",
   "fixedRef": "pinned-safe-replacement",

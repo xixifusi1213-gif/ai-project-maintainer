@@ -97,6 +97,7 @@ test("README first-run links are readable and not mojibake", () => {
   assert.match(readme, /\[Production evidence connectors\]\(docs\/CONNECTORS\.md\)/);
   assert.match(readme, /\[AI agent risk checks\]\(docs\/AGENT-RISK\.md\)/);
   assert.match(readme, /30-Second Quickstart/);
+  assert.match(readme, /npx ai-project-maintainer quickstart/);
   assert.match(readme, /PASS_WITH_GAPS/);
   assert.match(readme, /Optional Production Evidence Connectors/);
 });
@@ -139,7 +140,7 @@ test("demo repair loop proves gate to repair-pack to recheck to gate", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "1.3.0");
+  assert.equal(packageJson.version, "1.4.0");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

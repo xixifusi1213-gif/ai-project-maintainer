@@ -51,7 +51,7 @@ CI: true
 - production-audit/electron-desktop-production-evidence-gap: Google SRE Monitoring Distributed Systems, Google SRE Release Engineering, Google SRE Embracing Risk, CIS Control 11: Data Recovery, NIST SP 800-34 Rev. 1
 
 ## Tools
-- ai-project-maintainer: 1.3.0-benchmark
+- ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]

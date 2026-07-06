@@ -11,6 +11,7 @@
 ## 1. 跑健康态项目
 
 ```powershell
+npx ai-project-maintainer quickstart .\examples\demo-ai-app
 npm test --prefix .\examples\demo-ai-app
 npm run build --prefix .\examples\demo-ai-app
 ```

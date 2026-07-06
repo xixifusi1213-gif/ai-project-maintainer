@@ -2,7 +2,7 @@
 
 Source report: before-security-report.json
 Project root: TryGhost/Ghost@before
-Generated: 2026-07-05T20:57:42.459Z
+Generated: 2026-07-06T04:39:21.319Z
 
 ## Summary
 - Total tasks: 2

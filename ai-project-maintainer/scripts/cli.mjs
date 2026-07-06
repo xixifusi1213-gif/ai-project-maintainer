@@ -7,6 +7,7 @@ import { runAuditPlan } from "./audit-plan.mjs";
 import { runDoctor } from "./doctor.mjs";
 import { initAudit, initAuditWizard } from "./init-audit.mjs";
 import { initProject } from "./init-project.mjs";
+import { runQuickstart, toQuickstartMarkdown } from "./quickstart.mjs";
 import { runRepairPack } from "./repair-pack.mjs";
 import { runLocalGate, runLocalGateAsync } from "./run-local-gate.mjs";
 import { summarizeReport } from "./report-summary.mjs";
@@ -46,6 +47,15 @@ export function parseCliArgs(argv) {
       args: {
         jsonOnly: rest.includes("--json"),
         checkTrivyDb: !rest.includes("--no-trivy-db"),
+      },
+    };
+  }
+
+  if (command === "quickstart") {
+    return {
+      command,
+      args: {
+        projectRoot: firstPositional(rest) || process.cwd(),
       },
     };
   }
@@ -195,6 +205,19 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     return report.passed ? 0 : 1;
   }
 
+  if (parsed.command === "quickstart") {
+    try {
+      const result = runQuickstart(parsed.args.projectRoot, {
+        runnerOptions: io.runnerOptions || {},
+      });
+      io.stdout.write(`${toQuickstartMarkdown(result.summary)}\n`);
+      return 0;
+    } catch (error) {
+      io.stderr.write(`${error.message}\n`);
+      return 2;
+    }
+  }
+
   if (parsed.command === "init") {
     const result = initProject(parsed.args.projectRoot, {
       profile: parsed.args.profile,
@@ -286,7 +309,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
     }
   }
 
-  io.stderr.write("Usage: ai-project-maintainer <doctor|init|init-audit|audit-plan|gate|agent-risk|connectors|evidence|summary|repair-pack> [options]\n");
+  io.stderr.write("Usage: ai-project-maintainer <doctor|quickstart|init|init-audit|audit-plan|gate|agent-risk|connectors|evidence|summary|repair-pack> [options]\n");
   io.stderr.write("       ai-project-maintainer --version\n");
   return 2;
 }
