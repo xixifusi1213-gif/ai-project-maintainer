@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-05T20:57:42.459Z",
+  "generatedAt": "2026-07-06T04:39:21.319Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "TryGhost/Ghost@before",
   "overallStatus": "FAIL",

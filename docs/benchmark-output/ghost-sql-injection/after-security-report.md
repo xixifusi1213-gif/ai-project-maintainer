@@ -51,7 +51,7 @@ CI: true
 - production-audit/database-production-evidence-gap: OWASP SAMM, Google SRE Release Engineering
 
 ## Tools
-- ai-project-maintainer: 1.3.0-benchmark
+- ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]

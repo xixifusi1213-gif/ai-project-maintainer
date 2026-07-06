@@ -32,10 +32,15 @@ function fail(message) {
   throw new Error(message);
 }
 
+export function resolveSpawnCommand(command, platform = process.platform) {
+  if (platform === "win32" && command === "npm") return "npm.cmd";
+  return command;
+}
+
 function defaultRunner(command, args, options = {}) {
   // The verifier calls a fixed set of release-inspection commands without shell expansion.
   // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
-  const result = spawnSync(command, args, {
+  const result = spawnSync(resolveSpawnCommand(command), args, {
     cwd: options.cwd || repoRoot,
     encoding: "utf8",
     timeout: options.timeoutMs || 60_000,
@@ -45,13 +50,18 @@ function defaultRunner(command, args, options = {}) {
     status: result.status,
     stdout: result.stdout || "",
     stderr: result.stderr || "",
+    error: result.error || null,
   };
+}
+
+function commandFailureOutput(result) {
+  return result.error?.message || result.stderr || result.stdout || "";
 }
 
 function runJson(runner, command, args) {
   const result = runner(command, args);
   if (result.status !== 0) {
-    fail(`Command failed: ${command} ${args.join(" ")}\n${result.stderr || result.stdout}`);
+    fail(`Command failed: ${command} ${args.join(" ")}\n${commandFailureOutput(result)}`);
   }
   return JSON.parse(result.stdout);
 }
@@ -59,7 +69,7 @@ function runJson(runner, command, args) {
 function runText(runner, command, args) {
   const result = runner(command, args);
   if (result.status !== 0) {
-    fail(`Command failed: ${command} ${args.join(" ")}\n${result.stderr || result.stdout}`);
+    fail(`Command failed: ${command} ${args.join(" ")}\n${commandFailureOutput(result)}`);
   }
   return result.stdout.trim();
 }

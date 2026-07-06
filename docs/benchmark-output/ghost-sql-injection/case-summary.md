@@ -3,6 +3,7 @@
 Category: database
 Repository: [TryGhost/Ghost](https://github.com/TryGhost/Ghost)
 Evidence: [GHSA-w52v-v783-gw97](https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97)
+Evidence type: advisory + patch commit + patched version
 Patch/hardening reference: [30868d632b2252b638bc8a4c8ebf73964592ed91](https://github.com/TryGhost/Ghost/commit/30868d632b2252b638bc8a4c8ebf73964592ed91)
 
 | Stage | Overall Status | Passed | Primary signal |
@@ -14,4 +15,4 @@ Repair-pack tasks from before report: 2
 Auto-fix candidates: 0
 Maintainer decisions: 0
 
-This benchmark stores links, metadata, generated reports, and redacted snippets only. It does not vendor the upstream project or ship exploit code.
+This benchmark stores links, metadata, generated reports, and redacted snippets only. It does not modify upstream projects, vendor upstream source trees, ship exploit code, or claim upstream fixes were made by this tool.

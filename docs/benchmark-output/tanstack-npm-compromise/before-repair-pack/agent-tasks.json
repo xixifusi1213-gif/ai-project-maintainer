@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-05T20:57:42.508Z",
+  "generatedAt": "2026-07-06T04:39:21.375Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "TanStack/query@before",
   "overallStatus": "FAIL",

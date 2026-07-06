@@ -5,6 +5,7 @@
   "repo": "siyuan-note/siyuan",
   "advisory": "GHSA-x63q-3rcj-hhp5",
   "advisoryUrl": "https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5",
+  "evidenceType": "advisory + patched release + hardening model",
   "cve": null,
   "vulnerableRef": "v3.6.3",
   "fixedRef": "v3.6.4",

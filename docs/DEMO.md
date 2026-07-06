@@ -2,6 +2,14 @@
 
 This demo uses the runnable project in `examples/demo-ai-app`. It does not require any paid account or external API.
 
+For a first-time user trial, start here:
+
+```powershell
+npx ai-project-maintainer quickstart .\examples\demo-ai-app
+```
+
+This writes a short summary under `reports/` and tells you which report or repair-pack files to hand to Cursor, Claude Code, Cline, or Codex.
+
 Visual materials:
 
 - [90-second GIF storyboard](../assets/demo-90s.gif)

@@ -18,6 +18,7 @@ export const BENCHMARK_CASES = [
     repo: "siyuan-note/siyuan",
     advisory: "GHSA-x63q-3rcj-hhp5",
     advisoryUrl: "https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5",
+    evidenceType: "advisory + patched release + hardening model",
     vulnerableRef: "v3.6.3",
     fixedRef: "v3.6.4",
     fixedRelease: "v3.6.4",
@@ -39,6 +40,7 @@ export const BENCHMARK_CASES = [
     repo: "TryGhost/Ghost",
     advisory: "GHSA-w52v-v783-gw97",
     advisoryUrl: "https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97",
+    evidenceType: "advisory + patch commit + patched version",
     vulnerableRef: "ebf4bb79cb45e487e277318df61c6c559752fd0a",
     fixedRef: "30868d632b2252b638bc8a4c8ebf73964592ed91",
     fixedRelease: "v6.19.1",
@@ -59,6 +61,7 @@ export const BENCHMARK_CASES = [
     repo: "vercel/next.js",
     advisory: "GHSA-f82v-jwr5-mffw",
     advisoryUrl: "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+    evidenceType: "advisory + patched version",
     cve: "CVE-2025-29927",
     vulnerableRef: "15.2.2",
     fixedRef: "15.2.3",
@@ -79,6 +82,7 @@ export const BENCHMARK_CASES = [
     repo: "tj-actions/changed-files",
     advisory: "GHSA-mrrh-fwg8-r2c3",
     advisoryUrl: "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+    evidenceType: "advisory + CISA alert + hardening model",
     cve: "CVE-2025-30066",
     vulnerableRef: "v45.0.7",
     fixedRef: "pinned-safe-replacement",
@@ -99,6 +103,7 @@ export const BENCHMARK_CASES = [
     repo: "TanStack/query",
     advisory: "TanStack npm compromise postmortem",
     advisoryUrl: "https://tanstack.com/blog/npm-supply-chain-compromise-postmortem",
+    evidenceType: "postmortem + release workflow hardening model",
     vulnerableRef: "pre-postmortem release workflow",
     fixedRef: "postmortem release hardening",
     fixedRelease: "postmortem hardening",
@@ -397,7 +402,7 @@ async function reportForCaseStage(caseStudy, stage, options) {
     },
     checks,
     audit: caseAudit(caseStudy, stage),
-    toolVersions: { "ai-project-maintainer": "1.3.0-benchmark" },
+    toolVersions: { "ai-project-maintainer": "1.3.1-benchmark" },
     generatedAt,
   });
 }
@@ -422,6 +427,7 @@ function caseSummary(caseStudy, reports, repairPack) {
   lines.push(`Category: ${caseStudy.category}`);
   lines.push(`Repository: [${caseStudy.repo}](https://github.com/${caseStudy.repo})`);
   lines.push(`Evidence: [${caseStudy.advisory}](${caseStudy.advisoryUrl})`);
+  lines.push(`Evidence type: ${caseStudy.evidenceType}`);
   lines.push(`Patch/hardening reference: [${caseStudy.patchCommit}](${caseStudy.patchUrl})`);
   lines.push("");
   lines.push("| Stage | Overall Status | Passed | Primary signal |");
@@ -435,7 +441,7 @@ function caseSummary(caseStudy, reports, repairPack) {
   lines.push(`Auto-fix candidates: ${repairPack.summary.byType.auto_fix_candidate || 0}`);
   lines.push(`Maintainer decisions: ${repairPack.summary.byType.needs_maintainer_decision || 0}`);
   lines.push("");
-  lines.push("This benchmark stores links, metadata, generated reports, and redacted snippets only. It does not vendor the upstream project or ship exploit code.");
+  lines.push("This benchmark stores links, metadata, generated reports, and redacted snippets only. It does not modify upstream projects, vendor upstream source trees, ship exploit code, or claim upstream fixes were made by this tool.");
   return lines.join("\n");
 }
 
@@ -447,6 +453,7 @@ function writeCaseMetadata(caseDir, caseStudy) {
     repo: caseStudy.repo,
     advisory: caseStudy.advisory,
     advisoryUrl: caseStudy.advisoryUrl,
+    evidenceType: caseStudy.evidenceType,
     cve: caseStudy.cve || null,
     vulnerableRef: caseStudy.vulnerableRef,
     fixedRef: caseStudy.fixedRef,
@@ -489,10 +496,10 @@ function benchmarkSummary(results) {
   const lines = [];
   lines.push("# AI Project Maintainer Benchmark Summary");
   lines.push("");
-  lines.push("This benchmark uses public OSS advisories, releases, postmortems, and generated APM reports. It is not an exploit corpus and does not claim any project is absolutely production-safe.");
+  lines.push("This benchmark uses public OSS advisories, releases, postmortems, and generated APM reports. It is not an exploit corpus, does not modify upstream projects, and does not claim upstream fixes were made by this tool.");
   lines.push("");
-  lines.push("| Case | Project type | Before | Auto-fix tasks | Manual review tasks | User decisions | After | Remaining gaps |");
-  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  lines.push("| Case | Project type | Evidence type | Before | Auto-fix tasks | Manual review tasks | User decisions | After | Remaining gaps |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const [id, result] of Object.entries(results)) {
     const caseStudy = result.caseStudy;
     const before = result.reports.before.overallStatus;
@@ -500,7 +507,7 @@ function benchmarkSummary(results) {
     const after = result.reports[afterStage].overallStatus;
     const tasks = result.repairPack.summary.byType;
     const finalGaps = result.reports[afterStage].coverageGapCount;
-    lines.push(`| ${caseStudy.title} | ${caseStudy.category} | ${before} | ${tasks.auto_fix_candidate || 0} | ${tasks.manual_review_required || 0} | ${tasks.needs_maintainer_decision || 0} | ${after} | ${finalGaps} |`);
+    lines.push(`| ${caseStudy.title} | ${caseStudy.category} | ${caseStudy.evidenceType} | ${before} | ${tasks.auto_fix_candidate || 0} | ${tasks.manual_review_required || 0} | ${tasks.needs_maintainer_decision || 0} | ${after} | ${finalGaps} |`);
   }
   lines.push("");
   lines.push("Run locally with:");
@@ -541,7 +548,7 @@ function assertSafeOutput(outputDir) {
 }
 
 function assertMetadata(caseStudy) {
-  if (!caseStudy.repo || !caseStudy.advisoryUrl || !caseStudy.category) throw new Error(`${caseStudy.id} is missing benchmark metadata.`);
+  if (!caseStudy.repo || !caseStudy.advisoryUrl || !caseStudy.category || !caseStudy.evidenceType) throw new Error(`${caseStudy.id} is missing benchmark metadata.`);
   if (!caseStudy.vulnerableRef || !caseStudy.fixedRef) throw new Error(`${caseStudy.id} must pin vulnerable and fixed references.`);
   if (!caseStudy.expected?.before || !Object.values(caseStudy.expected).some((status) => status === "PASS_WITH_GAPS")) {
     throw new Error(`${caseStudy.id} must declare expected before and after statuses.`);

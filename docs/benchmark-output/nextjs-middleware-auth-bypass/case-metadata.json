@@ -5,6 +5,7 @@
   "repo": "vercel/next.js",
   "advisory": "GHSA-f82v-jwr5-mffw",
   "advisoryUrl": "https://github.com/vercel/next.js/security/advisories/GHSA-f82v-jwr5-mffw",
+  "evidenceType": "advisory + patched version",
   "cve": "CVE-2025-29927",
   "vulnerableRef": "15.2.2",
   "fixedRef": "15.2.3",

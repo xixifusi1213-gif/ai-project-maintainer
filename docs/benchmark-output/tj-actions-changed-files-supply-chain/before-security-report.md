@@ -49,7 +49,7 @@ CI: true
 - ci-security/tj-actions-changed-files-compromise: NIST SSDF SP 800-218, SLSA, OpenSSF Scorecard
 
 ## Tools
-- ai-project-maintainer: 1.3.0-benchmark
+- ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]

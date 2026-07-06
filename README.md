@@ -37,16 +37,18 @@ AI coding makes it easy to ship code that looks complete but quietly misses prod
 Requires Node.js 20+.
 
 ```powershell
-npx ai-project-maintainer doctor --no-trivy-db
-npx ai-project-maintainer init ".\my-project" --profile auto --ci github
-npx ai-project-maintainer agent-risk ".\my-project"
-npx ai-project-maintainer init-audit ".\my-project" --wizard --dry-run
-npx ai-project-maintainer init-audit ".\my-project" --wizard
-npx ai-project-maintainer gate ".\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
-npx ai-project-maintainer repair-pack reports/security-report.json --project ".\my-project" --output reports
+npx ai-project-maintainer quickstart ".\my-project"
 ```
 
-`PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
+`quickstart` detects the project profile, runs a lightweight report-only gate, skips project tests and production evidence by default, and writes:
+
+- `reports/quickstart-summary.md`
+- `reports/quickstart-security-report.json`
+- `reports/quickstart-security-report.md`
+- `reports/quickstart-security-report.sarif`
+- `reports/quickstart-repair-pack/` when blockers exist
+
+Give `quickstart-summary.md`, the detailed report, and any generated repair-pack files to Cursor, Claude Code, Cline, or Codex. `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
 
 ## The 3-Minute Flow
 
@@ -86,7 +88,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.3.0 --tag v1.3.0 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.0 --tag v1.4.0 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates
@@ -145,7 +147,7 @@ The script creates a broken temp copy of `examples/demo-ai-app`, runs the gate t
 
 ## Public Benchmark
 
-v1.3.0 expands the real case studies into a reproducible benchmark across five project-risk categories:
+v1.3.0 expands the real case studies into a reproducible benchmark across five project-risk categories. The benchmark uses real public incidents as evidence models; it does not modify upstream projects, vendor upstream source trees, or ship exploit code, and it does not claim upstream fixes were made by this tool.
 
 ```powershell
 npm run benchmark:verify
@@ -153,15 +155,17 @@ npm run benchmark:verify
 
 Launch snapshot: [Benchmark summary](docs/benchmark-output/benchmark-summary.md)
 
-| Category | Case | Before | After |
-| --- | --- | --- | --- |
-| Electron desktop | SiYuan Electron RCE | FAIL | PASS_WITH_GAPS |
-| Database | Ghost SQL injection | FAIL | PASS_WITH_GAPS |
-| Web/API | Next.js middleware authorization bypass | FAIL | PASS_WITH_GAPS |
-| CI / supply chain | tj-actions/changed-files compromise | FAIL | PASS_WITH_GAPS |
-| OSS npm library | TanStack npm package compromise | FAIL | PASS_WITH_GAPS |
+| Category | Case | Evidence type | Before | After |
+| --- | --- | --- | --- | --- |
+| Electron desktop | SiYuan Electron RCE | advisory + patched release + hardening model | FAIL | PASS_WITH_GAPS |
+| Database | Ghost SQL injection | advisory + patch commit + patched version | FAIL | PASS_WITH_GAPS |
+| Web/API | Next.js middleware authorization bypass | advisory + patched version | FAIL | PASS_WITH_GAPS |
+| CI / supply chain | tj-actions/changed-files compromise | advisory + CISA alert + hardening model | FAIL | PASS_WITH_GAPS |
+| OSS npm library | TanStack npm package compromise | postmortem + release workflow hardening model | FAIL | PASS_WITH_GAPS |
 
 The benchmark also writes `before-repair-pack/agent-tasks.json` and `fix-plan.md` for each case, so users can inspect how reports become AI-agent repair tasks. See [Benchmark](docs/BENCHMARK.md).
+
+How to interpret it: `FAIL` means the benchmarked blocker was detected; `PASS_WITH_GAPS` means deterministic blockers are cleared while production evidence still needs maintainer confirmation; `GAP` is missing evidence, not proof of safety. AI repair-pack tasks can help fix deterministic blockers, but they must not invent production evidence or accept risk on behalf of a maintainer.
 
 More demo material:
 

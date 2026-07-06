@@ -49,7 +49,7 @@ CI: true
 - electron/electron-runtime-hardening: Google SRE Release Engineering, DORA research
 
 ## Tools
-- ai-project-maintainer: 1.3.0-benchmark
+- ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]
