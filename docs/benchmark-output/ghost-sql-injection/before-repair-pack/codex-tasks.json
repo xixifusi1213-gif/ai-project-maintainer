@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "targetAgent": "codex",
+  "generatedAt": "2026-07-05T20:57:42.459Z",
+  "sourceReport": "before-security-report.json",
+  "projectRoot": "TryGhost/Ghost@before",
+  "instructions": [
+    "Fix auto_fix_candidate tasks first.",
+    "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+    "After each fix, run the task verificationCommands before rerunning the full gate.",
+    "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports."
+  ],
+  "tasks": [
+    {
+      "id": "fix-001",
+      "title": "Database query parameterization",
+      "type": "manual_review_required",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "database-query-parameterization",
+        "group": "database"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: User-controlled slug ordering can be interpolated into SQL instead of using bindings."
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Review the risky change with the maintainer, document the accepted path, then rerun the relevant check.",
+      "userDecisionRequired": true,
+      "verificationCommands": [
+        "npx ai-project-maintainer gate 'TryGhost/Ghost@before' --profile database --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "User-controlled slug ordering can be interpolated into SQL instead of using bindings."
+    },
+    {
+      "id": "fix-002",
+      "title": "Database query parameterization",
+      "type": "manual_review_required",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "database-query-parameterization",
+        "group": "database"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: User-controlled slug ordering can be interpolated into SQL instead of using bindings."
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Review the risky change with the maintainer, document the accepted path, then rerun the relevant check.",
+      "userDecisionRequired": true,
+      "verificationCommands": [
+        "npx ai-project-maintainer gate 'TryGhost/Ghost@before' --profile database --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "User-controlled slug ordering can be interpolated into SQL instead of using bindings."
+    }
+  ],
+  "recheckCommands": [
+    "npx ai-project-maintainer gate 'TryGhost/Ghost@before' --profile database --production --strict --release --output reports/security-report.json"
+  ]
+}

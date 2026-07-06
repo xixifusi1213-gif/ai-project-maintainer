@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "targetAgent": "codex",
+  "generatedAt": "2026-07-05T20:57:42.360Z",
+  "sourceReport": "before-security-report.json",
+  "projectRoot": "siyuan-note/siyuan@before",
+  "instructions": [
+    "Fix auto_fix_candidate tasks first.",
+    "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+    "After each fix, run the task verificationCommands before rerunning the full gate.",
+    "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports."
+  ],
+  "tasks": [
+    {
+      "id": "fix-001",
+      "title": "Electron runtime hardening",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "electron-runtime-hardening",
+        "group": "electron"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false."
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Tighten Electron webPreferences, preload, IPC, file access, or update trust according to the finding.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "npx ai-project-maintainer gate 'siyuan-note/siyuan@before' --profile electron-desktop --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false."
+    },
+    {
+      "id": "fix-002",
+      "title": "Electron runtime hardening",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "electron-runtime-hardening",
+        "group": "electron"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false."
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Tighten Electron webPreferences, preload, IPC, file access, or update trust according to the finding.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "npx ai-project-maintainer gate 'siyuan-note/siyuan@before' --profile electron-desktop --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false."
+    }
+  ],
+  "recheckCommands": [
+    "npx ai-project-maintainer gate 'siyuan-note/siyuan@before' --profile electron-desktop --production --strict --release --output reports/security-report.json"
+  ]
+}

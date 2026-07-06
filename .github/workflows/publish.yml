@@ -77,6 +77,9 @@ jobs:
       - name: Verify real OSS cases
         run: npm run cases:verify
 
+      - name: Verify benchmark cases
+        run: npm run benchmark:verify
+
       - name: Prepare release directories
         run: mkdir -p dist reports
 

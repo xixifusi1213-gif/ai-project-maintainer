@@ -1,0 +1,17 @@
+{
+  "id": "tj-actions-changed-files-supply-chain",
+  "title": "tj-actions/changed-files supply-chain compromise",
+  "category": "ci-supply-chain",
+  "repo": "tj-actions/changed-files",
+  "advisory": "GHSA-mrrh-fwg8-r2c3",
+  "advisoryUrl": "https://github.com/advisories/GHSA-mrrh-fwg8-r2c3",
+  "cve": "CVE-2025-30066",
+  "vulnerableRef": "v45.0.7",
+  "fixedRef": "pinned-safe-replacement",
+  "patchCommit": "workflow-hardening",
+  "patchUrl": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction",
+  "expected": {
+    "before": "FAIL",
+    "after": "PASS_WITH_GAPS"
+  }
+}

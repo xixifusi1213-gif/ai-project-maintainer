@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "targetAgent": "codex",
+  "generatedAt": "2026-07-05T20:57:42.508Z",
+  "sourceReport": "before-security-report.json",
+  "projectRoot": "TanStack/query@before",
+  "instructions": [
+    "Fix auto_fix_candidate tasks first.",
+    "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+    "After each fix, run the task verificationCommands before rerunning the full gate.",
+    "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports."
+  ],
+  "tasks": [
+    {
+      "id": "fix-001",
+      "title": "npm package release workflow hardening",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "npm-release-workflow-hardening",
+        "group": "ci-security"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Release workflow lacks the benchmarked post-compromise hardening controls.",
+        "command: zizmor .github/workflows"
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Harden the workflow or action configuration, then rerun actionlint/zizmor and the gate.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "zizmor .github/workflows",
+        "npx ai-project-maintainer gate 'TanStack/query@before' --profile oss-library --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Release workflow lacks the benchmarked post-compromise hardening controls."
+    },
+    {
+      "id": "fix-002",
+      "title": "npm package release workflow hardening",
+      "type": "auto_fix_candidate",
+      "severity": "P2",
+      "source": {
+        "report": "before-security-report.json",
+        "checkId": "npm-release-workflow-hardening",
+        "group": "ci-security"
+      },
+      "evidence": [
+        "status: fail",
+        "summary: Release workflow lacks the benchmarked post-compromise hardening controls.",
+        "command: zizmor .github/workflows"
+      ],
+      "targetFiles": [],
+      "fixStrategy": "Harden the workflow or action configuration, then rerun actionlint/zizmor and the gate.",
+      "userDecisionRequired": false,
+      "verificationCommands": [
+        "zizmor .github/workflows",
+        "npx ai-project-maintainer gate 'TanStack/query@before' --profile oss-library --production --strict --release --output reports/security-report.json"
+      ],
+      "riskNotes": "Release workflow lacks the benchmarked post-compromise hardening controls."
+    }
+  ],
+  "recheckCommands": [
+    "zizmor .github/workflows",
+    "npx ai-project-maintainer gate 'TanStack/query@before' --profile oss-library --production --strict --release --output reports/security-report.json"
+  ]
+}

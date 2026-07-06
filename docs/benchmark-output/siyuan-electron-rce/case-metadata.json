@@ -1,0 +1,18 @@
+{
+  "id": "siyuan-electron-rce",
+  "title": "SiYuan Electron RCE advisory",
+  "category": "electron-desktop",
+  "repo": "siyuan-note/siyuan",
+  "advisory": "GHSA-x63q-3rcj-hhp5",
+  "advisoryUrl": "https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5",
+  "cve": null,
+  "vulnerableRef": "v3.6.3",
+  "fixedRef": "v3.6.4",
+  "patchCommit": "bb326aa992b26096eedea64b69b182c3d2449681",
+  "patchUrl": "https://github.com/siyuan-note/siyuan/commit/bb326aa992b26096eedea64b69b182c3d2449681",
+  "expected": {
+    "before": "FAIL",
+    "patched-release": "FAIL",
+    "after": "PASS_WITH_GAPS"
+  }
+}
