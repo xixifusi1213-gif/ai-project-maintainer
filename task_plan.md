@@ -21,4 +21,4 @@ Implement v1.3.0: real case library and public benchmark for `ai-project-maintai
 
 ## Current Stage
 
-Implementation complete. Local verification passed. Next steps are commit, push, PR, CI/Security validation, tag, and Trusted Publishing.
+Implementation complete. Local verification passed. PR #14 is open. Next steps are CI/Security validation, merge, tag, and Trusted Publishing.
