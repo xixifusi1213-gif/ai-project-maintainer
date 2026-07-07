@@ -161,3 +161,37 @@
 ## v1.4.1 Completion
 
 - All planned v1.4.1 environment resilience implementation stages are complete on branch `codex/v1.4.1-env-resilience`.
+
+## v1.4.2 Trivy DB Resilience Implementation: 2026-07-07
+
+- User asked how other people can use the tool if Trivy DB downloads fail and requested a thorough fix.
+- Created branch `codex/v1.4.2-trivy-db-resilience`.
+- Confirmed Trivy's own help shows built-in default DB repositories include `mirror.gcr.io/aquasec/trivy-db:2` and `ghcr.io/aquasecurity/trivy-db:2`.
+- Recorded the v1.4.2 scope in `task_plan.md` and findings in `findings.md`.
+- Started focused tests for Trivy repository defaults and cached DB fallback behavior.
+- Added tests for Trivy default repository handling, multi-mirror environment parsing, cached DB fallback, strict-mode DB freshness blocking, and quickstart no-repair-pack behavior.
+- Implemented Trivy DB repository handling so the tool no longer forces a single GHCR source when no mirror is configured.
+- Added automatic cached-DB retry after online Trivy DB update failures.
+- Added quickstart evidence-gap details so cached DB fallback appears in `quickstart-summary.md`.
+- Updated README, local gate reference, promotion/checklist docs, v1.4.2 release notes, package metadata, and version tests.
+- Ran focused quickstart/gate tests; all 14 passed.
+- Ran full `npm test`; all 137 tests passed.
+- Ran `npm run check`; syntax check passed for 53 files.
+- Ran `npm pack --dry-run`; npm produced `ai-project-maintainer-1.4.2.tgz`.
+- Ran `npm run release:verify:pre`; release verification passed for `v1.4.2`.
+- Ran `git diff --check`; it exited successfully with only Windows LF-to-CRLF warnings.
+
+## v1.4.2 Completion
+
+- All planned v1.4.2 Trivy DB resilience stages are complete on branch `codex/v1.4.2-trivy-db-resilience`.
+
+## Local Trivy Environment Fix: 2026-07-07
+
+- Confirmed Windows user proxy is enabled at `127.0.0.1:1080`, but command-line environment variables were initially empty.
+- Refreshed the local Trivy vulnerability DB through the local proxy into `E:\DevCaches\trivy`.
+- Persisted user-level Trivy/proxy settings through `HKCU:\Environment` and added a PowerShell profile block at `C:\Users\tianf\Documents\WindowsPowerShell\profile.ps1` so new PowerShell sessions pick them up.
+- Verified a new PowerShell session sees `HTTPS_PROXY`, `TRIVY_TIMEOUT`, `TRIVY_CACHE_DIR`, and `TRIVY_DB_REPOSITORY`.
+- Verified `trivy fs` exits `0` and reports `0` high/critical npm vulnerabilities for `package-lock.json`.
+- Verified `npx ai-project-maintainer@latest quickstart .` exits `0` with `PASS_WITH_GAPS` and no blockers.
+- Verified `npx ai-project-maintainer@latest gate . --profile auto --agent-risk --strict --release --output reports/security-report.json` exits `0` with `PASS_WITH_GAPS`; Trivy and package tests both pass, while optional tools remain coverage gaps.
+- Adjusted the v1.4.2 quickstart test to isolate environment variables so the local `TRIVY_TIMEOUT=10m` setting does not break `npm test`.

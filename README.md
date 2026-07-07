@@ -52,6 +52,8 @@ Give `quickstart-summary.md`, the detailed report, and any generated repair-pack
 
 If a brand-new npm project has `package.json` but no `package-lock.json`, quickstart records dependency audit as a setup gap instead of a blocker. Run `npm install --package-lock-only`, then rerun quickstart when you want npm audit evidence.
 
+If Trivy cannot refresh its vulnerability database, quickstart retries with the local cached DB when one exists. That keeps the first run usable and reports `PASS_WITH_GAPS`; strict release gates still flag stale or incomplete vulnerability DB evidence until the cache is refreshed from a reachable mirror.
+
 ## The 3-Minute Flow
 
 Requires Node.js 20+.
@@ -90,7 +92,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.1 --tag v1.4.1 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.2 --tag v1.4.2 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates

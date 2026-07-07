@@ -50,14 +50,14 @@ If GitHub asks for PNG/JPG, export the SVG to PNG at `1280x640`.
 Current release:
 
 ```text
-Tag: v1.4.1
-Title: v1.4.1: First-run environment resilience
+Tag: v1.4.2
+Title: v1.4.2: Trivy DB resilience
 ```
 
 Release URL:
 
 ```text
-https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.1
+https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.2
 ```
 
 Release asset checklist:

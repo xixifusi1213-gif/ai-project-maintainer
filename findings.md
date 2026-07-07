@@ -126,3 +126,11 @@
 - Focused tests now confirm quickstart no-lockfile npm audit setup gaps produce `PASS_WITH_GAPS`, no blockers, and no repair-pack, while lockfile-backed audit failures still generate a repair-pack.
 - `npm test`, `npm run check`, `npm pack --dry-run`, `npm run release:verify:pre`, and `git diff --check` passed for `v1.4.1`. `git diff --check` printed only Windows LF-to-CRLF conversion warnings.
 - A final search found no remaining static `import YAML` statements under `ai-project-maintainer/scripts`; YAML use now goes through the local dependency helper.
+
+## v1.4.2 Trivy DB Resilience Findings
+
+- Local testing showed the current failure is environmental: GHCR starts downloading `trivy-db` but is too slow for the current timeout, `mirror.gcr.io` times out, and public ECR/CloudFront DNS fails on this machine.
+- The current product default forces `--db-repository ghcr.io/aquasecurity/trivy-db:2`, overriding Trivy's built-in multi-repository fallback.
+- Trivy can scan successfully on this machine when a local DB cache exists and DB updates are skipped.
+- The product fix should make first-run robust by using Trivy's built-in repository fallback by default, supporting configured mirror lists, and retrying with cached DB when the online update fails.
+- A cached DB fallback should produce `PASS_WITH_GAPS` in non-strict quickstart, but strict release gates should still surface stale/incomplete DB freshness as blocking evidence.

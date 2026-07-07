@@ -105,6 +105,41 @@ test("quickstart treats npm audit ENOLOCK without a lockfile as a setup gap", ()
   assert.match(markdown, /npm install --package-lock-only/);
 });
 
+test("quickstart completes with cached Trivy DB fallback and no repair pack", () => {
+  const root = tempProject();
+  const calls = [];
+  const result = runQuickstart(root, {
+    runnerOptions: {
+      env: {},
+      commandRunner: (command, args) => {
+        calls.push({ command, args });
+        if (command === "npm" && args[0] === "audit") return { status: "pass", code: 0, stdout: "{}" };
+        if (command === "trivy" && args[0] === "fs" && args.includes("--skip-db-update")) {
+          return { status: "pass", code: 0, stdout: "cached db clean" };
+        }
+        if (command === "trivy" && args[0] === "fs") {
+          return { status: "fail", code: 1, stderr: "failed to download vulnerability DB: context deadline exceeded" };
+        }
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const markdown = fs.readFileSync(path.join(root, "reports", "quickstart-summary.md"), "utf8");
+  const report = JSON.parse(fs.readFileSync(path.join(root, "reports", "quickstart-security-report.json"), "utf8"));
+  const firstTrivyCall = calls.find((call) => call.command === "trivy" && call.args[0] === "fs");
+
+  assert.equal(result.summary.status, "PASS_WITH_GAPS");
+  assert.equal(result.summary.counts.blockers, 0);
+  assert.equal(report.blockerCount, 0);
+  assert.equal(report.checks.find((check) => check.checkId === "trivy")?.trivyDbFallback, "cache");
+  assert.equal(report.coverageGaps.some((gap) => gap.checkId === "trivy-db-cache"), true);
+  assert.equal(calls.filter((call) => call.command === "trivy" && call.args[0] === "fs").length, 2);
+  assert.equal(firstTrivyCall.args[firstTrivyCall.args.indexOf("--timeout") + 1], "45s");
+  assert.equal(fs.existsSync(path.join(root, "reports", "quickstart-repair-pack")), false);
+  assert.match(markdown, /local cached database/i);
+});
+
 test("quickstart writes only report outputs and creates a repair pack for blockers", () => {
   const root = tempProject();
   const before = new Set(listFiles(root));

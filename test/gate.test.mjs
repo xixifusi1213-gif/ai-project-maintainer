@@ -65,6 +65,123 @@ test("non-strict mode reports Trivy DB errors as coverage gaps", () => {
   assert.equal(report.coverageGaps.some((gap) => gap.name === "trivy filesystem scan"), true);
 });
 
+test("Trivy scan uses built-in repository fallback when no mirror env is configured", () => {
+  const root = tempProject();
+  const calls = [];
+  const report = runLocalGate(root, {
+    strict: false,
+    release: false,
+    runnerOptions: {
+      env: {},
+      commandRunner: (command, args) => {
+        calls.push({ command, args });
+        if (command === "trivy" && args[0] === "fs") return { status: "pass", code: 0, stdout: "trivy clean" };
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const trivyCall = calls.find((call) => call.command === "trivy" && call.args[0] === "fs");
+
+  assert.equal(report.checks.find((check) => check.checkId === "trivy")?.status, "pass");
+  assert.equal(trivyCall.args.includes("--db-repository"), false);
+  assert.equal(trivyCall.args.includes("ghcr.io/aquasecurity/trivy-db:2"), false);
+  assert.equal(trivyCall.args[trivyCall.args.indexOf("--timeout") + 1], "90s");
+});
+
+test("Trivy scan supports multiple configured DB repositories", () => {
+  const root = tempProject();
+  const calls = [];
+  runLocalGate(root, {
+    strict: false,
+    release: false,
+    runnerOptions: {
+      env: {
+        TRIVY_DB_REPOSITORY: "mirror.gcr.io/aquasec/trivy-db:2,public.ecr.aws/aquasecurity/trivy-db:2",
+        TRIVY_JAVA_DB_REPOSITORY: "mirror.gcr.io/aquasec/trivy-java-db:1 ghcr.io/aquasecurity/trivy-java-db:1",
+      },
+      commandRunner: (command, args) => {
+        calls.push({ command, args });
+        if (command === "trivy" && args[0] === "fs") return { status: "pass", code: 0, stdout: "trivy clean" };
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const trivyCall = calls.find((call) => call.command === "trivy" && call.args[0] === "fs");
+  const dbRepositoryValues = trivyCall.args
+    .map((arg, index) => (arg === "--db-repository" ? trivyCall.args[index + 1] : null))
+    .filter(Boolean);
+  const javaDbRepositoryValues = trivyCall.args
+    .map((arg, index) => (arg === "--java-db-repository" ? trivyCall.args[index + 1] : null))
+    .filter(Boolean);
+
+  assert.deepEqual(dbRepositoryValues, ["mirror.gcr.io/aquasec/trivy-db:2", "public.ecr.aws/aquasecurity/trivy-db:2"]);
+  assert.deepEqual(javaDbRepositoryValues, ["mirror.gcr.io/aquasec/trivy-java-db:1", "ghcr.io/aquasecurity/trivy-java-db:1"]);
+});
+
+test("non-strict mode retries Trivy with cached DB when online update fails", () => {
+  const root = tempProject();
+  const calls = [];
+  const report = runLocalGate(root, {
+    strict: false,
+    release: false,
+    runnerOptions: {
+      commandRunner: (command, args) => {
+        calls.push({ command, args });
+        if (command === "trivy" && args[0] === "fs" && args.includes("--skip-db-update")) {
+          return { status: "pass", code: 0, stdout: "cached db clean" };
+        }
+        if (command === "trivy" && args[0] === "fs") {
+          return { status: "fail", code: 1, stderr: "failed to download vulnerability DB: context deadline exceeded" };
+        }
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const trivyScan = report.checks.find((check) => check.checkId === "trivy");
+  const dbFreshness = report.checks.find((check) => check.checkId === "trivy-db-cache");
+
+  assert.equal(calls.filter((call) => call.command === "trivy" && call.args[0] === "fs").length, 2);
+  assert.equal(trivyScan.status, "pass");
+  assert.equal(trivyScan.trivyDbFallback, "cache");
+  assert.equal(dbFreshness.status, "gap");
+  assert.equal(dbFreshness.blocking, false);
+  assert.match(dbFreshness.summary, /local cached database/i);
+  assert.equal(report.passed, true);
+  assert.equal(report.overallStatus, "PASS_WITH_GAPS");
+});
+
+test("strict mode blocks cached Trivy DB fallback as incomplete release evidence", () => {
+  const root = tempProject();
+  const calls = [];
+  const report = runLocalGate(root, {
+    strict: true,
+    release: false,
+    runnerOptions: {
+      commandRunner: (command, args) => {
+        calls.push({ command, args });
+        if (command === "trivy" && args[0] === "fs" && args.includes("--skip-db-update")) {
+          return { status: "pass", code: 0, stdout: "cached db clean" };
+        }
+        if (command === "trivy" && args[0] === "fs") {
+          return { status: "fail", code: 1, stderr: "failed to download vulnerability DB: context deadline exceeded" };
+        }
+        if (command === "gitleaks" || command === "semgrep") return { status: "pass", code: 0, stdout: `${command} clean` };
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const dbFreshnessBlocker = report.blockers.find((check) => check.checkId === "trivy-db-cache");
+
+  assert.equal(report.passed, false);
+  assert.equal(dbFreshnessBlocker?.status, "gap");
+  assert.match(dbFreshnessBlocker?.summary || "", /online database update failed/i);
+  assert.doesNotMatch(dbFreshnessBlocker?.summary || "", /vulnerabilities (were )?(found|detected)/i);
+});
+
 test("strict mode blocks Trivy DB errors as incomplete evidence, not vulnerability findings", () => {
   const root = tempProject();
   const tools = fs.mkdtempSync(path.join(os.tmpdir(), "apm-tools-"));
