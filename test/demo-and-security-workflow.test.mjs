@@ -117,9 +117,11 @@ test("generated security workflow pins scanner versions", () => {
 test("Codex skill quick start numbering is monotonic", () => {
   const skill = fs.readFileSync(path.join(repoRoot, "ai-project-maintainer", "SKILL.md"), "utf8");
   const numbers = [...skill.matchAll(/^(\d+)\. /gm)].map((match) => Number(match[1]));
-  const quickStartNumbers = numbers.slice(0, 17);
+  const quickStartNumbers = numbers.slice(0, 18);
 
-  assert.deepEqual(quickStartNumbers, Array.from({ length: 17 }, (_, index) => index + 1));
+  assert.match(skill, /^1\. First run: `npx ai-project-maintainer quickstart \.`/m);
+  assert.match(skill, /If a direct local script fails because the `yaml` dependency is missing/);
+  assert.deepEqual(quickStartNumbers, Array.from({ length: 18 }, (_, index) => index + 1));
 });
 
 test("demo repair loop proves gate to repair-pack to recheck to gate", () => {
@@ -140,7 +142,7 @@ test("demo repair loop proves gate to repair-pack to recheck to gate", () => {
 
 test("npm package includes the runnable demo project", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  assert.equal(packageJson.version, "1.4.0");
+  assert.equal(packageJson.version, "1.4.1");
   assert.equal(packageJson.files.includes("assets/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/scripts/"), true);
   assert.equal(packageJson.files.includes("examples/demo-ai-app/src/"), true);

@@ -17,20 +17,22 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
 
 ## Quick Start
 
-1. Check the local environment with `node <this-skill>/scripts/doctor.mjs` or `npx ai-project-maintainer doctor`.
-2. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo> --profile auto --ci github` or `npx ai-project-maintainer init <repo> --profile auto --ci github`.
-3. For production-oriented review, initialize intake with `node <this-skill>/scripts/init-audit.mjs <repo> --wizard` or `npx ai-project-maintainer init-audit <repo> --wizard`. Use `--dry-run` first when you only need a preview.
-4. Generate the audit plan with `node <this-skill>/scripts/audit-plan.mjs <repo> --profile auto --output reports/audit-plan.json` or `npx ai-project-maintainer audit-plan <repo> --profile auto --output reports/audit-plan.json`.
-5. Before giving AI agents broad repository access, run `node <this-skill>/scripts/agent-risk.mjs <repo> --output reports/agent-risk-report.json` or `npx ai-project-maintainer agent-risk <repo> --output reports/agent-risk-report.json`.
-6. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --profile auto --agent-risk --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --profile auto --agent-risk --strict --release --output reports/security-report.json`.
-7. For production evidence review, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --profile auto --production --agent-risk --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --profile auto --production --agent-risk --strict --release --output reports/security-report.json`.
-8. For optional platform evidence, first run `npx ai-project-maintainer connectors doctor <repo>`, then run `npx ai-project-maintainer evidence <repo> --output reports/evidence-report.json`, and only then add `--connectors` to the production gate. Never ask the user to paste tokens into chat or config files; ask them to set environment variables named in `.ai-maintainer/connectors.yml`.
-9. Convert a gate report into AI-agent repair tasks with `node <this-skill>/scripts/repair-pack.mjs <repo>/reports/security-report.json --project <repo> --output <repo>/reports` or `npx ai-project-maintainer repair-pack <repo>/reports/security-report.json --project <repo> --output <repo>/reports`.
-10. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
-11. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
-12. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
-13. Use `node <this-skill>/../examples/demo-ai-app/scripts/run-repair-loop-demo.mjs --json` from a source checkout when you need to dogfood the full gate -> repair-pack -> simulated AI repair -> recheck -> gate loop.
-14. Read only the relevant references:
+1. First run: `npx ai-project-maintainer quickstart .`.
+2. Check the local environment with `node <this-skill>/scripts/doctor.mjs` or `npx ai-project-maintainer doctor`.
+3. If a direct local script fails because the `yaml` dependency is missing, use the packaged `npx ai-project-maintainer ...` CLI or run `npm install` in the package checkout before using local scripts.
+4. Initialize a project with `node <this-skill>/scripts/init-project.mjs <repo> --profile auto --ci github` or `npx ai-project-maintainer init <repo> --profile auto --ci github`.
+5. For production-oriented review, initialize intake with `node <this-skill>/scripts/init-audit.mjs <repo> --wizard` or `npx ai-project-maintainer init-audit <repo> --wizard`. Use `--dry-run` first when you only need a preview.
+6. Generate the audit plan with `node <this-skill>/scripts/audit-plan.mjs <repo> --profile auto --output reports/audit-plan.json` or `npx ai-project-maintainer audit-plan <repo> --profile auto --output reports/audit-plan.json`.
+7. Before giving AI agents broad repository access, run `node <this-skill>/scripts/agent-risk.mjs <repo> --output reports/agent-risk-report.json` or `npx ai-project-maintainer agent-risk <repo> --output reports/agent-risk-report.json`.
+8. For a reusable local safety gate, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --profile auto --agent-risk --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --profile auto --agent-risk --strict --release --output reports/security-report.json`.
+9. For production evidence review, run `node <this-skill>/scripts/run-local-gate.mjs <repo> --profile auto --production --agent-risk --strict --release --output reports/security-report.json` or `npx ai-project-maintainer gate <repo> --profile auto --production --agent-risk --strict --release --output reports/security-report.json`.
+10. For optional platform evidence, first run `npx ai-project-maintainer connectors doctor <repo>`, then run `npx ai-project-maintainer evidence <repo> --output reports/evidence-report.json`, and only then add `--connectors` to the production gate. Never ask the user to paste tokens into chat or config files; ask them to set environment variables named in `.ai-maintainer/connectors.yml`.
+11. Convert a gate report into AI-agent repair tasks with `node <this-skill>/scripts/repair-pack.mjs <repo>/reports/security-report.json --project <repo> --output <repo>/reports` or `npx ai-project-maintainer repair-pack <repo>/reports/security-report.json --project <repo> --output <repo>/reports`.
+12. Summarize an existing report with `node <this-skill>/scripts/report-summary.mjs <repo>/reports/security-report.json` or `npx ai-project-maintainer summary <repo>/reports/security-report.json`.
+13. If required local tools are missing on Windows, run `powershell -ExecutionPolicy Bypass -File <this-skill>/scripts/bootstrap-local-tools.ps1 -Tools gitleaks,trivy,semgrep,checkov`.
+14. Run `node <this-skill>/scripts/probe-project.mjs <repo>` when you only need classification and tool availability.
+15. Use `node <this-skill>/../examples/demo-ai-app/scripts/run-repair-loop-demo.mjs --json` from a source checkout when you need to dogfood the full gate -> repair-pack -> simulated AI repair -> recheck -> gate loop.
+16. Read only the relevant references:
    - Local account-free gate: `references/local-gate.md`
    - Database and migrations: `references/database.md`
    - Electron desktop apps: `references/electron-desktop.md`
@@ -38,9 +40,9 @@ description: Orchestrates local and CI safety gates for AI-coded projects across
    - Production incidents and SRE triage: `references/incident-response.md`
    - CI/CD guardrails and maintenance automation: `references/ci-guardrails.md`
    - Tool selection details: `references/tool-router.md`
-15. Build a short execution plan from the detected risk surfaces and the audit plan.
-16. Run the least invasive checks first, then deeper checks only where evidence points.
-17. Return findings first, ordered by severity, with commands/tests already run.
+17. Build a short execution plan from the detected risk surfaces and the audit plan.
+18. Run the least invasive checks first, then deeper checks only where evidence points.
+19. Return findings first, ordered by severity, with commands/tests already run.
 
 ## Modes
 

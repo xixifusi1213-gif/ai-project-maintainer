@@ -119,3 +119,60 @@ Implement `npx ai-project-maintainer quickstart .` as the low-friction first-run
 ## Current Implementation Stage
 
 All v1.4.0 quickstart implementation stages are complete on branch `codex/v1.4.0-quickstart`.
+
+## Post-Release: v1.4.0 Promotion and v1.4.1 Candidate
+
+## Objective
+
+Complete lightweight post-release follow-up for `v1.4.0`: record the first-run ENOLOCK friction as a small patch candidate and promote the new quickstart entrypoint.
+
+## Stages
+
+1. Run external npm smoke for `ai-project-maintainer@1.4.0`. Status: complete.
+2. Record ENOLOCK as a `v1.4.1` candidate. Status: complete.
+3. Prepare launch/promotion copy centered on `npx ai-project-maintainer quickstart .`. Status: in_progress.
+
+## Current Post-Release Stage
+
+Stage 3 is in progress: prepare concise promotion copy for the published quickstart release.
+
+## Implementation: v1.4.1 First-Run Environment Resilience
+
+## Objective
+
+Implement a small `v1.4.1` patch that keeps `v1.4.0` quickstart promotion moving while improving first-run behavior around environment gaps.
+
+## Scope
+
+- Treat quickstart-only npm `ENOLOCK` audit failures as a non-blocking setup/evidence gap when no lockfile exists.
+- Keep full gate behavior stricter so release readiness can still require dependency audit evidence.
+- Preserve Trivy DB/download failures as scanner/database availability gaps rather than vulnerability findings.
+- Update local skill/docs so the first entrypoint is `npx ai-project-maintainer quickstart .` and strict gate runtime expectations are clear.
+- Bump package metadata and release verification scripts to `1.4.1`.
+
+## Out of Scope
+
+- New connectors, scanners, benchmark cases, or CI scaffolding.
+- Publishing or changing private local project details.
+- Changing quickstart's report-only write boundary.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Add focused failing tests for quickstart ENOLOCK behavior, strict Trivy wording, skill quickstart docs, and release metadata. Status: complete.
+3. Implement quickstart first-run audit-gap handling and clearer environment messages. Status: complete.
+4. Update docs, skill entrypoint, and v1.4.1 release metadata. Status: complete.
+5. Run targeted and full verification. Status: complete.
+
+## Current Implementation Stage
+
+All v1.4.1 environment resilience implementation stages are complete on branch `codex/v1.4.1-env-resilience`.
+
+## Errors Encountered
+
+| Error | Attempt | Resolution |
+| --- | --- | --- |
+| Focused red tests failed because `yaml-support.mjs` does not exist yet. | 1 | Expected red test for local dependency guidance; implement helper next. |
+| Quickstart ENOLOCK fixture still produced `FAIL` and a repair-pack. | 1 | Expected red test; add quickstart-only setup-gap behavior. |
+| Skill quick start and package version assertions still reflected `v1.4.0`. | 1 | Expected red test; update docs and metadata in Stage 4. |
+| Full `npm test` failed because a release manifest fixture still used `1.4.0` while package metadata was `1.4.1`. | 1 | Updated the fixture to `1.4.1` and re-ran release-trust tests. |

@@ -50,6 +50,8 @@ npx ai-project-maintainer quickstart ".\my-project"
 
 Give `quickstart-summary.md`, the detailed report, and any generated repair-pack files to Cursor, Claude Code, Cline, or Codex. `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
 
+If a brand-new npm project has `package.json` but no `package-lock.json`, quickstart records dependency audit as a setup gap instead of a blocker. Run `npm install --package-lock-only`, then rerun quickstart when you want npm audit evidence.
+
 ## The 3-Minute Flow
 
 Requires Node.js 20+.
@@ -88,7 +90,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.0 --tag v1.4.0 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.1 --tag v1.4.1 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates

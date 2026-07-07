@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { runDoctor } from "../ai-project-maintainer/scripts/doctor.mjs";
+import { formatMissingYamlDependencyError } from "../ai-project-maintainer/scripts/lib/yaml-support.mjs";
 
 function fakeTool(dir, name) {
   if (process.platform === "win32") {
@@ -39,4 +40,13 @@ test("doctor explains when Trivy DB check is intentionally skipped", () => {
 
   assert.equal(report.trivyDb.status, "skipped");
   assert.match(report.trivyDb.summary, /disabled/);
+});
+
+test("local dependency guidance for missing yaml points users to npx or dependency install", () => {
+  const error = formatMissingYamlDependencyError(new Error("Cannot find module 'yaml'"));
+
+  assert.match(error.message, /local ai-project-maintainer skill/i);
+  assert.match(error.message, /yaml dependency/i);
+  assert.match(error.message, /npx ai-project-maintainer/i);
+  assert.match(error.message, /npm install/i);
 });

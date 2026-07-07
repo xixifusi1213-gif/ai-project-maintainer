@@ -11,6 +11,10 @@ function packageManager(project) {
   return null;
 }
 
+function hasNpmAuditLockfile(root) {
+  return exists(path.join(root, "package-lock.json")) || exists(path.join(root, "npm-shrinkwrap.json"));
+}
+
 export function makeCheck(name, group, result, blocking, summary, extra = {}) {
   return {
     name,
@@ -25,6 +29,35 @@ export function makeCheck(name, group, result, blocking, summary, extra = {}) {
     stderr: result.stderr,
     ...extra,
   };
+}
+
+function npmLockfileGap(result = {}) {
+  return makeCheck(
+    "npm production audit",
+    "dependencies",
+    {
+      status: "gap",
+      command: "npm audit --omit=dev --json",
+      code: null,
+      stdout: "",
+      stderr: "",
+      durationMs: 0,
+      ...result,
+      status: "gap",
+    },
+    false,
+    "npm audit requires a package-lock.json or npm-shrinkwrap.json; run npm install --package-lock-only or install dependencies before relying on dependency audit evidence.",
+    {
+      checkId: "package-audit",
+      coverageGap: true,
+      setupGap: true,
+      recommendation: "Run npm install --package-lock-only, then rerun quickstart.",
+    },
+  );
+}
+
+function isNpmAuditLockfileError(result) {
+  return /ENOLOCK|requires an existing lockfile|package-lock\.json|npm-shrinkwrap\.json/i.test(`${result.stderr}\n${result.stdout}`);
 }
 
 export function normalizeToolResult(toolName, result) {
@@ -87,8 +120,16 @@ export function runPackageAuditChecks(project, options = {}) {
   if (!project.packageJson) return checks;
   const pm = packageManager(project);
   if (!pm?.audit) return checks;
+  if (options.firstRun && pm.name === "npm" && !hasNpmAuditLockfile(project.root)) {
+    checks.push(npmLockfileGap());
+    return checks;
+  }
   const [cmd, commandArgs] = pm.audit;
   const result = runCommand(cmd, commandArgs, { ...options.runnerOptions, cwd: project.root, timeoutMs: 10 * 60 * 1000 });
+  if (options.firstRun && pm.name === "npm" && isNpmAuditLockfileError(result)) {
+    checks.push(npmLockfileGap(result));
+    return checks;
+  }
   checks.push(makeCheck(`${pm.name} production audit`, "dependencies", result, result.status === "fail", "Production dependency audit must pass or have a documented exception.", { checkId: "package-audit" }));
   return checks;
 }

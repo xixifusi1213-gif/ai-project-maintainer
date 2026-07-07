@@ -122,3 +122,42 @@
 - All planned v1.4.0 quickstart implementation stages are complete.
 - Branch is `codex/v1.4.0-quickstart`.
 - `.serena/` remains untracked and untouched.
+
+## v1.4.0 Post-Release Follow-Up: 2026-07-07
+
+- User asked to record ENOLOCK as a `v1.4.1` small-fix candidate and move to promotion.
+- Confirmed no existing GitHub issue matched `ENOLOCK quickstart`.
+- Created GitHub issue #16: `v1.4.1 candidate: handle npm audit ENOLOCK in quickstart`.
+- Updated `findings.md` with post-release smoke findings and the issue reference.
+- Updated `task_plan.md` with the post-release promotion/v1.4.1-candidate stage.
+
+## v1.4.1 Environment Resilience Implementation: 2026-07-07
+
+- User requested implementation of the v1.4.0 promotion plus v1.4.1 environment resilience plan.
+- Read Serena initial instructions, planning-with-files, executing-plans, test-driven-development, and ai-project-maintainer skill guidance.
+- Ran planning session catch-up; it reported the proposed v1.4.1 plan and implementation request as unsynced context.
+- Confirmed existing uncommitted changes were planning files only, plus untracked `.serena/`.
+- Created implementation branch `codex/v1.4.1-env-resilience`.
+- Updated `task_plan.md` and `findings.md` with v1.4.1 implementation scope and current findings.
+- Added focused red tests for quickstart ENOLOCK/no-lockfile behavior, strict Trivy evidence wording, missing YAML dependency guidance, skill quickstart docs, and v1.4.1 metadata.
+- Ran `node --test test/quickstart.test.mjs test/gate.test.mjs test/doctor.test.mjs`; it failed as expected because `yaml-support.mjs` is missing and quickstart still treats ENOLOCK as a blocker. The new Trivy strict wording test already passed.
+- Ran `node --test test/demo-and-security-workflow.test.mjs test/cli.test.mjs`; it failed as expected because the skill quick start and package version still target v1.4.0.
+- Added `yaml-support.mjs` and moved production YAML parsing/stringifying through it so local dependency failures get an actionable message.
+- Added quickstart-only first-run audit-gap handling for npm projects without a lockfile or with ENOLOCK audit output.
+- Threaded the internal `firstRun` flag through `runLocalGate` to registered checks.
+- Re-ran `node --test test/quickstart.test.mjs test/gate.test.mjs test/doctor.test.mjs`; all 12 focused tests passed.
+- Updated README, Codex skill quick start, local gate reference, promotion links, launch checklist, package metadata, package lock metadata, and v1.4.1 release notes.
+- Re-ran `node --test test/demo-and-security-workflow.test.mjs test/cli.test.mjs`; all 17 tests passed.
+- Ran `npm test`; 131 of 132 tests passed, with the only failure in a release manifest fixture still pinned to `1.4.0`.
+- Updated the release manifest fixture in `test/release-trust.test.mjs` to `1.4.1`.
+- Ran `node --test test/release-trust.test.mjs`; all 8 tests passed.
+- Re-ran `npm test`; all 132 tests passed.
+- Ran `npm run check`; syntax check passed for 53 files.
+- Ran `npm pack --dry-run`; npm produced dry-run package `ai-project-maintainer-1.4.1.tgz`.
+- Ran `npm run release:verify:pre`; release verification passed for `v1.4.1`.
+- Ran `git diff --check`; it exited successfully with only Git line-ending conversion warnings.
+- Confirmed `.serena/` remains untracked and untouched by product changes.
+
+## v1.4.1 Completion
+
+- All planned v1.4.1 environment resilience implementation stages are complete on branch `codex/v1.4.1-env-resilience`.

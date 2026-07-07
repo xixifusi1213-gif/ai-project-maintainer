@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import YAML from "yaml";
 import { normalizeProfileId, resolveProjectProfile } from "./profiles.mjs";
+import { parseYaml } from "./yaml-support.mjs";
 
 export const intakeRelativePaths = {
   profile: ".ai-maintainer/project-profile.yml",
@@ -105,7 +105,7 @@ function readYaml(root, relativePath, fallback, parseErrors) {
 
   try {
     const text = fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
-    return { exists: true, value: YAML.parse(text) || fallback };
+    return { exists: true, value: parseYaml(text) || fallback };
   } catch (error) {
     parseErrors.push({ path: relativePath, reason: error.message });
     return { exists: true, value: fallback };

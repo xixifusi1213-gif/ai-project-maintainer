@@ -64,3 +64,31 @@ test("non-strict mode reports Trivy DB errors as coverage gaps", () => {
   assert.equal(report.passed, true);
   assert.equal(report.coverageGaps.some((gap) => gap.name === "trivy filesystem scan"), true);
 });
+
+test("strict mode blocks Trivy DB errors as incomplete evidence, not vulnerability findings", () => {
+  const root = tempProject();
+  const tools = fs.mkdtempSync(path.join(os.tmpdir(), "apm-tools-"));
+  fakeTool(tools, "gitleaks", "echo gitleaks clean");
+  fakeTool(
+    tools,
+    "trivy",
+    process.platform === "win32"
+      ? "echo failed to download vulnerability DB 1>&2\r\nexit /b 1"
+      : "echo failed to download vulnerability DB >&2\nexit 1",
+  );
+  fakeTool(tools, "semgrep", "echo semgrep clean");
+
+  const report = runLocalGate(root, {
+    strict: true,
+    release: false,
+    runnerOptions: { envPath: tools },
+  });
+  const trivyBlocker = report.blockers.find((check) => check.checkId === "trivy");
+
+  assert.equal(report.passed, false);
+  assert.equal(trivyBlocker?.status, "error");
+  assert.equal(trivyBlocker?.coverageGap, true);
+  assert.match(trivyBlocker?.summary || "", /vulnerability database was unavailable/i);
+  assert.match(trivyBlocker?.summary || "", /coverage is incomplete/i);
+  assert.doesNotMatch(trivyBlocker?.summary || "", /vulnerabilities (were )?(found|detected)/i);
+});

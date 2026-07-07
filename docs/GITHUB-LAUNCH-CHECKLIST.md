@@ -50,14 +50,14 @@ If GitHub asks for PNG/JPG, export the SVG to PNG at `1280x640`.
 Current release:
 
 ```text
-Tag: v1.4.0
-Title: v1.4.0: Quickstart first-run experience
+Tag: v1.4.1
+Title: v1.4.1: First-run environment resilience
 ```
 
 Release URL:
 
 ```text
-https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.0
+https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.1
 ```
 
 Release asset checklist:
