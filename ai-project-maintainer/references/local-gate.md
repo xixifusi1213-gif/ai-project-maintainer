@@ -110,12 +110,22 @@ Exceptions must include `id`, `check`, `reason`, `expires`, and `owner`. Expired
 
 ## Trivy Database Availability
 
-Trivy needs a vulnerability database on first run. The gate uses GHCR first:
+Trivy needs a vulnerability database on first run. By default, the gate does not override Trivy's built-in repository fallback, so current Trivy versions try their configured DB mirrors in priority order.
+
+If your network needs explicit mirrors, configure one or more repositories with comma or space separated values:
 
 ```powershell
-$env:TRIVY_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-db:2"
-$env:TRIVY_JAVA_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-java-db:1"
+$env:TRIVY_DB_REPOSITORY="mirror.gcr.io/aquasec/trivy-db:2,ghcr.io/aquasecurity/trivy-db:2"
+$env:TRIVY_JAVA_DB_REPOSITORY="mirror.gcr.io/aquasec/trivy-java-db:1,ghcr.io/aquasecurity/trivy-java-db:1"
 $env:TRIVY_TIMEOUT="90s"
 ```
 
-If the database cannot download, strict mode must fail because dependency and image vulnerability coverage is unavailable. This means scanner evidence is incomplete, not that Trivy found a vulnerability. Re-run from a network that can reach the configured OCI registry, or set those environment variables to an internal mirror.
+If the online database update fails but a local Trivy DB cache exists, the gate retries with the cached DB. Non-strict quickstart can continue and report `PASS_WITH_GAPS`; strict release mode still treats the stale or incomplete DB freshness as blocking evidence until you refresh the cache.
+
+To pre-warm the cache on a reachable network:
+
+```powershell
+trivy image --download-db-only
+```
+
+If your organization blocks public OCI registries, mirror `trivy-db:2` and `trivy-java-db:1` internally and set the two repository environment variables to those mirrors. Database download failures mean scanner evidence is incomplete, not that Trivy found a vulnerability.

@@ -56,6 +56,19 @@ function setupNotes(report, limit = 5) {
     }));
 }
 
+function coverageGapNotes(report, limit = 5) {
+  return (report.coverageGaps || [])
+    .slice(0, limit)
+    .map((check) => ({
+      checkId: check.checkId || null,
+      group: check.group || null,
+      name: check.name,
+      status: check.status,
+      summary: check.summary || "",
+      recommendation: check.recommendation || "",
+    }));
+}
+
 function buildFileSummary(paths, repairPackResult) {
   const files = {
     summaryMarkdown: paths.summaryMarkdown,
@@ -145,6 +158,7 @@ export function buildQuickstartSummary(report, options = {}) {
     },
     topBlockers: topBlockers(report),
     setupNotes: setupNotes(report),
+    coverageGaps: coverageGapNotes(report),
     files,
     handoffFiles: buildHandoffFiles(files),
     nextCommands: {
@@ -181,6 +195,15 @@ export function toQuickstartMarkdown(summary) {
   } else {
     for (const blocker of summary.topBlockers) {
       lines.push(`- ${blocker.name}: ${blocker.status}. ${blocker.summary}`.trim());
+    }
+  }
+  lines.push("");
+  lines.push("## Evidence Gaps");
+  if (!summary.coverageGaps?.length) {
+    lines.push("- None");
+  } else {
+    for (const gap of summary.coverageGaps) {
+      lines.push(`- ${gap.name}: ${gap.summary}${gap.recommendation ? ` ${gap.recommendation}` : ""}`.trim());
     }
   }
   lines.push("");

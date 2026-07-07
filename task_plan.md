@@ -168,6 +168,38 @@ Implement a small `v1.4.1` patch that keeps `v1.4.0` quickstart promotion moving
 
 All v1.4.1 environment resilience implementation stages are complete on branch `codex/v1.4.1-env-resilience`.
 
+## Implementation: v1.4.2 Trivy DB Resilience
+
+## Objective
+
+Make first-run and quickstart usage resilient when Trivy cannot download its vulnerability database from the network.
+
+## Scope
+
+- Stop forcing a single GHCR Trivy DB source when users have not configured one.
+- Allow multiple Trivy DB repository values when users configure mirrors.
+- Retry Trivy with the local cached database when the online DB update fails.
+- Keep quickstart non-blocking when cached Trivy evidence is available, while preserving stricter release-gate evidence semantics.
+- Document the user-facing fix and bump release metadata to `1.4.2`.
+
+## Out of Scope
+
+- Adding new scanners or connectors.
+- Mirroring Trivy DB inside this package.
+- Claiming cached vulnerability evidence is equivalent to a freshly updated release scan.
+
+## Stages
+
+1. Inspect current Trivy behavior and record the product fix. Status: complete.
+2. Add focused tests for default repository handling, cache fallback, strict evidence behavior, and docs. Status: complete.
+3. Implement Trivy DB fallback and cache retry. Status: complete.
+4. Update docs and release metadata. Status: complete.
+5. Run targeted and release verification. Status: complete.
+
+## Current Implementation Stage
+
+All v1.4.2 Trivy DB resilience implementation stages are complete on branch `codex/v1.4.2-trivy-db-resilience`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |

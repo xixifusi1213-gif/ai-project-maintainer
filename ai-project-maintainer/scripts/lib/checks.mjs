@@ -60,11 +60,57 @@ function isNpmAuditLockfileError(result) {
   return /ENOLOCK|requires an existing lockfile|package-lock\.json|npm-shrinkwrap\.json/i.test(`${result.stderr}\n${result.stdout}`);
 }
 
+function splitRepositoryEnv(value) {
+  return String(value || "")
+    .split(/[,\s]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function enabledEnvFlag(value) {
+  return /^(1|true|yes)$/i.test(String(value || ""));
+}
+
+export function trivyRepositoryArgs(env = process.env) {
+  const args = [];
+  for (const repo of splitRepositoryEnv(env.TRIVY_DB_REPOSITORY)) {
+    args.push("--db-repository", repo);
+  }
+  for (const repo of splitRepositoryEnv(env.TRIVY_JAVA_DB_REPOSITORY)) {
+    args.push("--java-db-repository", repo);
+  }
+  return args;
+}
+
+function trivyScanArgs(root, env = process.env, options = {}) {
+  const skipDbUpdate = Boolean(options.skipDbUpdate);
+  const timeout = env.TRIVY_TIMEOUT || (options.firstRun ? "45s" : "90s");
+  return [
+    "fs",
+    ...trivyRepositoryArgs(env),
+    "--timeout",
+    timeout,
+    ...(skipDbUpdate ? ["--skip-db-update", "--skip-java-db-update"] : []),
+    "--scanners",
+    "vuln,secret,misconfig",
+    "--severity",
+    "HIGH,CRITICAL",
+    "--exit-code",
+    "1",
+    "--quiet",
+    root,
+  ];
+}
+
+function isTrivyDbUnavailable(result) {
+  return /failed to download vulnerability DB|DB error|download artifact|unable to download|timeout|deadline exceeded|no such host|connection refused|tls handshake timeout|first run cannot skip downloading DB/i.test(`${result.stderr}\n${result.stdout}`);
+}
+
 export function normalizeToolResult(toolName, result) {
   if (
     toolName === "trivy" &&
     result.status === "fail" &&
-    /failed to download vulnerability DB|DB error|download artifact|unable to download|timeout|deadline exceeded/i.test(`${result.stderr}\n${result.stdout}`)
+    isTrivyDbUnavailable(result)
   ) {
     return { ...result, status: "error" };
   }
@@ -155,38 +201,64 @@ export function runTrivyFilesystemChecks(project, options = {}) {
   const checks = [];
   const strict = Boolean(options.strict);
   const runner = options.runnerOptions || {};
+  const env = runner.env || process.env;
   const root = project.root;
-  const trivy = normalizeToolResult("trivy", runCommand(
+  const initialSkipDbUpdate = enabledEnvFlag(env.TRIVY_SKIP_DB_UPDATE);
+  const timeoutMs = !env.TRIVY_TIMEOUT && options.firstRun ? 75 * 1000 : 150 * 1000;
+  let onlineUpdateFailure = null;
+  let cacheFallbackUsed = false;
+  let trivy = normalizeToolResult("trivy", runCommand(
     "trivy",
-    [
-      "fs",
-      "--db-repository",
-      process.env.TRIVY_DB_REPOSITORY || "ghcr.io/aquasecurity/trivy-db:2",
-      "--java-db-repository",
-      process.env.TRIVY_JAVA_DB_REPOSITORY || "ghcr.io/aquasecurity/trivy-java-db:1",
-      "--timeout",
-      process.env.TRIVY_TIMEOUT || "90s",
-      "--scanners",
-      "vuln,secret,misconfig",
-      "--severity",
-      "HIGH,CRITICAL",
-      "--exit-code",
-      "1",
-      "--quiet",
-      root,
-    ],
-    { ...runner, cwd: root, timeoutMs: 150 * 1000 },
+    trivyScanArgs(root, env, { firstRun: options.firstRun, skipDbUpdate: initialSkipDbUpdate }),
+    { ...runner, cwd: root, timeoutMs },
   ));
+  if (!initialSkipDbUpdate && trivy.status === "error" && isTrivyDbUnavailable(trivy)) {
+    onlineUpdateFailure = trivy;
+    trivy = normalizeToolResult("trivy", runCommand(
+      "trivy",
+      trivyScanArgs(root, env, { firstRun: options.firstRun, skipDbUpdate: true }),
+      { ...runner, cwd: root, timeoutMs },
+    ));
+    cacheFallbackUsed = trivy.status !== "error" || !isTrivyDbUnavailable(trivy);
+  }
   checks.push(makeCheck(
     "trivy filesystem scan",
     "dependencies",
     trivy,
     trivy.status === "fail" || (strict && (trivy.status === "error" || trivy.status === "missing")),
-    trivy.status === "error"
+    cacheFallbackUsed
+      ? "Trivy scan completed with a local cached vulnerability database after the online database update failed."
+      : trivy.status === "error"
       ? "Trivy is installed but its vulnerability database was unavailable; release coverage is incomplete."
       : "High/critical vulnerabilities, secrets, and misconfigurations block release.",
-    { checkId: "trivy", coverageGap: trivy.status === "error" || trivy.status === "missing" },
+    {
+      checkId: "trivy",
+      coverageGap: trivy.status === "error" || trivy.status === "missing",
+      ...(cacheFallbackUsed ? { trivyDbFallback: "cache" } : {}),
+    },
   ));
+  if (cacheFallbackUsed) {
+    checks.push(makeCheck(
+      "trivy database freshness",
+      "dependencies",
+      {
+        status: "gap",
+        command: onlineUpdateFailure?.command || "trivy fs",
+        code: onlineUpdateFailure?.code ?? null,
+        stdout: onlineUpdateFailure?.stdout || "",
+        stderr: onlineUpdateFailure?.stderr || "",
+        durationMs: onlineUpdateFailure?.durationMs || 0,
+      },
+      strict,
+      "Trivy online database update failed, so the scan used a local cached database; refresh the DB before treating this as complete release evidence.",
+      {
+        checkId: "trivy-db-cache",
+        coverageGap: true,
+        recommendation: "Pre-warm the Trivy cache on a network that can reach a DB mirror, or configure TRIVY_DB_REPOSITORY/TRIVY_JAVA_DB_REPOSITORY to reachable internal mirrors.",
+        trivyDbFallback: "cache",
+      },
+    ));
+  }
 
   return checks;
 }
