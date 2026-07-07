@@ -45,6 +45,10 @@ node <skill>/scripts/run-local-gate.mjs <repo>
 
 Strict mode treats missing relevant tools as failures. Non-strict mode reports missing tools as coverage gaps.
 
+## Runtime Expectations
+
+Use `quickstart` for the first pass. The strict release gate can take several minutes because it may run project tests, E2E tests, build/dist scripts, Semgrep, Gitleaks, Trivy, and any applicable supply-chain or CI checks. Give external command runners a longer timeout for strict gates, especially on Windows or fresh machines.
+
 Summarize a saved report:
 
 ```bash
@@ -114,4 +118,4 @@ $env:TRIVY_JAVA_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-java-db:1"
 $env:TRIVY_TIMEOUT="90s"
 ```
 
-If the database cannot download, strict mode must fail because dependency and image vulnerability coverage is unavailable. Re-run from a network that can reach the configured OCI registry, or set those environment variables to an internal mirror.
+If the database cannot download, strict mode must fail because dependency and image vulnerability coverage is unavailable. This means scanner evidence is incomplete, not that Trivy found a vulnerability. Re-run from a network that can reach the configured OCI registry, or set those environment variables to an internal mirror.

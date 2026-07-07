@@ -2,7 +2,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import YAML from "yaml";
 import {
   defaultBusinessFlows,
   defaultEvidenceSources,
@@ -12,6 +11,7 @@ import {
 import { runIntakeWizard } from "./lib/intake-wizard.mjs";
 import { connectorsTemplate } from "./lib/connectors.mjs";
 import { normalizeProfileId } from "./lib/profiles.mjs";
+import { stringifyYaml } from "./lib/yaml-support.mjs";
 
 const markdownTemplates = {
   ".ai-maintainer/threat-model.md": `# Threat Model
@@ -71,7 +71,7 @@ observability:
 };
 
 function yamlTemplate(value) {
-  return YAML.stringify(value);
+  return stringifyYaml(value);
 }
 
 function projectProfileTemplate(profile = "auto") {

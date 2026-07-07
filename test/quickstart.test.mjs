@@ -7,7 +7,8 @@ import test from "node:test";
 import { runCli } from "../ai-project-maintainer/scripts/cli.mjs";
 import { runQuickstart } from "../ai-project-maintainer/scripts/quickstart.mjs";
 
-function tempProject() {
+function tempProject(options = {}) {
+  const { lockfile = true } = options;
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "apm-quickstart-"));
   fs.mkdirSync(path.join(root, "app"), { recursive: true });
   fs.writeFileSync(path.join(root, "app", "page.tsx"), "export default function Page() { return null; }\n");
@@ -23,6 +24,20 @@ function tempProject() {
       next: "15.0.0",
     },
   }, null, 2));
+  if (lockfile) {
+    fs.writeFileSync(path.join(root, "package-lock.json"), JSON.stringify({
+      name: "quickstart-fixture",
+      lockfileVersion: 3,
+      packages: {
+        "": {
+          name: "quickstart-fixture",
+          dependencies: {
+            next: "15.0.0",
+          },
+        },
+      },
+    }, null, 2));
+  }
   return root;
 }
 
@@ -43,11 +58,11 @@ function listFiles(root) {
   return out.sort();
 }
 
-function quickstartRunner(calls = []) {
+function quickstartRunner(calls = [], auditResult = { status: "fail", code: 1, stderr: "simulated production dependency blocker" }) {
   return (command, args) => {
     calls.push({ command, args });
     if (command === "npm" && args[0] === "audit") {
-      return { status: "fail", code: 1, stderr: "simulated production dependency blocker" };
+      return auditResult;
     }
     if (command === "npm" && (args[0] === "test" || args[1] === "test:e2e" || args[1] === "build")) {
       return { status: "fail", code: 1, stderr: "project scripts should be skipped by quickstart" };
@@ -58,6 +73,37 @@ function quickstartRunner(calls = []) {
     return { status: "missing", code: null, stderr: `${command} missing in test fixture` };
   };
 }
+
+test("quickstart treats npm audit ENOLOCK without a lockfile as a setup gap", () => {
+  const root = tempProject({ lockfile: false });
+  let stdout = "";
+  let stderr = "";
+  const code = runCli(["quickstart", root], {
+    stdout: { write: (chunk) => { stdout += chunk; } },
+    stderr: { write: (chunk) => { stderr += chunk; } },
+    runnerOptions: {
+      commandRunner: quickstartRunner([], {
+        status: "fail",
+        code: 1,
+        stderr: "npm ERR! code ENOLOCK\nnpm ERR! audit This command requires an existing lockfile.",
+      }),
+    },
+  });
+  const summary = JSON.parse(fs.readFileSync(path.join(root, "reports", "quickstart-summary.json"), "utf8"));
+  const report = JSON.parse(fs.readFileSync(path.join(root, "reports", "quickstart-security-report.json"), "utf8"));
+  const markdown = fs.readFileSync(path.join(root, "reports", "quickstart-summary.md"), "utf8");
+
+  assert.equal(code, 0);
+  assert.equal(stderr, "");
+  assert.match(stdout, /PASS_WITH_GAPS/);
+  assert.equal(summary.status, "PASS_WITH_GAPS");
+  assert.equal(summary.counts.blockers, 0);
+  assert.equal(report.blockerCount, 0);
+  assert.equal(fs.existsSync(path.join(root, "reports", "quickstart-repair-pack")), false);
+  assert.equal(report.coverageGaps.some((gap) => gap.checkId === "package-audit"), true);
+  assert.match(markdown, /package-lock\.json/);
+  assert.match(markdown, /npm install --package-lock-only/);
+});
 
 test("quickstart writes only report outputs and creates a repair pack for blockers", () => {
   const root = tempProject();

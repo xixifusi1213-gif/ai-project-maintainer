@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline/promises";
-import YAML from "yaml";
 import { detectProject } from "./project-detect.mjs";
 import {
   deepMerge,
@@ -12,6 +11,7 @@ import {
   loadIntake,
 } from "./intake.mjs";
 import { normalizeProfileId, profileIds } from "./profiles.mjs";
+import { stringifyYaml } from "./yaml-support.mjs";
 
 const summaryPath = ".ai-maintainer/intake-summary.md";
 const yesValues = new Set(["yes", "y", "true", "1", "present"]);
@@ -369,7 +369,7 @@ function writeYaml(root, relativePath, value, result) {
   const full = rel(root, relativePath);
   fs.mkdirSync(path.dirname(full), { recursive: true });
   const existed = fs.existsSync(full);
-  fs.writeFileSync(full, YAML.stringify(value));
+  fs.writeFileSync(full, stringifyYaml(value));
   result[existed ? "updated" : "created"].push(relativePath);
 }
 

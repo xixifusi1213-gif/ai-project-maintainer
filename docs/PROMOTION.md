@@ -43,7 +43,7 @@ ai-agents
 ```text
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.0
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.1
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 ```
@@ -55,11 +55,11 @@ I built AI Project Maintainer: a release readiness gate for AI-coded projects.
 
 AI writes code fast, but shipping safely still needs tests, security checks, release evidence, monitoring gaps, and maintainer decisions.
 
-v1.4.0 adds `npx ai-project-maintainer quickstart .`, a report-only first-run path that detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack when blockers exist. The public benchmark remains available as evidence-model validation across Electron, Web/API, database, CI/supply-chain, and OSS npm library risks.
+v1.4.0 added `npx ai-project-maintainer quickstart .`, a report-only first-run path that detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack when blockers exist. The latest v1.4.1 patch keeps that message and reduces first-run environment friction. The public benchmark remains available as evidence-model validation across Electron, Web/API, database, CI/supply-chain, and OSS npm library risks.
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.0
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.1
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 ```
 
@@ -84,7 +84,7 @@ It wraps common tools like Gitleaks, Trivy, Semgrep, OSV-Scanner, Syft, Grype, a
 
 The repo dogfoods itself with GitHub CI and a heavier Security workflow. There is also a runnable demo app showing a broken before state, failing business tests, the fixed after state, and the production gate report.
 
-v1.4.0 adds a first-run quickstart command, so users can try the workflow without first learning doctor/init/init-audit/audit-plan/gate/repair-pack. The reproducible benchmark remains available across Electron desktop, Web/API, database, CI/supply-chain, and OSS npm library cases, with before/after reports and repair-pack output for inspection.
+v1.4.0 added a first-run quickstart command, so users can try the workflow without first learning doctor/init/init-audit/audit-plan/gate/repair-pack. The latest patch keeps the quickstart message and smooths first-run environment gaps like missing npm lockfiles. The reproducible benchmark remains available across Electron desktop, Web/API, database, CI/supply-chain, and OSS npm library cases, with before/after reports and repair-pack output for inspection.
 
 It is account-free by default. Optional production evidence connectors are read-only and use user-provided tokens from environment variables.
 
@@ -106,7 +106,7 @@ AI 写代码很快，但上线前仍然需要业务测试、安全扫描、依�
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.0
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.1
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.zh-CN.md
 ```
 

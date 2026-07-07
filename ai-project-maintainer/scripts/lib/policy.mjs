@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import YAML from "yaml";
 import { buildProfilePolicy, normalizeProfileId, resolveProjectProfile } from "./profiles.mjs";
+import { parseYaml } from "./yaml-support.mjs";
 
 export const defaultPolicy = {
   profile: "auto",
@@ -47,7 +47,7 @@ export const defaultPolicy = {
 function parseYamlFile(filePath, fallback) {
   try {
     const text = fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, "");
-    return YAML.parse(text) || fallback;
+    return parseYaml(text) || fallback;
   } catch {
     return fallback;
   }

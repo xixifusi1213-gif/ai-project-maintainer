@@ -11,6 +11,7 @@ const quickstartMode = {
   production: false,
   connectors: false,
   noTests: true,
+  firstRun: true,
 };
 
 function markdownList(items, fallback = "- None") {
@@ -39,6 +40,20 @@ function topBlockers(report, limit = 5) {
     status: check.status,
     summary: check.summary || "",
   }));
+}
+
+function setupNotes(report, limit = 5) {
+  return (report.checks || [])
+    .filter((check) => check.setupGap)
+    .slice(0, limit)
+    .map((check) => ({
+      checkId: check.checkId || null,
+      group: check.group || null,
+      name: check.name,
+      status: check.status,
+      summary: check.summary || "",
+      recommendation: check.recommendation || "",
+    }));
 }
 
 function buildFileSummary(paths, repairPackResult) {
@@ -129,6 +144,7 @@ export function buildQuickstartSummary(report, options = {}) {
       ],
     },
     topBlockers: topBlockers(report),
+    setupNotes: setupNotes(report),
     files,
     handoffFiles: buildHandoffFiles(files),
     nextCommands: {
@@ -168,6 +184,13 @@ export function toQuickstartMarkdown(summary) {
     }
   }
   lines.push("");
+  if (summary.setupNotes?.length) {
+    lines.push("## Setup Notes");
+    for (const note of summary.setupNotes) {
+      lines.push(`- ${note.name}: ${note.summary}${note.recommendation ? ` ${note.recommendation}` : ""}`.trim());
+    }
+    lines.push("");
+  }
   lines.push("## AI Agent Handoff");
   lines.push("Give these files to Cursor, Claude Code, Cline, or Codex:");
   for (const file of summary.handoffFiles) {

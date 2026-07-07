@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import YAML from "yaml";
+import { parseYaml, stringifyYaml } from "./yaml-support.mjs";
 
 export const connectorsRelativePath = ".ai-maintainer/connectors.yml";
 
@@ -104,7 +104,7 @@ function readYaml(root) {
   }
   try {
     const text = fs.readFileSync(fullPath, "utf8").replace(/^\uFEFF/, "");
-    return { exists: true, value: YAML.parse(text) || defaultConnectorsConfig, parseErrors: [] };
+    return { exists: true, value: parseYaml(text) || defaultConnectorsConfig, parseErrors: [] };
   } catch (error) {
     return {
       exists: true,
@@ -126,7 +126,7 @@ function findSecretFields(value, prefix = []) {
 }
 
 export function connectorsTemplate() {
-  return YAML.stringify(defaultConnectorsConfig);
+  return stringifyYaml(defaultConnectorsConfig);
 }
 
 export function loadConnectorsConfig(projectRoot) {
