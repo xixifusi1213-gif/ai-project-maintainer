@@ -61,6 +61,101 @@ test("audit plan creates migration, backup, and rollback gaps for database proje
   assert.equal(audit.plan.find((item) => item.id === "prisma-migration-safety").status, "GAP");
 });
 
+test("audit plan requires data boundaries and authorization evidence for sensitive auth projects", () => {
+  const root = tempProject();
+  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({
+    dependencies: { express: "latest" },
+  }));
+  initAudit(root);
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "project-profile.yml"), [
+    "schema_version: 1",
+    "project:",
+    "  profile: node-api",
+    "risk:",
+    "  handles_auth: true",
+    "  handles_sensitive_data: true",
+    "  has_admin_roles: true",
+    "",
+  ].join("\n"));
+
+  const audit = planFor(root);
+
+  assert.equal(audit.plan.find((item) => item.id === "data-boundaries").status, "GAP");
+  assert.equal(audit.plan.find((item) => item.id === "data-boundaries").group, "data-exposure");
+  assert.equal(audit.plan.find((item) => item.id === "authz-matrix").status, "GAP");
+  assert.equal(audit.plan.find((item) => item.id === "authz-matrix").group, "auth-boundary");
+  assert.equal(audit.plan.find((item) => item.id === "sensitive-log-redaction").status, "GAP");
+  assert.equal(audit.coverageGaps.some((gap) => gap.id === "data-boundaries"), true);
+});
+
+test("audit plan passes declared data boundaries and blocks missing authz tests", () => {
+  const root = tempProject();
+  initAudit(root);
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "project-profile.yml"), [
+    "schema_version: 1",
+    "project:",
+    "  profile: node-api",
+    "risk:",
+    "  handles_auth: true",
+    "  handles_sensitive_data: true",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "data-boundaries.yml"), [
+    "schema_version: 1",
+    "data_classes:",
+    "  - id: user-profile",
+    "    sensitivity: personal",
+    "    fields: [email]",
+    "    exposed_to: [self, admin]",
+    "    may_appear_in_logs: false",
+    "    tests:",
+    "      - tests/privacy/user-profile.test.ts",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "authz-matrix.yml"), [
+    "schema_version: 1",
+    "roles: [anonymous, user, admin]",
+    "resources:",
+    "  - id: profile",
+    "    owner_field: userId",
+    "    actions:",
+    "      read:",
+    "        allowed_roles: [owner, admin]",
+    "        tests: []",
+    "",
+  ].join("\n"));
+
+  const audit = planFor(root);
+
+  assert.equal(audit.plan.find((item) => item.id === "data-boundaries").status, "PASS");
+  assert.equal(audit.plan.find((item) => item.id === "authz-object-tests").status, "GAP");
+});
+
+test("audit plan requires idempotency evidence for side-effect business flows", () => {
+  const root = tempProject();
+  initAudit(root);
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "business-flows.yml"), [
+    "schema_version: 1",
+    "business_flows:",
+    "  - id: checkout",
+    "    name: Checkout",
+    "    criticality: high",
+    "    side_effects: [payment, order, webhook]",
+    "    abuse_controls: []",
+    "    idempotency_required: true",
+    "    replay_safe: false",
+    "    tests: []",
+    "",
+  ].join("\n"));
+
+  const audit = planFor(root);
+
+  assert.equal(audit.plan.find((item) => item.id === "business-critical-flows").group, "business-flow-safety");
+  assert.equal(audit.plan.find((item) => item.id === "business-flow-idempotency").status, "GAP");
+  assert.equal(audit.plan.find((item) => item.id === "business-flow-idempotency").group, "business-flow-safety");
+  assert.equal(audit.plan.find((item) => item.id === "business-flow-abuse-controls").status, "GAP");
+});
+
 test("audit plan reduces runtime production evidence pressure for OSS library profile", () => {
   const root = tempProject();
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "sample-lib", main: "index.js" }, null, 2));

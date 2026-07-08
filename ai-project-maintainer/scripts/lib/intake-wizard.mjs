@@ -4,7 +4,9 @@ import readline from "node:readline/promises";
 import { detectProject } from "./project-detect.mjs";
 import {
   deepMerge,
+  defaultAuthzMatrix,
   defaultBusinessFlows,
+  defaultDataBoundaries,
   defaultEvidenceSources,
   defaultProjectProfile,
   defaultRiskPolicy,
@@ -120,6 +122,14 @@ export function buildWizardQuestions(project, intake, options = {}) {
     { id: "observability_alerts", kind: "yes-no", default: hasEvidence(observability.alerts), prompt: localized(lang, "Are production alerts configured?", "是否配置生产告警？") },
     { id: "critical_flows", kind: "text", default: "", prompt: localized(lang, "Critical business flows, comma-separated", "核心业务流程，用逗号分隔") },
     { id: "business_flow_tests", kind: "yes-no", default: "unknown", prompt: localized(lang, "Do critical flows already have automated tests?", "核心业务流程是否已有自动化测试？") },
+    { id: "flow_side_effects", kind: "text", default: "", prompt: localized(lang, "Side effects for critical flows, comma-separated", "核心流程的副作用，用逗号分隔") },
+    { id: "flow_abuse_controls", kind: "text", default: "", prompt: localized(lang, "Abuse controls for critical flows, comma-separated", "核心流程的滥用控制，用逗号分隔") },
+    { id: "flow_idempotency_required", kind: "yes-no", default: "unknown", prompt: localized(lang, "Do critical flows require idempotency or duplicate-execution protection?", "核心流程是否需要幂等或防重复执行？") },
+    { id: "flow_replay_safe", kind: "yes-no", default: "unknown", prompt: localized(lang, "Are critical flows safe against replay or duplicate submissions?", "核心流程是否能防重放或重复提交？") },
+    { id: "data_classes", kind: "text", default: "", prompt: localized(lang, "Sensitive data classes, comma-separated", "敏感数据类型，用逗号分隔") },
+    { id: "data_boundary_tests", kind: "yes-no", default: "unknown", prompt: localized(lang, "Do sensitive data boundaries already have tests?", "敏感数据边界是否已有测试？") },
+    { id: "authz_resources", kind: "text", default: "", prompt: localized(lang, "Protected resources for authorization, comma-separated", "需要鉴权的资源，用逗号分隔") },
+    { id: "authz_tests", kind: "yes-no", default: "unknown", prompt: localized(lang, "Do protected resources already have object-level authorization tests?", "受保护资源是否已有对象级授权测试？") },
     { id: "strict_production", kind: "yes-no", default: "no", prompt: localized(lang, "Should missing production evidence block release?", "缺少生产证据时是否阻断发布？") },
 
     { id: "electron_ipc", kind: "yes-no", default: detectedElectron ? "yes" : "unknown", when: (answers) => detectedElectron || electronProfileIds.has(answers.project_type), prompt: localized(lang, "Does the Electron app expose IPC APIs?", "Electron 应用是否暴露 IPC API？") },
@@ -186,6 +196,8 @@ function answerLabel(value) {
 function buildBusinessFlows(answers) {
   const flows = splitList(answers.critical_flows);
   if (!flows.length) return defaultBusinessFlows;
+  const sideEffects = splitList(answers.flow_side_effects);
+  const abuseControls = splitList(answers.flow_abuse_controls);
   return {
     schema_version: 1,
     business_flows: flows.map((name, index) => ({
@@ -193,7 +205,48 @@ function buildBusinessFlows(answers) {
       name,
       criticality: "high",
       expected_behavior: "Maintainer confirmed this flow must not break.",
+      side_effects: sideEffects,
+      abuse_controls: abuseControls,
+      idempotency_required: yesNo(answers.flow_idempotency_required),
+      replay_safe: yesNo(answers.flow_replay_safe),
       tests: answerLabel(answers.business_flow_tests) === "yes" ? ["Declare concrete test files here"] : [],
+    })),
+  };
+}
+
+function buildDataBoundaries(answers) {
+  const dataClasses = splitList(answers.data_classes);
+  if (!dataClasses.length) return defaultDataBoundaries;
+  return {
+    schema_version: 1,
+    data_classes: dataClasses.map((name, index) => ({
+      id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `data-class-${index + 1}`,
+      sensitivity: "personal",
+      fields: [],
+      stored_in: ["database"],
+      exposed_to: ["self", "admin"],
+      may_appear_in_logs: false,
+      tests: answerLabel(answers.data_boundary_tests) === "yes" ? ["Declare concrete data-boundary test files here"] : [],
+    })),
+  };
+}
+
+function buildAuthzMatrix(answers) {
+  const resources = splitList(answers.authz_resources);
+  if (!resources.length) return defaultAuthzMatrix;
+  return {
+    schema_version: 1,
+    roles: ["anonymous", "user", "admin"],
+    resources: resources.map((name, index) => ({
+      id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `resource-${index + 1}`,
+      owner_field: "userId",
+      tenant_field: "",
+      actions: {
+        read: {
+          allowed_roles: ["owner", "admin"],
+          tests: answerLabel(answers.authz_tests) === "yes" ? ["Declare concrete object-authorization test files here"] : [],
+        },
+      },
     })),
   };
 }
@@ -277,11 +330,13 @@ function buildDocuments(root, project, intake, answers, options = {}) {
   });
 
   const businessFlows = buildBusinessFlows(answers);
-  const summary = buildIntakeSummary(root, project, { profile, evidence, businessFlows, riskPolicy }, answers, options);
+  const dataBoundaries = buildDataBoundaries(answers);
+  const authzMatrix = buildAuthzMatrix(answers);
+  const summary = buildIntakeSummary(root, project, { profile, evidence, dataBoundaries, authzMatrix, businessFlows, riskPolicy }, answers, options);
   const persistedProfile = { ...profile };
   delete persistedProfile.derived;
 
-  return { profile: persistedProfile, evidence, businessFlows, riskPolicy, summary };
+  return { profile: persistedProfile, evidence, dataBoundaries, authzMatrix, businessFlows, riskPolicy, summary };
 }
 
 function detectedSignals(project) {
@@ -425,6 +480,8 @@ export async function runIntakeWizard(projectRoot, options = {}) {
 
   writeYaml(root, ".ai-maintainer/project-profile.yml", documents.profile, result);
   writeYaml(root, ".ai-maintainer/evidence-sources.yml", documents.evidence, result);
+  writeYaml(root, ".ai-maintainer/data-boundaries.yml", documents.dataBoundaries, result);
+  writeYaml(root, ".ai-maintainer/authz-matrix.yml", documents.authzMatrix, result);
   writeYaml(root, ".ai-maintainer/business-flows.yml", documents.businessFlows, result);
   writeYaml(root, ".ai-maintainer/risk-policy.yml", documents.riskPolicy, result);
   writeText(root, summaryPath, documents.summary, result);

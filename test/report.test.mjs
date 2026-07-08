@@ -55,6 +55,9 @@ test("reports attach standards and evidence levels to core check groups", () => 
     { name: "squawk SQL migration lint", checkId: "squawk", group: "database", status: "pass", blocking: false, command: "squawk" },
     { name: "OpenSSF Scorecard", checkId: "scorecard", group: "oss-hygiene", status: "pass", blocking: false, command: "scorecard" },
     { name: "production audit: Critical business flows", checkId: "production-business-flows", group: "production-audit", status: "USER_DECISION", blocking: false },
+    { name: "production audit: Data boundaries", checkId: "production-data-boundaries", group: "data-exposure", status: "GAP", blocking: false, coverageGap: true },
+    { name: "production audit: Authorization matrix", checkId: "production-authz-matrix", group: "auth-boundary", status: "GAP", blocking: false, coverageGap: true },
+    { name: "production audit: Business flow idempotency", checkId: "production-business-flow-idempotency", group: "business-flow-safety", status: "USER_DECISION", blocking: false },
     { name: "production evidence: Sentry error monitoring", checkId: "evidence-sentry-error-monitoring", group: "production-evidence", status: "PASS", blocking: false },
   ];
   const report = buildJsonReport({
@@ -73,6 +76,7 @@ test("reports attach standards and evidence levels to core check groups", () => 
   assert.equal(report.checks.every((check) => check.standardRefs.length > 0), true);
   assert.equal(report.checks.find((check) => check.group === "production-evidence").evidenceLevel, "PLATFORM_VERIFIED");
   assert.equal(report.checks.find((check) => check.status === "USER_DECISION").evidenceLevel, "USER_REPORTED");
+  assert.equal(report.checks.find((check) => check.group === "business-flow-safety").evidenceLevel, "USER_REPORTED");
   assert.equal(report.checks.find((check) => check.group === "tests").evidenceLevel, "TOOL_VERIFIED");
   assert.match(markdown, /## Evidence Levels/);
   assert.match(markdown, /## Standards Crosswalk/);

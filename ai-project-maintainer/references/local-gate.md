@@ -49,6 +49,16 @@ Strict mode treats missing relevant tools as failures. Non-strict mode reports m
 
 Use `quickstart` for the first pass. The strict release gate can take several minutes because it may run project tests, E2E tests, build/dist scripts, Semgrep, Gitleaks, Trivy, and any applicable supply-chain or CI checks. Give external command runners a longer timeout for strict gates, especially on Windows or fresh machines.
 
+v1.5.0 also checks production accident evidence when `--production` is enabled. For projects with auth, sensitive data, payments, public APIs, admin roles, databases, or side-effectful flows, the strict production gate expects these intake files to be real rather than templates:
+
+```text
+.ai-maintainer/data-boundaries.yml
+.ai-maintainer/authz-matrix.yml
+.ai-maintainer/business-flows.yml
+```
+
+Quickstart only reports these as production readiness gaps. The full production gate can block on them when `risk-policy.yml` sets `production.block_on_coverage_gaps: true`.
+
 Summarize a saved report:
 
 ```bash
@@ -72,6 +82,7 @@ Block release for:
 - High or critical production dependency vulnerabilities without a documented exception.
 - Electron `nodeIntegration: true`, `contextIsolation: false`, `webSecurity: false`, or unrestricted IPC file/system access.
 - Unsafe database migrations: likely lock/table rewrite, destructive incompatible change, or missing rollback for risky schema changes.
+- Missing data-boundary, object-level authorization, sensitive-log redaction, idempotency, replay-safety, or business-flow abuse-control evidence for production projects that handle user data or side effects.
 - IaC/Kubernetes settings that expose admin surfaces, plaintext secrets, privileged containers, broad IAM, or public ingress without controls.
 
 Warn, tune, or document exceptions for:

@@ -19,6 +19,8 @@ test("initAudit creates production audit templates without secrets", () => {
   const expected = [
     ".ai-maintainer/project-profile.yml",
     ".ai-maintainer/evidence-sources.yml",
+    ".ai-maintainer/data-boundaries.yml",
+    ".ai-maintainer/authz-matrix.yml",
     ".ai-maintainer/business-flows.yml",
     ".ai-maintainer/risk-policy.yml",
     ".ai-maintainer/connectors.yml",
@@ -41,6 +43,16 @@ test("initAudit creates production audit templates without secrets", () => {
 
   const evidenceText = fs.readFileSync(path.join(root, ".ai-maintainer", "evidence-sources.yml"), "utf8");
   assert.doesNotMatch(evidenceText, /token|password|secret|dsn/i);
+
+  const dataBoundaries = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "data-boundaries.yml"), "utf8"));
+  assert.equal(dataBoundaries.schema_version, 1);
+  assert.equal(Array.isArray(dataBoundaries.data_classes), true);
+  assert.equal(dataBoundaries.data_classes[0].template, true);
+
+  const authzMatrix = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "authz-matrix.yml"), "utf8"));
+  assert.equal(authzMatrix.schema_version, 1);
+  assert.deepEqual(authzMatrix.roles, ["anonymous", "user", "admin"]);
+  assert.equal(authzMatrix.resources[0].template, true);
 
   const connectorsText = fs.readFileSync(path.join(root, ".ai-maintainer", "connectors.yml"), "utf8");
   assert.match(connectorsText, /token_env: GITHUB_TOKEN/);
@@ -82,6 +94,30 @@ test("loadIntake merges defaults and tolerates malformed YAML", () => {
   assert.equal(intake.parseErrors.length, 1);
 });
 
+test("loadIntake reads data boundaries and authorization matrix parse errors", () => {
+  const root = tempProject();
+  fs.mkdirSync(path.join(root, ".ai-maintainer"));
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "project-profile.yml"), "risk:\n  handles_auth: true\n  handles_sensitive_data: true\n");
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "data-boundaries.yml"), [
+    "schema_version: 1",
+    "data_classes:",
+    "  - id: user-profile",
+    "    sensitivity: personal",
+    "    fields: [email]",
+    "    exposed_to: [self]",
+    "    may_appear_in_logs: false",
+    "    tests: []",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(root, ".ai-maintainer", "authz-matrix.yml"), "resources: [broken\n");
+
+  const intake = loadIntake(root, { riskSurfaces: { database: [] }, electron: { detected: false }, files: [] });
+
+  assert.equal(intake.dataBoundaries.data_classes[0].id, "user-profile");
+  assert.equal(intake.dataBoundaries.data_classes[0].may_appear_in_logs, false);
+  assert.equal(intake.parseErrors.some((error) => error.path === ".ai-maintainer/authz-matrix.yml"), true);
+});
+
 test("intake wizard writes professional project profile and summary", async () => {
   const root = tempProject();
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({
@@ -114,6 +150,14 @@ test("intake wizard writes professional project profile and summary", async () =
       observability_alerts: "no",
       critical_flows: "submit reimbursement, approve reimbursement",
       business_flow_tests: "yes",
+      flow_side_effects: "payment,email",
+      flow_abuse_controls: "rate_limit",
+      flow_idempotency_required: "yes",
+      flow_replay_safe: "no",
+      data_classes: "employee-profile, reimbursement-record",
+      data_boundary_tests: "yes",
+      authz_resources: "reimbursement",
+      authz_tests: "no",
       strict_production: "yes",
       db_migrations: "yes",
       db_backup: "no",
@@ -126,6 +170,8 @@ test("intake wizard writes professional project profile and summary", async () =
   const profile = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "project-profile.yml"), "utf8"));
   const evidence = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "evidence-sources.yml"), "utf8"));
   const business = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "business-flows.yml"), "utf8"));
+  const dataBoundaries = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "data-boundaries.yml"), "utf8"));
+  const authzMatrix = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "authz-matrix.yml"), "utf8"));
   const risk = YAML.parse(fs.readFileSync(path.join(root, ".ai-maintainer", "risk-policy.yml"), "utf8"));
   const summary = fs.readFileSync(path.join(root, ".ai-maintainer", "intake-summary.md"), "utf8");
 
@@ -141,6 +187,15 @@ test("intake wizard writes professional project profile and summary", async () =
   assert.equal(evidence.evidence.observability.logs, "unknown");
   assert.equal(evidence.evidence.database.backup_policy, "none");
   assert.equal(business.business_flows.length, 2);
+  assert.deepEqual(business.business_flows[0].side_effects, ["payment", "email"]);
+  assert.equal(business.business_flows[0].idempotency_required, true);
+  assert.equal(business.business_flows[0].replay_safe, false);
+  assert.equal(dataBoundaries.data_classes.length, 2);
+  assert.equal(dataBoundaries.data_classes[0].may_appear_in_logs, false);
+  assert.equal(dataBoundaries.data_classes[0].tests.length, 1);
+  assert.equal(authzMatrix.resources[0].id, "reimbursement");
+  assert.deepEqual(authzMatrix.resources[0].actions.read.allowed_roles, ["owner", "admin"]);
+  assert.deepEqual(authzMatrix.resources[0].actions.read.tests, []);
   assert.equal(risk.production.block_on_coverage_gaps, true);
   assert.match(summary, /Maintainer Confirmed/);
   assert.match(summary, /Database evidence detected/);

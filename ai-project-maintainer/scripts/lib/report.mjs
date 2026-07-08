@@ -42,9 +42,19 @@ function buildOverallStatus({ blockers, warnings, coverageGaps, invalidException
   return "PASS";
 }
 
+const productionReadinessGroups = new Set([
+  "production-audit",
+  "data-exposure",
+  "auth-boundary",
+  "business-flow-safety",
+  "database-safety",
+  "operational-safety",
+  "ai-repair-safety",
+]);
+
 function isNonCodeReadinessSignal(check) {
   const status = statusKey(check.status);
-  return check.group === "production-audit" || check.coverageGap || status === "gap" || status === "user_decision";
+  return productionReadinessGroups.has(check.group) || check.coverageGap || status === "gap" || status === "user_decision";
 }
 
 function shouldIncludeInSarif(check, options = {}) {

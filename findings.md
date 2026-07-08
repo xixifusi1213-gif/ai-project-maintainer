@@ -160,3 +160,52 @@
 - Real-project smoke using `npx -y ai-project-maintainer@latest quickstart .` completed with exit code `0` for all five repos.
 - `sindresorhus/p-limit`, `unjs/defu`, `expressjs/cors`, and `chalk/chalk` produced `PASS_WITH_GAPS`, zero blockers, and no repair pack.
 - `sindresorhus/execa` produced `FAIL` with one Semgrep blocker and a repair pack. The blocker includes code-level `javascript.lang.security.detect-child-process.detect-child-process` findings in child process execution paths, so it should be recorded as maintainer triage rather than an environment failure.
+
+## v1.5.0 Production Accident / Data Exposure Gate Research Findings
+
+- The desired product floor is not "absolute security"; it is a practical production-safety floor for AI-coded products against common mistakes, low-skill attacks, configuration gaps, data exposure, database accidents, and ordinary operational failures.
+- The upgrade should treat user business descriptions as input, not proof. The gate must convert descriptions into required evidence: tests, checks, repair tasks, blockers, gaps, or explicit user decisions.
+- `ai-project-maintainer` should remain the evidence orchestrator and release gate. Specialist tools, including Codex Security-style attack review, should be treated as evidence sources rather than replacements for the gate.
+- The research should use primary standards and official guidance first: OWASP, NIST, CISA, OpenSSF/SLSA, and relevant official cloud/application security references.
+- OWASP ASVS is the right verification backbone because it is explicitly a basis for testing web application technical security controls and secure-development requirements.
+- OWASP API Security Top 10 directly supports the user's biggest concern: Broken Object Level Authorization says endpoints that accept object IDs need object-level authorization checks, and failures can expose, modify, or destroy unauthorized data.
+- OWASP Authorization Testing Automation recommends formalizing an authorization matrix and driving integration tests from it. That maps well to a v1.5.0 `roles x resources x actions x data scope` evidence file.
+- OWASP API6:2023 "Unrestricted Access to Sensitive Business Flows" covers non-exploit abuse of legitimate flows such as buying inventory, spam posting, or reserving all slots. This is important because the user's baseline explicitly includes low-skill misuse, not only vulnerabilities.
+- OWASP Logging guidance says logs can contain personal and sensitive information and may need exclusion, masking, sanitization, hashing, or encryption. v1.5.0 should treat sensitive logging as a data-exposure class, not only as observability.
+- NIST Privacy Framework is a fit for privacy/data-exposure framing because it is intended to help organizations identify and manage privacy risk while protecting individuals' privacy.
+- NIST SSDF supports the release-gate model: secure practices should be integrated into the SDLC to reduce vulnerabilities, mitigate impact, and address root causes.
+- NIST CSF 2.0 supports operational readiness because prevention, detection, response, and recovery are all continuous or ready-at-all-times functions, not one-time scans.
+- SLSA and OpenSSF Scorecard remain relevant but are not enough for this upgrade. They cover build integrity, provenance, dependency and repo health; v1.5.0 needs business/data/authorization evidence above that layer.
+- OWASP Top 10:2025 keeps Broken Access Control as the top risk and explicitly links access failures to unauthorized disclosure, modification, destruction, or business actions outside limits.
+- OWASP Top 10:2025 Security Logging and Alerting Failures directly supports requiring alert use cases and avoiding sensitive data in logs.
+- CISA Secure by Design supports shifting security burden away from the end user and toward the product maker. For this product, that means the tool should not expect a solo founder to manually infer every production safety checklist item.
+- OWASP LLM Top 10 and NIST AI RMF support an AI-repair safety layer: LLM output needs validation, sensitive disclosure must be controlled, excessive agency is a risk, and AI risk management should be built into design, development, use, and evaluation.
+- Current `audit-plan.mjs` already covers intake presence, project profile, critical business flows, business-flow tests, CI, release approval, observability, database migration review, backup, rollback, and profile-specific checks.
+- Current `init-audit` / `intake-wizard` already asks about auth, sensitive data, payments, financial data, health data, user-generated content, database, deployment, monitoring, critical flows, public API, file uploads, admin roles, CORS, database concurrency, and audit logs.
+- Current production gate can convert audit `GAP` and `USER_DECISION` items into report checks. By default these are non-blocking; `risk-policy.yml` can make coverage gaps and user decisions blocking.
+- Current `repair-pack` already converts production gaps and user decisions into `needs_maintainer_decision` tasks and warns agents not to invent evidence or accept production risk.
+- The main v1.5.0 gap is not missing scanner coverage. It is missing a structured production-safety model for:
+  - data inventory and sensitivity classes;
+  - roles, permissions, object ownership, and tenant isolation;
+  - endpoint/action authorization matrix;
+  - sensitive-field response and log redaction rules;
+  - critical business-flow abuse controls, idempotency, and duplicate execution protection;
+  - database write safety beyond migration backup/rollback;
+  - AI repair invariants that block "fixes" which remove auth, validation, tests, audit logs, or error handling.
+- The current reporting schema can carry these as additive checks without breaking existing consumers: new groups such as `data-exposure`, `auth-boundary`, `business-flow-safety`, `database-safety`, `operational-safety`, and `ai-repair-safety` can feed `buildJsonReport` and `repair-pack`.
+- Added `docs/PRODUCTION-GATE-RESEARCH.zh-CN.md` as the implementation design input. It recommends adding `data-boundaries.yml`, `authz-matrix.yml`, and an extended `business-flows.yml` schema, while keeping quickstart non-blocking and making production strict release gates block missing data/auth/business-flow evidence.
+- The proposed standard is stronger than the user's baseline for common non-advanced accidents because it turns missing data, authorization, business-flow, database, operational, and AI-repair evidence into explicit blockers or maintainer decisions.
+- The proposed standard still does not claim protection against professional attackers, 0day, malicious insiders, targeted supply-chain compromise, or incorrect/incomplete business descriptions.
+
+## v1.5.0 Implementation Findings
+
+- Current branch is `codex/v1.5-production-gate-research` and already contains the research/planning docs that should be included in the implementation PR.
+- `package.json` is at the repository root, not under `ai-project-maintainer/`; release metadata updates must touch the root `package.json` and `package-lock.json`.
+- Existing `runLocalGate` only builds `audit` when `options.production` is true. Therefore quickstart, which sets `production: false`, will not block on the new production model as long as new checks are attached to `audit-plan`/production audit behavior.
+- Existing `productionAuditChecks` maps audit `GAP` and `USER_DECISION` to `production-audit` checks and uses `risk-policy.yml` to decide whether they block.
+- Existing `repair-pack` treats `production-audit` and coverage gaps as maintainer-decision tasks, so v1.5.0 can reuse that behavior and only needs tightening if new groups need manual review semantics.
+- Focused v1.5.0 tests now confirm the new intake templates, data/auth YAML parsing, production strict blockers, quickstart non-blocking production-readiness gaps, and repair-pack maintainer-owned task typing.
+- Documentation and release metadata are aligned to `1.5.0`; a stale-version search found no unexpected `v1.4.4` references outside historical smoke/research/release documents.
+- Documentation hygiene checks found no mojibake markers in the updated README, promotion copy, report schema, standards crosswalk, repair-pack docs, local gate reference, or quickstart feedback template.
+- Full verification passed for v1.5.0: focused tests, `npm test`, `npm run check`, `npm pack --dry-run`, `npm run release:verify:pre`, and `git diff --check`.
+- Production accident report checks now use focused groups (`data-exposure`, `auth-boundary`, `business-flow-safety`, `database-safety`, `operational-safety`, `ai-repair-safety`) instead of flattening all new production risks into `production-audit`.

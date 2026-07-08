@@ -1,5 +1,29 @@
 export const standardsSources = [
   {
+    id: "owasp-asvs",
+    title: "OWASP ASVS",
+    url: "https://owasp.org/www-project-application-security-verification-standard/",
+    summary: "Application security verification requirements for access control, data protection, logging, and business logic.",
+  },
+  {
+    id: "owasp-api-top-10",
+    title: "OWASP API Security Top 10",
+    url: "https://owasp.org/API-Security/",
+    summary: "API risk categories including broken object-level authorization and unrestricted access to sensitive business flows.",
+  },
+  {
+    id: "nist-privacy-framework",
+    title: "NIST Privacy Framework",
+    url: "https://www.nist.gov/privacy-framework",
+    summary: "Privacy risk management framework for identifying and protecting personal data.",
+  },
+  {
+    id: "cisa-secure-by-design",
+    title: "CISA Secure by Design",
+    url: "https://www.cisa.gov/resources-tools/resources/secure-by-design",
+    summary: "Secure-by-design guidance that shifts security burden toward software producers and safer defaults.",
+  },
+  {
     id: "nist-ssdf",
     title: "NIST SSDF SP 800-218",
     url: "https://csrc.nist.gov/pubs/sp/800/218/final",
@@ -98,11 +122,46 @@ const groupMappings = {
   database: [ref("owasp-samm"), ref("google-sre-release")],
   "oss-hygiene": [ref("openssf-scorecard"), ref("slsa")],
   "production-audit": [
+    ref("owasp-asvs"),
+    ref("owasp-api-top-10"),
+    ref("nist-privacy-framework"),
+    ref("cisa-secure-by-design"),
     ref("google-sre-monitoring"),
     ref("google-sre-release"),
     ref("google-sre-risk"),
     ref("cis-control-11"),
     ref("nist-sp-800-34"),
+  ],
+  "data-exposure": [
+    ref("owasp-asvs"),
+    ref("nist-privacy-framework"),
+    ref("cisa-secure-by-design"),
+  ],
+  "auth-boundary": [
+    ref("owasp-asvs"),
+    ref("owasp-api-top-10"),
+    ref("nist-ssdf"),
+  ],
+  "business-flow-safety": [
+    ref("owasp-api-top-10"),
+    ref("owasp-asvs"),
+    ref("google-sre-risk"),
+  ],
+  "database-safety": [
+    ref("owasp-samm"),
+    ref("google-sre-release"),
+    ref("cis-control-11"),
+    ref("nist-sp-800-34"),
+  ],
+  "operational-safety": [
+    ref("google-sre-monitoring"),
+    ref("google-sre-release"),
+    ref("google-sre-risk"),
+  ],
+  "ai-repair-safety": [
+    ref("owasp-llm-top-10"),
+    ref("owasp-agentic-ai"),
+    ref("nist-ssdf"),
   ],
   "production-evidence": [
     ref("google-sre-monitoring"),
@@ -114,6 +173,16 @@ const groupMappings = {
   "agent-risk": [ref("owasp-llm-top-10"), ref("owasp-agentic-ai"), ref("nist-ssdf"), ref("owasp-samm")],
 };
 
+const productionAuditGroups = new Set([
+  "production-audit",
+  "data-exposure",
+  "auth-boundary",
+  "business-flow-safety",
+  "database-safety",
+  "operational-safety",
+  "ai-repair-safety",
+]);
+
 const checkIdMappings = [
   [/gitleaks|secret/i, [ref("nist-ssdf"), ref("owasp-samm")]],
   [/semgrep|sast/i, [ref("nist-ssdf"), ref("owasp-samm")]],
@@ -123,6 +192,9 @@ const checkIdMappings = [
   [/release-approval/i, [ref("google-sre-release"), ref("google-sre-risk")]],
   [/error-monitoring|alerting|alert-status|observability|logs|metrics/i, [ref("google-sre-monitoring"), ref("google-sre-risk")]],
   [/database|migration|bytebase|atlas|squawk/i, [ref("owasp-samm"), ref("google-sre-release")]],
+  [/data-boundar|sensitive-log|privacy/i, [ref("owasp-asvs"), ref("nist-privacy-framework"), ref("cisa-secure-by-design")]],
+  [/authz|authorization|object-level|tenant/i, [ref("owasp-asvs"), ref("owasp-api-top-10"), ref("nist-ssdf")]],
+  [/business-flow|idempotency|abuse-control|replay/i, [ref("owasp-api-top-10"), ref("owasp-asvs"), ref("google-sre-risk")]],
   [/backup|rollback|recovery/i, [ref("cis-control-11"), ref("nist-sp-800-34"), ref("google-sre-release")]],
   [/deployment|runtime/i, [ref("google-sre-release"), ref("dora")]],
   [/agent|mcp|prompt|codex|claude|cursor/i, [ref("owasp-llm-top-10"), ref("owasp-agentic-ai"), ref("nist-ssdf")]],
@@ -155,7 +227,7 @@ export function evidenceLevelForCheck(check) {
   const status = statusKey(check.status);
   if (["gap", "missing", "skipped"].includes(status) || check.coverageGap) return "GAP";
   if (check.group === "production-evidence") return "PLATFORM_VERIFIED";
-  if (check.group === "production-audit") {
+  if (productionAuditGroups.has(check.group)) {
     if (status === "user_decision") return "USER_REPORTED";
     return "INFERRED";
   }

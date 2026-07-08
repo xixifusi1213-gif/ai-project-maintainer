@@ -48,7 +48,7 @@ function productionAuditChecks(audit, intake) {
     .map((item) => ({
       checkId: `production-${item.id}`,
       name: `production audit: ${item.title}`,
-      group: "production-audit",
+      group: item.group || "production-audit",
       status: item.status,
       blocking: item.status === "GAP" ? blockOnCoverageGaps : blockOnUserDecisions,
       coverageGap: item.status === "GAP",
