@@ -74,6 +74,31 @@ function quickstartRunner(calls = [], auditResult = { status: "fail", code: 1, s
   };
 }
 
+function semgrepJson(checkIds, options = {}) {
+  return JSON.stringify({
+    results: checkIds.map((checkId, index) => ({
+      check_id: checkId,
+      path: index % 2 === 0 ? ".github/workflows/ci.yml" : ".npmrc",
+      start: { line: index + 1 },
+      extra: {
+        message: "simulated semgrep finding",
+        ...(options.padding ? { metadata: { padding: options.padding } } : {}),
+      },
+    })),
+  });
+}
+
+function semgrepQuickstartRunner(calls = [], semgrepResult = {}) {
+  return (command, args) => {
+    calls.push({ command, args });
+    if (command === "npm" && args[0] === "audit") return { status: "pass", code: 0, stdout: "{}" };
+    if (command === "trivy" && args[0] === "fs") return { status: "pass", code: 0, stdout: "trivy clean" };
+    if (command === "semgrep" && args[0] === "scan") return semgrepResult;
+    if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+    return { status: "missing", code: null, stderr: `${command} missing in test fixture` };
+  };
+}
+
 test("quickstart treats npm audit ENOLOCK without a lockfile as a setup gap", () => {
   const root = tempProject({ lockfile: false });
   let stdout = "";
@@ -103,6 +128,62 @@ test("quickstart treats npm audit ENOLOCK without a lockfile as a setup gap", ()
   assert.equal(report.coverageGaps.some((gap) => gap.checkId === "package-audit"), true);
   assert.match(markdown, /package-lock\.json/);
   assert.match(markdown, /npm install --package-lock-only/);
+});
+
+test("quickstart treats selected Semgrep supply-chain hardening findings as warnings", () => {
+  const root = tempProject();
+  const calls = [];
+  const result = runQuickstart(root, {
+    runnerOptions: {
+      commandRunner: semgrepQuickstartRunner(calls, {
+        status: "fail",
+        code: 1,
+        stdout: semgrepJson([
+          "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+          "package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age",
+        ], { padding: "x".repeat(7000) }),
+        stderr: "2 blocking findings",
+      }),
+    },
+  });
+  const report = JSON.parse(fs.readFileSync(path.join(root, "reports", "quickstart-security-report.json"), "utf8"));
+  const markdown = fs.readFileSync(path.join(root, "reports", "quickstart-summary.md"), "utf8");
+  const semgrep = report.checks.find((check) => check.checkId === "semgrep");
+
+  assert.equal(result.summary.status, "PASS_WITH_GAPS");
+  assert.equal(result.summary.counts.blockers, 0);
+  assert.equal(report.blockerCount, 0);
+  assert.equal(semgrep.status, "fail");
+  assert.equal(semgrep.blocking, false);
+  assert.equal(semgrep.quickstartSeverity, "recommended-hardening");
+  assert.deepEqual(semgrep.semgrepRuleIds, [
+    "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+    "package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age",
+  ]);
+  assert.equal(fs.existsSync(path.join(root, "reports", "quickstart-repair-pack")), false);
+  assert.match(markdown, /recommended hardening/i);
+  assert.equal(calls.some(({ command, args }) => command === "semgrep" && args.includes("--json")), true);
+});
+
+test("quickstart still blocks non-hardening Semgrep findings", () => {
+  const root = tempProject();
+  const result = runQuickstart(root, {
+    runnerOptions: {
+      commandRunner: semgrepQuickstartRunner([], {
+        status: "fail",
+        code: 1,
+        stdout: semgrepJson(["javascript.express.security.audit.xss.mustache.escape"]),
+        stderr: "1 blocking finding",
+      }),
+    },
+  });
+  const report = JSON.parse(fs.readFileSync(path.join(root, "reports", "quickstart-security-report.json"), "utf8"));
+  const semgrep = report.blockers.find((check) => check.checkId === "semgrep");
+
+  assert.equal(result.summary.status, "FAIL");
+  assert.equal(result.summary.counts.blockers, 1);
+  assert.equal(semgrep?.blocking, true);
+  assert.equal(fs.existsSync(path.join(root, "reports", "quickstart-repair-pack", "fix-plan.md")), true);
 });
 
 test("quickstart completes with cached Trivy DB fallback and no repair pack", () => {

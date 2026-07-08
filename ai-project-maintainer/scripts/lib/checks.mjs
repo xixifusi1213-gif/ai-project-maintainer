@@ -60,6 +60,13 @@ function isNpmAuditLockfileError(result) {
   return /ENOLOCK|requires an existing lockfile|package-lock\.json|npm-shrinkwrap\.json/i.test(`${result.stderr}\n${result.stdout}`);
 }
 
+const quickstartSemgrepHardeningRules = new Set([
+  "yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag",
+  "package_managers.dependabot.dependabot-missing-cooldown.dependabot-missing-cooldown",
+  "package_managers.npm.npm-missing-minimum-release-age.npm-missing-minimum-release-age",
+]);
+const semgrepJsonOutputLimit = 5 * 1024 * 1024;
+
 function splitRepositoryEnv(value) {
   return String(value || "")
     .split(/[,\s]+/)
@@ -115,6 +122,23 @@ export function normalizeToolResult(toolName, result) {
     return { ...result, status: "error" };
   }
   return result;
+}
+
+function semgrepRuleIds(result) {
+  try {
+    const parsed = JSON.parse(result.stdout || "{}");
+    return (parsed.results || [])
+      .map((finding) => finding.check_id)
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function isQuickstartSemgrepHardeningOnly(result) {
+  if (result.status !== "fail") return false;
+  const ruleIds = semgrepRuleIds(result);
+  return ruleIds.length > 0 && ruleIds.every((ruleId) => quickstartSemgrepHardeningRules.has(ruleId));
 }
 
 function runProjectScript(project, pm, scriptName, options) {
@@ -277,9 +301,34 @@ export function runOsvScannerChecks(project, options = {}) {
 export function runSastChecks(project, options = {}) {
   const strict = Boolean(options.strict);
   const runner = options.runnerOptions || {};
-  const result = runCommand("semgrep", ["scan", "--config", "auto", "--error", project.root], { ...runner, cwd: project.root, timeoutMs: 20 * 60 * 1000 });
+  const result = runCommand("semgrep", ["scan", "--config", "auto", "--error", "--json", project.root], {
+    ...runner,
+    cwd: project.root,
+    timeoutMs: 20 * 60 * 1000,
+    maxOutput: semgrepJsonOutputLimit,
+  });
+  const quickstartHardening = Boolean(options.firstRun) && isQuickstartSemgrepHardeningOnly(result);
+  const ruleIds = quickstartHardening ? [...new Set(semgrepRuleIds(result))] : [];
   return [
-    makeCheck("semgrep static scan", "sast", result, result.status === "fail" || (strict && result.status === "missing"), "High-confidence static analysis findings block release.", { checkId: "semgrep" }),
+    makeCheck(
+      "semgrep static scan",
+      "sast",
+      result,
+      (result.status === "fail" && !quickstartHardening) || (strict && result.status === "missing"),
+      quickstartHardening
+        ? "Semgrep found recommended hardening items for supply-chain posture; review them before release, but they do not block quickstart."
+        : "High-confidence static analysis findings block release.",
+      {
+        checkId: "semgrep",
+        ...(quickstartHardening
+          ? {
+              quickstartSeverity: "recommended-hardening",
+              semgrepRuleIds: ruleIds,
+              recommendation: "Review supply-chain hardening findings before a strict release gate.",
+            }
+          : {}),
+      },
+    ),
   ];
 }
 

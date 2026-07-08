@@ -69,6 +69,19 @@ function coverageGapNotes(report, limit = 5) {
     }));
 }
 
+function warningNotes(report, limit = 5) {
+  return (report.warnings || [])
+    .slice(0, limit)
+    .map((check) => ({
+      checkId: check.checkId || null,
+      group: check.group || null,
+      name: check.name,
+      status: check.status,
+      summary: check.summary || "",
+      recommendation: check.recommendation || "",
+    }));
+}
+
 function buildFileSummary(paths, repairPackResult) {
   const files = {
     summaryMarkdown: paths.summaryMarkdown,
@@ -158,6 +171,7 @@ export function buildQuickstartSummary(report, options = {}) {
     },
     topBlockers: topBlockers(report),
     setupNotes: setupNotes(report),
+    warnings: warningNotes(report),
     coverageGaps: coverageGapNotes(report),
     files,
     handoffFiles: buildHandoffFiles(files),
@@ -195,6 +209,15 @@ export function toQuickstartMarkdown(summary) {
   } else {
     for (const blocker of summary.topBlockers) {
       lines.push(`- ${blocker.name}: ${blocker.status}. ${blocker.summary}`.trim());
+    }
+  }
+  lines.push("");
+  lines.push("## Warnings");
+  if (!summary.warnings?.length) {
+    lines.push("- None");
+  } else {
+    for (const warning of summary.warnings) {
+      lines.push(`- ${warning.name}: ${warning.summary}${warning.recommendation ? ` ${warning.recommendation}` : ""}`.trim());
     }
   }
   lines.push("");

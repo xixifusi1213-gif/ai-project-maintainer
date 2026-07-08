@@ -200,6 +200,38 @@ Make first-run and quickstart usage resilient when Trivy cannot download its vul
 
 All v1.4.2 Trivy DB resilience implementation stages are complete on branch `codex/v1.4.2-trivy-db-resilience`.
 
+## Implementation: v1.4.3 Quickstart Semgrep Calibration
+
+## Objective
+
+Tune quickstart first-run severity so selected Semgrep supply-chain hardening recommendations do not make mature public projects appear failed on first contact.
+
+## Scope
+
+- Keep Semgrep enabled in quickstart.
+- Downgrade selected Semgrep supply-chain hardening findings to non-blocking warnings only in quickstart/first-run mode.
+- Preserve strict release-gate behavior: the same Semgrep findings still block release gates.
+- Keep concrete code/security Semgrep findings blocking in quickstart.
+- Bump release metadata to `1.4.3` and add release notes.
+
+## Out of Scope
+
+- Disabling Semgrep.
+- Changing strict release policy.
+- Adding new scanners, connectors, or benchmark cases.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Add focused tests for quickstart Semgrep hardening downgrade and strict gate preservation. Status: complete.
+3. Implement Semgrep result classification and quickstart-only downgrade. Status: complete.
+4. Update release metadata and docs. Status: complete.
+5. Run targeted and full verification. Status: complete.
+
+## Current Implementation Stage
+
+All v1.4.3 quickstart Semgrep calibration stages are complete on branch `codex/v1.4.3-quickstart-semgrep-calibration`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |
@@ -208,3 +240,4 @@ All v1.4.2 Trivy DB resilience implementation stages are complete on branch `cod
 | Quickstart ENOLOCK fixture still produced `FAIL` and a repair-pack. | 1 | Expected red test; add quickstart-only setup-gap behavior. |
 | Skill quick start and package version assertions still reflected `v1.4.0`. | 1 | Expected red test; update docs and metadata in Stage 4. |
 | Full `npm test` failed because a release manifest fixture still used `1.4.0` while package metadata was `1.4.1`. | 1 | Updated the fixture to `1.4.1` and re-ran release-trust tests. |
+| Real-project v1.4.3 smoke still blocked Semgrep hardening findings. | 1 | Found Semgrep JSON was truncated before rule parsing; added per-command output limit and used a larger limit for Semgrep JSON. |
