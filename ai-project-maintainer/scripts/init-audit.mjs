@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   defaultBusinessFlows,
+  defaultDataBoundaries,
+  defaultAuthzMatrix,
   defaultEvidenceSources,
   defaultProjectProfile,
   defaultRiskPolicy,
@@ -114,6 +116,8 @@ export function initAudit(projectRoot, options = {}) {
 
   safeWrite(root, ".ai-maintainer/project-profile.yml", yamlTemplate(projectProfileTemplate(options.profile)), result);
   safeWrite(root, ".ai-maintainer/evidence-sources.yml", yamlTemplate(defaultEvidenceSources), result);
+  safeWrite(root, ".ai-maintainer/data-boundaries.yml", yamlTemplate(defaultDataBoundaries), result);
+  safeWrite(root, ".ai-maintainer/authz-matrix.yml", yamlTemplate(defaultAuthzMatrix), result);
   safeWrite(root, ".ai-maintainer/business-flows.yml", yamlTemplate(defaultBusinessFlows), result);
   safeWrite(root, ".ai-maintainer/risk-policy.yml", yamlTemplate(defaultRiskPolicy), result);
   safeWrite(root, ".ai-maintainer/connectors.yml", connectorsTemplate(), result);

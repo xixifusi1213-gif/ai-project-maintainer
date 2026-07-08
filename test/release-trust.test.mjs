@@ -21,7 +21,7 @@ function writeJson(filePath, value) {
 
 test("release manifest records tarball, SBOM, and security report hashes", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "apm-release-manifest-"));
-  const tarball = path.join(dir, "ai-project-maintainer-1.4.4.tgz");
+  const tarball = path.join(dir, "ai-project-maintainer-1.5.0.tgz");
   const sbom = path.join(dir, "sbom.cdx.json");
   const report = path.join(dir, "security-report.json");
   const output = path.join(dir, "release-manifest.json");
@@ -30,8 +30,8 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
   fs.writeFileSync(report, '{"overallStatus":"PASS"}');
 
   const { manifest, markdownOutput } = writeReleaseManifest({
-    version: "1.4.4",
-    tag: "v1.4.4",
+    version: "1.5.0",
+    tag: "v1.5.0",
     tarball,
     sbom,
     report,
@@ -39,14 +39,14 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
     commit: "abc123",
   });
 
-  assert.equal(manifest.package.version, "1.4.4");
-  assert.equal(manifest.git.tag, "v1.4.4");
+  assert.equal(manifest.package.version, "1.5.0");
+  assert.equal(manifest.git.tag, "v1.5.0");
   assert.equal(manifest.git.commit, "abc123");
   assert.equal(manifest.artifacts.tarball.sha256, sha256("package-bytes"));
   assert.equal(manifest.artifacts.sbom.sha256, sha256('{"bomFormat":"CycloneDX"}'));
   assert.equal(manifest.artifacts.securityReport.sha256, sha256('{"overallStatus":"PASS"}'));
   assert.equal(fs.existsSync(output), true);
-  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.4\.4/);
+  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.5\.0/);
 });
 
 test("prepublish verification validates versions, tag, release notes, and tarball name", () => {

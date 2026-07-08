@@ -294,6 +294,68 @@ Run a lightweight promotion and validation batch for `ai-project-maintainer@late
 
 All v1.4.4 promotion smoke stages are complete. PR #22 is merged; no npm release was needed because this was documentation and issue-template work only.
 
+## Research: v1.5.0 Production Accident / Data Exposure Gate
+
+## Objective
+
+Research and design the next major product upgrade: a production-incident and data-exposure gate that turns business boundaries into concrete evidence, checks, blockers, gaps, and AI repair tasks.
+
+## Scope
+
+- Compare the desired product floor against primary security and software supply-chain standards.
+- Map common AI-coded production accident categories to actionable gate checks.
+- Inspect the current tool's existing coverage and identify remaining product gaps.
+- Produce a practical v1.5.0 design that improves on the baseline without claiming absolute safety.
+
+## Out of Scope
+
+- Implementing v1.5.0 production code in this research phase.
+- Adding new connectors, scanners, or benchmark categories before the gate design is clear.
+- Claiming compliance certification, absolute security, or protection against 0day, professional attackers, malicious insiders, or targeted supply-chain attacks.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Research primary standards and incident classes. Status: complete.
+3. Inspect current implementation coverage and gaps. Status: complete.
+4. Draft the v1.5.0 gate design, acceptance criteria, and implementation sequence. Status: complete.
+
+## Current Research Stage
+
+All v1.5.0 production accident / data exposure gate research stages are complete on branch `codex/v1.5-production-gate-research`.
+
+## Implementation: v1.5.0 Production Accident / Data Exposure Gate
+
+## Objective
+
+Implement the production accident and data exposure gate described in the v1.5.0 execution plan.
+
+## Scope
+
+- Add structured production safety intake for data boundaries and authorization matrix.
+- Extend business-flow safety evidence with idempotency, replay safety, side effects, and abuse controls.
+- Make production strict release gates block missing data/auth/business-flow/database safety evidence while keeping quickstart low-friction.
+- Ensure repair-pack treats production data/auth gaps as maintainer decisions or manual review, not AI guesswork.
+- Update documentation and release metadata to `1.5.0`.
+
+## Out of Scope
+
+- New scanners or connectors.
+- Cloud write operations or production mutations.
+- Claims of absolute security or resistance to professional targeted attacks.
+
+## Stages
+
+1. Prepare implementation context and planning files. Status: complete.
+2. Add focused failing tests for new intake templates, production gate behavior, quickstart behavior, repair-pack task typing, and release metadata. Status: complete.
+3. Implement intake model, audit plan checks, and production gate blocking rules. Status: complete.
+4. Update repair-pack, docs, and release metadata. Status: complete.
+5. Run focused and full verification. Status: complete.
+
+## Current Implementation Stage
+
+All v1.5.0 production accident / data exposure gate implementation stages are complete on branch `codex/v1.5-production-gate-research`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |

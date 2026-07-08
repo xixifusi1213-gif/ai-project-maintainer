@@ -9,6 +9,10 @@ It is not a certification, compliance claim, audit opinion, or guarantee that a 
 | Source | What it supports |
 | --- | --- |
 | [NIST SSDF SP 800-218](https://csrc.nist.gov/pubs/sp/800/218/final) | Secure software development, testing, vulnerability review, and release practices. |
+| [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) | Application security verification for access control, data protection, logging, and business logic. |
+| [OWASP API Security Top 10](https://owasp.org/API-Security/) | API authorization and sensitive business-flow abuse categories. |
+| [NIST Privacy Framework](https://www.nist.gov/privacy-framework) | Privacy risk management for personal and sensitive data. |
+| [CISA Secure by Design](https://www.cisa.gov/resources-tools/resources/secure-by-design) | Safer defaults and shifting security burden toward the software producer. |
 | [OWASP SAMM](https://owasp.org/www-project-samm/) | Governance, design, implementation, verification, and operations maturity. |
 | [SLSA](https://slsa.dev/) | Build integrity, provenance, and software supply-chain trust. |
 | [OpenSSF Scorecard](https://scorecard.dev/) | Open source project security posture and supply-chain hygiene. |
@@ -31,11 +35,15 @@ It is not a certification, compliance claim, audit opinion, or guarantee that a 
 | CI security | `ci-security` | OpenSSF Scorecard, SLSA, Google SRE Release Engineering |
 | Release trust chain | npm provenance, GitHub attestation, release manifest | SLSA, OpenSSF Scorecard, Google SRE Release Engineering |
 | Infrastructure and app configuration | `iac`, `electron` | NIST SSDF, OWASP SAMM |
-| Database migration risk | `database`, `production-evidence` migration checks | OWASP SAMM Operations, Google SRE Release Engineering |
-| Release approval and deployment evidence | `production-audit`, `production-evidence` | Google SRE Release Engineering, Google SRE Embracing Risk, DORA |
-| Monitoring, logs, metrics, and alerts | `production-audit`, `production-evidence` | Google SRE Monitoring, Google SRE Embracing Risk |
-| Backup, rollback, and recovery | `production-audit` | CIS Control 11, NIST SP 800-34, Google SRE Release Engineering |
-| Risk acceptance | `production-audit` `USER_DECISION` | Google SRE Embracing Risk |
+| Database migration risk | `database`, `database-safety`, `production-evidence` migration checks | OWASP SAMM Operations, Google SRE Release Engineering |
+| Data exposure and sensitive logs | `data-exposure` | OWASP ASVS, NIST Privacy Framework, CISA Secure by Design |
+| Authorization boundary and tenant/object access | `auth-boundary` | OWASP ASVS, OWASP API Security Top 10, NIST SSDF |
+| Sensitive business-flow abuse and idempotency | `business-flow-safety` | OWASP API Security Top 10, OWASP ASVS, Google SRE Embracing Risk |
+| Release approval and deployment evidence | `operational-safety`, `production-evidence` | Google SRE Release Engineering, Google SRE Embracing Risk, DORA |
+| Monitoring, logs, metrics, and alerts | `operational-safety`, `production-evidence` | Google SRE Monitoring, Google SRE Embracing Risk |
+| Backup, rollback, and recovery | `database-safety` | CIS Control 11, NIST SP 800-34, Google SRE Release Engineering |
+| Risk acceptance | production safety `USER_DECISION` checks | Google SRE Embracing Risk |
+| AI repair safety | `ai-repair-safety`, `agent-risk` | OWASP Top 10 for LLM Applications, OWASP Agentic AI, NIST SSDF |
 | AI agent and MCP risk | `agent-risk` | OWASP Top 10 for LLM Applications, OWASP Agentic AI, NIST SSDF, OWASP SAMM |
 
 ## How Reports Use This

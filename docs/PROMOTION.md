@@ -1,6 +1,6 @@
 # Promotion Kit
 
-Use this after the repository has npm, CI, Security workflow, demo, license, social preview, and a release.
+Use this after npm, CI, the Security workflow, demo, license, social preview, and a release are ready.
 
 ## Account Boundary
 
@@ -13,13 +13,14 @@ Start with channels you control:
 - npm package page
 - direct link to the demo case
 - direct link to the real-project smoke summary
+- quickstart feedback issues
 
 ## GitHub About
 
 Description:
 
 ```text
-Release readiness gate for AI-coded projects.
+Production maintenance gate for AI-coded projects.
 ```
 
 Topics:
@@ -42,32 +43,34 @@ ai-agents
 ```text
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.0
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
+Production gate research: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/PRODUCTION-GATE-RESEARCH.zh-CN.md
 ```
 
 ## English Short Post
 
 ```text
-I built AI Project Maintainer: a release readiness gate for AI-coded projects.
+I built AI Project Maintainer v1.5.0: a production accident gate for AI-coded projects.
 
-AI writes code fast, but shipping safely still needs tests, security checks, release evidence, monitoring gaps, and maintainer decisions.
+AI writes code fast, but production use still needs evidence for data boundaries, object-level authorization, critical business flows, database write safety, monitoring gaps, and maintainer decisions.
 
-The first command is now:
+The first command is still:
 
 npx ai-project-maintainer quickstart .
 
-It is report-only by default: detect the project profile, run a lightweight gate, write a short summary, and generate an AI repair-pack only when blockers exist. PASS_WITH_GAPS is not a production safety guarantee. It means quickstart found no blockers, but release evidence or maintainer decisions are still missing.
+Quickstart is report-only by default. It detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack only when blockers exist.
 
-I also ran ai-project-maintainer@latest against public projects including p-limit, defu, cors, chalk, and execa. Four completed as PASS_WITH_GAPS; execa produced a real Semgrep child-process blocker for maintainer triage. That is the shape I want: low-friction first run, conservative blockers, and explicit gaps instead of false confidence.
+v1.5.0 adds structured production accident checks for data exposure, authorization matrices, sensitive log boundaries, idempotency/replay safety, and business-flow abuse controls. Missing evidence becomes an explicit gap in quickstart and can become a blocker in the full production release gate.
+
+PASS_WITH_GAPS is not a production safety guarantee. It means no quickstart blocker failed, while release evidence still needs maintainer confirmation.
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.0
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
-Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
 ```
 
 ## Show HN
@@ -75,67 +78,63 @@ Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/bl
 Title:
 
 ```text
-Show HN: AI Project Maintainer - quickstart gate for AI-coded projects
+Show HN: Production accident gate for AI-coded projects
 ```
 
 Body:
 
 ```text
-I built a local/CI gate for AI-coded projects.
+I built AI Project Maintainer, a local/CI gate for AI-coded projects.
 
-The idea is simple: AI can write code quickly, but the hard part is proving a project is ready enough to ship. This tool turns that into a repeatable loop:
+AI can write code quickly, but the hard part is proving a project is ready enough to ship. This tool turns that into a repeatable loop:
 
-project profile -> audit plan -> local/CI gate -> evidence report -> AI fixes -> rerun
+project profile -> production intake -> local/CI gate -> evidence report -> AI repair-pack -> rerun
 
-The first command is now:
+The first command is:
 
 npx ai-project-maintainer quickstart .
 
 Quickstart is intentionally low-friction and report-only. It detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack only when blockers exist.
 
-It wraps tools like Gitleaks, Trivy, Semgrep, OSV-Scanner, Syft, Grype, actionlint, and zizmor, but adds a production audit layer. It reports missing monitoring, release approval, database backup/rollback evidence, and business-flow test gaps as explicit GAP or USER_DECISION items.
+v1.5.0 adds production accident checks for data exposure, object-level authorization, sensitive logs, business-flow idempotency, replay safety, database write safety, and abuse controls. PASS_WITH_GAPS is not a production safety guarantee; it means missing evidence stays visible instead of being mistaken for readiness.
 
-I ran the published npm package against five public projects. The command completed for all five; four reported PASS_WITH_GAPS with no repair pack, and one generated a repair pack for a code-level Semgrep blocker.
-
-PASS_WITH_GAPS is not a production safety guarantee. It means no quickstart blocker failed, while release evidence still needs maintainer confirmation.
-
-Feedback on the first-run report, false positives, and positioning would be very useful.
+Feedback on first-run friction, false positives, and which production evidence gaps are most useful would be very helpful.
 ```
 
 ## Chinese Short Post
 
 ```text
-我做了一个给 AI coding 项目的发布前维护门禁：AI Project Maintainer。
+我做了 AI Project Maintainer v1.5.0：一个给 AI-coded 产品用的生产事故门禁。
 
-AI 写代码很快，但上线前仍然需要测试、安全检查、依赖审计、发布证据、监控告警、回滚策略和维护者判断。
+AI 写代码很快，但真正上线还需要证明：用户数据边界清楚、对象级授权有测试、关键业务流不会重复扣费/重复发货、数据库写入有事务/唯一约束/恢复方案、监控告警和发布证据不是空白。
 
-现在陌生用户第一步只需要跑：
+第一次使用仍然只需要：
 
 npx ai-project-maintainer quickstart .
 
-它会自动识别项目类型，跑轻量 gate，生成简短 summary；只有发现 blocker 时才生成 AI repair-pack。PASS_WITH_GAPS 不是生产安全保证，只表示 quickstart 没发现阻断项，但仍有证据缺口或需要维护者确认的事项。
+quickstart 默认只生成报告，不改项目配置。它会识别项目类型，跑轻量 gate，生成 summary；只有发现 blocker 时才生成 AI repair-pack。
 
-我也用 npm latest 跑了 5 个真实公开项目 smoke：p-limit、defu、cors、chalk、execa。5 个命令都能跑完，4 个是 PASS_WITH_GAPS，1 个因为 Semgrep 发现代码级 child_process 风险而生成 repair-pack。
+v1.5.0 新增的是生产事故层：data-boundaries.yml、authz-matrix.yml、业务流幂等/重放/滥用控制、敏感日志边界、数据库写入安全。quickstart 会把缺口显示成 GAP；完整 production strict release gate 可以把缺证据变成 blocker。
+
+PASS_WITH_GAPS 不是生产安全保证。它表示没有 quickstart blocker，但仍有生产证据或维护者决策缺口。
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
-Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.zh-CN.md
-Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.0
 ```
 
 ## V2EX / Zhihu / Juejin Outline
 
 ```text
-标题：我做了一个给 AI coding 项目的发布前维护门禁
+标题：我做了一个给 AI-coded 产品用的生产事故门禁
 
-1. 背景：AI 写代码变快后，维护、测试、安全和生产证据成了新的瓶颈。
-2. 问题：个人开发者和小团队不一定有安全团队、SRE、DBA，但仍然要对上线负责。
-3. 入口：第一次先跑 npx ai-project-maintainer quickstart .，不用先理解完整 gate 链条。
-4. 输出：项目类型、轻量检查、简短 summary；有 blocker 时自动生成 AI repair-pack。
-5. 边界：PASS_WITH_GAPS 不是生产安全保证，不替代最终人工审查，不托管用户数据。
-6. 真实 smoke：用 npm latest 跑 5 个公开项目，5 个命令都能完成，4 个无 blocker，1 个生成 repair-pack。
-7. 想要反馈：报告是否看得懂、哪些 blocker 太严格、哪些 gap 表达不清、真实项目首跑是否顺畅。
+1. 背景：AI coding 让一个人能做真实产品，但生产事故风险没有消失。
+2. 问题：常见事故不是 0day，而是数据越权、敏感日志、重复扣费、数据库误操作、监控和回滚缺失。
+3. 入口：第一次先跑 npx ai-project-maintainer quickstart .
+4. 输出：项目类型、轻量检查、summary；有 blocker 时自动生成 AI repair-pack。
+5. v1.5.0：新增 data-boundaries.yml、authz-matrix.yml、业务流幂等/重放/滥用控制。
+6. 边界：PASS_WITH_GAPS 不是生产安全保证；缺证据不能当成通过。
+7. 想要反馈：哪些 gap 有用，哪些太吵，报告是否能交给 Cursor / Claude Code / Cline / Codex。
 ```
 
 ## Reddit Targets
@@ -149,7 +148,7 @@ Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/bl
 Suggested title:
 
 ```text
-I built a quickstart release-readiness gate for AI-coded projects
+I built a production accident gate for AI-coded projects
 ```
 
 ## Feedback CTA
@@ -175,7 +174,7 @@ What was confusing or too strict:
 - [x] Security badge is green.
 - [x] Real demo link works.
 - [x] Before/after case exists.
-- [x] 90-second GIF exported from `docs/demo-output/90-second-demo.html`.
 - [x] Real project smoke summary exists.
 - [x] Quickstart feedback issue template exists.
+- [ ] v1.5.0 release published.
 - [ ] First external post published by the maintainer.

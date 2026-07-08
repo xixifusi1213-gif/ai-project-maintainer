@@ -84,6 +84,42 @@ test("repair pack turns GAP and USER_DECISION into maintainer decision tasks", (
   assert.equal(pack.tasks.every((task) => task.userDecisionRequired), true);
 });
 
+test("repair pack treats production data and authorization gaps as maintainer-owned work", () => {
+  const report = baseReport({
+    overallStatus: "FAIL",
+    passed: false,
+    checks: [
+      {
+        checkId: "production-data-boundaries",
+        group: "production-audit",
+        name: "production audit: Data boundaries",
+        status: "GAP",
+        blocking: true,
+        coverageGap: true,
+        summary: "Data boundary evidence is incomplete; this is not a discovered vulnerability.",
+        recommendation: "Fill .ai-maintainer/data-boundaries.yml.",
+      },
+      {
+        checkId: "production-authz-object-tests",
+        group: "production-audit",
+        name: "production audit: Object authorization tests",
+        status: "GAP",
+        blocking: true,
+        coverageGap: true,
+        summary: "Authorization matrix tests are missing.",
+        recommendation: "Fill .ai-maintainer/authz-matrix.yml.",
+      },
+    ],
+  });
+
+  const pack = buildRepairPack(report, { reportPath: "reports/security-report.json", projectRoot: "E:\\project" });
+
+  assert.equal(pack.summary.total, 2);
+  assert.equal(pack.tasks.every((task) => task.type === "needs_maintainer_decision"), true);
+  assert.equal(pack.tasks.every((task) => task.userDecisionRequired), true);
+  assert.match(pack.tasks[0].fixStrategy, /maintainer/i);
+});
+
 test("repair pack ignores passed and N/A checks", () => {
   const report = baseReport({
     overallStatus: "PASS",

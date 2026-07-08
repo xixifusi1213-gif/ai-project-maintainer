@@ -6,6 +6,8 @@ import { parseYaml } from "./yaml-support.mjs";
 export const intakeRelativePaths = {
   profile: ".ai-maintainer/project-profile.yml",
   evidence: ".ai-maintainer/evidence-sources.yml",
+  dataBoundaries: ".ai-maintainer/data-boundaries.yml",
+  authzMatrix: ".ai-maintainer/authz-matrix.yml",
   businessFlows: ".ai-maintainer/business-flows.yml",
   riskPolicy: ".ai-maintainer/risk-policy.yml",
 };
@@ -27,6 +29,10 @@ export const defaultProjectProfile = {
     has_database: "auto",
     has_deployment: false,
     has_user_generated_content: false,
+    has_public_api: false,
+    has_admin_roles: false,
+    database_concurrent_writes: false,
+    database_audit_log: false,
   },
 };
 
@@ -63,7 +69,46 @@ export const defaultBusinessFlows = {
       name: "Replace with a real critical user flow",
       criticality: "high",
       expected_behavior: "Describe what must never break.",
+      side_effects: [],
+      abuse_controls: [],
+      idempotency_required: false,
+      replay_safe: false,
       tests: [],
+      template: true,
+    },
+  ],
+};
+
+export const defaultDataBoundaries = {
+  schema_version: 1,
+  data_classes: [
+    {
+      id: "example-user-data",
+      sensitivity: "personal",
+      fields: [],
+      stored_in: [],
+      exposed_to: [],
+      may_appear_in_logs: false,
+      tests: [],
+      template: true,
+    },
+  ],
+};
+
+export const defaultAuthzMatrix = {
+  schema_version: 1,
+  roles: ["anonymous", "user", "admin"],
+  resources: [
+    {
+      id: "example-resource",
+      owner_field: "userId",
+      tenant_field: "",
+      actions: {
+        read: {
+          allowed_roles: ["owner", "admin"],
+          tests: [],
+        },
+      },
       template: true,
     },
   ],
@@ -141,11 +186,15 @@ export function loadIntake(projectRoot, project = {}, options = {}) {
   const parseErrors = [];
   const profileDocument = readYaml(root, intakeRelativePaths.profile, defaultProjectProfile, parseErrors);
   const evidenceDocument = readYaml(root, intakeRelativePaths.evidence, defaultEvidenceSources, parseErrors);
+  const dataBoundariesDocument = readYaml(root, intakeRelativePaths.dataBoundaries, defaultDataBoundaries, parseErrors);
+  const authzMatrixDocument = readYaml(root, intakeRelativePaths.authzMatrix, defaultAuthzMatrix, parseErrors);
   const businessDocument = readYaml(root, intakeRelativePaths.businessFlows, defaultBusinessFlows, parseErrors);
   const riskDocument = readYaml(root, intakeRelativePaths.riskPolicy, defaultRiskPolicy, parseErrors);
 
   const profile = deepMerge(defaultProjectProfile, profileDocument.value);
   const evidence = deepMerge(defaultEvidenceSources, evidenceDocument.value);
+  const dataBoundaries = deepMerge(defaultDataBoundaries, dataBoundariesDocument.value);
+  const authzMatrix = deepMerge(defaultAuthzMatrix, authzMatrixDocument.value);
   const businessFlows = deepMerge(defaultBusinessFlows, businessDocument.value);
   const riskPolicy = deepMerge(defaultRiskPolicy, riskDocument.value);
 
@@ -182,6 +231,8 @@ export function loadIntake(projectRoot, project = {}, options = {}) {
     initialized: profileDocument.exists,
     profile,
     evidence,
+    dataBoundaries,
+    authzMatrix,
     businessFlows,
     riskPolicy,
     parseErrors,

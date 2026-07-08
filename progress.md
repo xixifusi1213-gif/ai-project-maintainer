@@ -284,3 +284,73 @@
 ## v1.4.4 Promotion Smoke Completion
 
 - v1.4.4 promotion and real-project quickstart smoke documentation is complete and merged.
+
+## v1.5.0 Production Gate Research: 2026-07-09
+
+- User requested a technical research pass to ensure the next upgrade can meet or exceed the practical baseline for AI-coded production products.
+- Read the `agent-reach` and `planning-with-files` skill instructions because this is a research task that should update persistent planning files.
+- Ran planning session catch-up and recovered the latest discussion context about product meaning, production incidents, data leakage, and Codex Security's role.
+- Confirmed the worktree is on `main`, aligned with `origin/main`, with only untracked `.serena/` local metadata.
+- Created branch `codex/v1.5-production-gate-research`.
+- Started the v1.5.0 production accident / data exposure gate research section in `task_plan.md` and `findings.md`.
+- Completed the first external-source pass using primary standards and official guidance:
+  - OWASP ASVS, API Security Top 10, Authorization Testing Automation, Logging Cheat Sheet, Top 10:2025, and LLM Top 10.
+  - NIST SSDF, CSF 2.0, Privacy Framework, and AI RMF.
+  - CISA Secure by Design and AI Secure by Design guidance.
+  - SLSA and OpenSSF Scorecard.
+- Recorded the standard-to-product implications in `findings.md`.
+- Inspected local audit, gate, intake, policy, profile, report, repair-pack, and production-gate test code.
+- Confirmed current production readiness checks are broad but still evidence-light for data exposure, object-level authorization, tenant isolation, business-flow abuse, idempotency, and AI repair invariants.
+- Recorded the current coverage and v1.5.0 gap model in `findings.md`.
+- Added `docs/PRODUCTION-GATE-RESEARCH.zh-CN.md` with the v1.5.0 design, source standard mapping, current coverage, gaps, proposed schemas, gate groups, Codex Security integration point, acceptance criteria, and recommended implementation sequence.
+- Marked all v1.5.0 production gate research stages complete in `task_plan.md`.
+- Ran `agent-reach check-update`; it reported the installed Agent Reach version is current.
+
+## v1.5.0 Production Gate Implementation: 2026-07-09
+
+- User approved the v1.5.0 execution plan and requested implementation.
+- Read Serena initial instructions, executing-plans, test-driven-development, planning-with-files, and ai-project-maintainer skill guidance.
+- Ran planning session catch-up; it reported the approved plan and implementation request as unsynced context.
+- Confirmed current branch is `codex/v1.5-production-gate-research`.
+- Confirmed current uncommitted work is the v1.5.0 research/planning files plus untracked `.serena/`.
+- Recorded the v1.5.0 implementation scope and stages in `task_plan.md` and findings in `findings.md`.
+- Added focused red tests for data-boundary/authz templates, intake parsing, production gate blocking, quickstart production gap messaging, repair-pack task typing, and v1.5.0 release metadata.
+- Ran focused tests; 11 failures were expected red results for missing v1.5.0 behavior and stale version metadata. The repair-pack production-gap task typing test already passed with existing behavior.
+- Implemented v1.5.0 production safety model support:
+  - `loadIntake` now reads `data-boundaries.yml` and `authz-matrix.yml`.
+  - `init-audit` and the wizard now generate the new templates.
+  - `business-flows.yml` supports side effects, abuse controls, idempotency, and replay safety.
+  - `audit-plan` now reports data-exposure, auth-boundary, business-flow-safety, database-safety, and AI repair safety items.
+  - `quickstart` surfaces production readiness gaps without turning them into blockers or repair-pack tasks.
+- Updated package metadata to `1.5.0`.
+- Re-ran focused tests; all 57 focused tests passed.
+- Completed v1.5.0 documentation and release metadata updates, including README, local gate docs, repair-pack docs, report schema, standards crosswalk, promotion copy, launch checklist, quickstart feedback template, and `docs/releases/v1.5.0.md`.
+- Re-ran the expanded focused test set including CLI, release trust, demo workflow, quickstart, init-audit, audit-plan, production gate, and repair-pack tests; all 64 tests passed.
+- Checked for unexpected stale `v1.4.4` references and mojibake markers in updated public docs; no unexpected matches were found.
+- Ran full verification:
+  - `npm test` passed with 148 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `npm pack --dry-run` produced `ai-project-maintainer-1.5.0.tgz`.
+  - `npm run release:verify:pre` passed for `v1.5.0`.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF warnings.
+- Added explicit production accident report groups for data exposure, authorization boundary, business-flow safety, database safety, operational safety, and AI repair safety.
+- Re-ran affected tests and full verification after the group change:
+  - focused v1.5.0/report tests passed with 72 tests.
+  - `npm test` passed with 148 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `npm pack --dry-run` produced `ai-project-maintainer-1.5.0.tgz`.
+  - `npm run release:verify:pre` passed for `v1.5.0`.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF warnings.
+- Tightened the production group mapping so declared critical flows remain under `business-flow-safety` and CI production review appears under `operational-safety`.
+- Final verification after that last consistency fix passed:
+  - focused affected tests passed with 20 tests.
+  - `npm test` passed with 148 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `npm pack --dry-run` produced `ai-project-maintainer-1.5.0.tgz`.
+  - `npm run release:verify:pre` passed for `v1.5.0`.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF warnings.
+
+## v1.5.0 Production Gate Implementation Completion
+
+- All planned v1.5.0 production accident / data exposure gate implementation stages are complete.
+- `.serena/` remains untracked and untouched by product changes.

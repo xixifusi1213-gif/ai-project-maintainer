@@ -48,7 +48,7 @@ npx ai-project-maintainer quickstart ".\my-project"
 - `reports/quickstart-security-report.sarif`
 - `reports/quickstart-repair-pack/` when blockers exist
 
-Give `quickstart-summary.md`, the detailed report, and any generated repair-pack files to Cursor, Claude Code, Cline, or Codex. `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production.
+Give `quickstart-summary.md`, the detailed report, and any generated repair-pack files to Cursor, Claude Code, Cline, or Codex. `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production. In v1.5.0, quickstart also points out missing production data/auth/business-flow model files without turning first-run gaps into blockers.
 
 If a brand-new npm project has `package.json` but no `package-lock.json`, quickstart records dependency audit as a setup gap instead of a blocker. Run `npm install --package-lock-only`, then rerun quickstart when you want npm audit evidence.
 
@@ -94,7 +94,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.4 --tag v1.4.4 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.5.0 --tag v1.5.0 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates
@@ -212,11 +212,13 @@ The repository stores links, metadata, and generated reports. It does not vendor
 
 ## Production Audit, Not Just Scanning
 
-V3 adds an intake-driven audit layer:
+v1.5.0 adds an intake-driven production accident and data-exposure layer:
 
 ```text
 .ai-maintainer/project-profile.yml
 .ai-maintainer/evidence-sources.yml
+.ai-maintainer/data-boundaries.yml
+.ai-maintainer/authz-matrix.yml
 .ai-maintainer/business-flows.yml
 .ai-maintainer/risk-policy.yml
 .ai-maintainer/intake-summary.md
@@ -227,7 +229,16 @@ V3 adds an intake-driven audit layer:
 .ai-maintainer/observability-checklist.yml
 ```
 
-v0.6.0 adds a guided intake wizard:
+The new production safety files let the full production gate check:
+
+- data classes, sensitive fields, response/log boundaries, and redaction tests
+- roles, protected resources, owner/tenant fields, actions, and object-level authorization tests
+- critical business flows with side effects, abuse controls, idempotency, replay safety, and linked tests
+- database write safety, audit logs, backup, rollback, and migration review evidence
+
+This is not a production safety guarantee. It prevents missing business/data/security evidence from being mistaken for release readiness.
+
+The guided intake wizard writes these files:
 
 ```powershell
 npx ai-project-maintainer init-audit "E:\my-project" --wizard

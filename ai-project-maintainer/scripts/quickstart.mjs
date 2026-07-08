@@ -1,5 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import { buildAuditPlan } from "./audit-plan.mjs";
+import { detectProject } from "./lib/project-detect.mjs";
+import { loadIntake } from "./lib/intake.mjs";
 import { runRepairPack } from "./repair-pack.mjs";
 import { runLocalGate } from "./run-local-gate.mjs";
 
@@ -79,6 +82,32 @@ function warningNotes(report, limit = 5) {
       status: check.status,
       summary: check.summary || "",
       recommendation: check.recommendation || "",
+    }));
+}
+
+function productionReadinessNotes(root, limit = 8) {
+  const project = detectProject(root);
+  const intake = loadIntake(root, project, { profile: "auto" });
+  const audit = buildAuditPlan(project, intake);
+  const importantIds = new Set([
+    "data-boundaries",
+    "sensitive-log-redaction",
+    "authz-matrix",
+    "authz-object-tests",
+    "business-flow-idempotency",
+    "business-flow-abuse-controls",
+    "database-write-safety",
+    "database-audit-log",
+  ]);
+  return [...(audit.coverageGaps || []), ...(audit.userDecisions || [])]
+    .filter((item) => importantIds.has(item.id))
+    .slice(0, limit)
+    .map((item) => ({
+      id: item.id,
+      title: item.title,
+      status: item.status,
+      summary: item.summary || "",
+      recommendation: item.recommendation || "",
     }));
 }
 
@@ -173,6 +202,7 @@ export function buildQuickstartSummary(report, options = {}) {
     setupNotes: setupNotes(report),
     warnings: warningNotes(report),
     coverageGaps: coverageGapNotes(report),
+    productionReadinessGaps: options.productionReadinessNotes || [],
     files,
     handoffFiles: buildHandoffFiles(files),
     nextCommands: {
@@ -237,6 +267,14 @@ export function toQuickstartMarkdown(summary) {
     }
     lines.push("");
   }
+  if (summary.productionReadinessGaps?.length) {
+    lines.push("## Production Readiness Gaps");
+    lines.push("Quickstart does not block on these, but the full production gate can require them before release:");
+    for (const gap of summary.productionReadinessGaps) {
+      lines.push(`- ${gap.title}: ${gap.summary}${gap.recommendation ? ` ${gap.recommendation}` : ""}`.trim());
+    }
+    lines.push("");
+  }
   lines.push("## AI Agent Handoff");
   lines.push("Give these files to Cursor, Claude Code, Cline, or Codex:");
   for (const file of summary.handoffFiles) {
@@ -280,6 +318,7 @@ export function runQuickstart(projectRoot = process.cwd(), options = {}) {
     reportsDir,
     securityReportJson,
     repairPackResult,
+    productionReadinessNotes: productionReadinessNotes(root),
   });
 
   writeQuickstartSummary(summary);

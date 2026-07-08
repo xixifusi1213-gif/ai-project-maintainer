@@ -13,7 +13,7 @@ body:
     attributes:
       label: Version
       description: Paste the npm version you used.
-      placeholder: "1.4.4"
+      placeholder: "1.5.0"
     validations:
       required: true
   - type: textarea

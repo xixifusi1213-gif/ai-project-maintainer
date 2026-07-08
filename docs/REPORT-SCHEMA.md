@@ -4,6 +4,17 @@ v1.0.0 marks the public report format as stable for the `1.x` release line.
 
 The tool may add new fields in `1.x`, but it should not remove or rename stable fields until `2.0`.
 
+v1.5.0 adds production safety inputs and audit items for data boundaries, authorization matrices, critical business-flow safety, database write safety, and AI repair safety. These are additive to the stable report shape.
+
+Production accident checks may use more specific `group` values instead of the older broad `production-audit` group:
+
+- `data-exposure`
+- `auth-boundary`
+- `business-flow-safety`
+- `database-safety`
+- `operational-safety`
+- `ai-repair-safety`
+
 ## Stable CLI Commands
 
 The following commands are stable for the `1.x` release line:
@@ -34,6 +45,18 @@ The following fields are stable in `reports/security-report.json`:
 - `audit`
 - `agentRisk`
 - `standards`
+
+The `audit.plan`, `audit.coverageGaps`, and generated `checks` may include production safety ids such as:
+
+- `data-boundaries`
+- `sensitive-log-redaction`
+- `authz-matrix`
+- `authz-object-tests`
+- `business-flow-idempotency`
+- `business-flow-abuse-controls`
+- `database-write-safety`
+- `database-audit-log`
+- `ai-repair-safety`
 
 Each check item should keep:
 

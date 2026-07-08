@@ -42,6 +42,8 @@ Examples: failing tests, dangerous Electron settings, dependency upgrades, stati
 
 Examples: missing production monitoring evidence, missing business-flow declarations, release approval decisions, production evidence gaps.
 
+v1.5.0 production safety examples: missing `data-boundaries.yml`, missing `authz-matrix.yml`, missing object-level authorization tests, missing sensitive-log redaction evidence, or missing idempotency/replay evidence for payment/order/webhook/cron/queue flows.
+
 `manual_review_required`: the agent can prepare evidence and suggestions, but a human must approve the actual change.
 
 Examples: exposed secrets that require credential rotation, complex database migrations, permission model changes, production rollback strategy.
@@ -116,3 +118,5 @@ Fix auto_fix_candidate tasks first. Ask the maintainer before changing needs_mai
 ```
 
 Do not let an agent treat production `GAP`, `needs_maintainer_decision`, or `manual_review_required` tasks as permission to invent evidence or accept risk. Those tasks require the maintainer to answer, provide evidence, or explicitly accept the risk.
+
+For production data or authorization gaps, the agent may draft tests, inspect code paths, or propose YAML updates, but it must not claim that user data, tenant isolation, admin permissions, logs, payments, orders, webhooks, queues, or database writes are safe without maintainer-confirmed evidence.
