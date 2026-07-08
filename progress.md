@@ -242,3 +242,11 @@
   - `npm pack --dry-run` produced `ai-project-maintainer-1.4.4.tgz`.
   - `npm run release:verify:pre` passed for `v1.4.4`.
   - `git diff --check` exited successfully with only Windows LF-to-CRLF conversion warnings.
+- Created PR #21, waited for CI, merged it, pushed tag `v1.4.4`, and monitored Publish run `28922843243` to success.
+- Confirmed npm reports `ai-project-maintainer@1.4.4` and `latest: 1.4.4`.
+- Confirmed GitHub Release `v1.4.4` is published: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
+- Downloaded the v1.4.4 release manifest and reran local Windows published-release verification; it passed.
+
+## v1.4.4 Completion
+
+- v1.4.4 is published and verified.

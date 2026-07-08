@@ -257,11 +257,11 @@ Fix local Windows published-release verification after v1.4.3, where `spawnSync(
 2. Add focused release verification tests. Status: complete.
 3. Implement Windows npm shim target handling. Status: complete.
 4. Update release metadata and docs. Status: complete.
-5. Run focused/full verification and publish. Status: in_progress.
+5. Run focused/full verification and publish. Status: complete.
 
 ## Current Implementation Stage
 
-Stage 5 is in progress on branch `codex/v1.4.4-windows-release-verify`.
+All v1.4.4 Windows release verify shim stages are complete. `v1.4.4` is published on npm and GitHub Releases.
 
 ## Errors Encountered
 
