@@ -37,10 +37,22 @@ export function resolveSpawnCommand(command, platform = process.platform) {
   return command;
 }
 
+export function resolveSpawnTarget(command, args, platform = process.platform, env = process.env) {
+  const resolved = resolveSpawnCommand(command, platform);
+  if (platform === "win32" && resolved === "npm.cmd") {
+    return {
+      command: env.ComSpec || env.comspec || "cmd.exe",
+      args: ["/d", "/s", "/c", "call", resolved, ...args],
+    };
+  }
+  return { command: resolved, args };
+}
+
 function defaultRunner(command, args, options = {}) {
   // The verifier calls a fixed set of release-inspection commands without shell expansion.
+  const target = resolveSpawnTarget(command, args);
   // nosemgrep: javascript.lang.security.detect-child-process.detect-child-process
-  const result = spawnSync(resolveSpawnCommand(command), args, {
+  const result = spawnSync(target.command, target.args, {
     cwd: options.cwd || repoRoot,
     encoding: "utf8",
     timeout: options.timeoutMs || 60_000,

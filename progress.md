@@ -221,3 +221,24 @@
 ## v1.4.3 Completion
 
 - All planned v1.4.3 quickstart Semgrep calibration stages are complete on branch `codex/v1.4.3-quickstart-semgrep-calibration`.
+- Created and merged PR #20, then pushed tag `v1.4.3`.
+- GitHub Actions Publish run `28921765299` succeeded, including trusted npm publish, GitHub Release creation, and published-release alignment verification.
+- Confirmed npm reports `ai-project-maintainer@1.4.3` and `latest: 1.4.3`.
+- A local Windows rerun of published-release verification failed because `spawnSync("npm.cmd")` returned `EINVAL`; direct probing showed `cmd.exe /d /s /c call npm.cmd ...` succeeds.
+
+## v1.4.4 Windows Release Verify Shim: 2026-07-08
+
+- Created branch `codex/v1.4.4-windows-release-verify` from `main` after v1.4.3 publication.
+- Updated planning files with the v1.4.4 scope: fix local Windows npm shim handling in release verification only.
+- Added a focused release-trust test for Windows npm target resolution through `cmd.exe /d /s /c call npm.cmd`.
+- Implemented `resolveSpawnTarget` in `verify-release.mjs` and routed only Windows npm calls through the cmd call shim.
+- Ran `node --test test/release-trust.test.mjs`; all 8 tests passed.
+- Downloaded the v1.4.3 release manifest and reran local Windows published-release verification; it passed after the shim fix.
+- Bumped release metadata and docs to `1.4.4` and added `docs/releases/v1.4.4.md`.
+- Ran focused version/release docs tests: `node --test test/release-trust.test.mjs test/cli.test.mjs test/demo-and-security-workflow.test.mjs`; all 25 tests passed.
+- Ran full verification:
+  - `npm test` passed with 140 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `npm pack --dry-run` produced `ai-project-maintainer-1.4.4.tgz`.
+  - `npm run release:verify:pre` passed for `v1.4.4`.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF conversion warnings.
