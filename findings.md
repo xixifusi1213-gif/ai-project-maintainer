@@ -134,3 +134,12 @@
 - Trivy can scan successfully on this machine when a local DB cache exists and DB updates are skipped.
 - The product fix should make first-run robust by using Trivy's built-in repository fallback by default, supporting configured mirror lists, and retrying with cached DB when the online update fails.
 - A cached DB fallback should produce `PASS_WITH_GAPS` in non-strict quickstart, but strict release gates should still surface stale/incomplete DB freshness as blocking evidence.
+
+## v1.4.3 Quickstart Semgrep Calibration Findings
+
+- Real project smoke after v1.4.2 showed quickstart now runs reliably and Trivy passes, but three public npm projects still failed first-run quickstart because Semgrep reported supply-chain hardening recommendations as blockers.
+- Observed Semgrep rule families were GitHub Actions mutable tags, Dependabot missing cooldown, and npm missing minimum release age.
+- These are legitimate release hardening recommendations, but they are too aggressive as first-run quickstart blockers for unfamiliar users.
+- The fix should be quickstart-only and rule-specific. Strict release gates must continue to block Semgrep failures.
+- Follow-up smoke with local v1.4.3 code showed the first implementation still blocked because Semgrep JSON output was truncated to the command-runner tail limit before rule IDs were parsed.
+- After increasing Semgrep's captured JSON output limit, real-project smoke on `expressjs/cors`, `sindresorhus/p-limit`, and `unjs/defu` produced `PASS_WITH_GAPS` with zero blockers and no quickstart repair pack while keeping Semgrep findings visible as warnings.

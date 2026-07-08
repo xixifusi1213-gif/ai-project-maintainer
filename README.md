@@ -92,7 +92,7 @@ Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`,
 Published-release alignment can be checked with:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.2 --tag v1.4.2 --manifest dist/release-manifest.json
+node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.4.3 --tag v1.4.3 --manifest dist/release-manifest.json
 ```
 
 ## Profile-Aware Gates

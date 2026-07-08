@@ -20,6 +20,17 @@ function fakeTool(dir, name, body) {
   fs.chmodSync(file, 0o755);
 }
 
+function semgrepJson(checkIds) {
+  return JSON.stringify({
+    results: checkIds.map((checkId) => ({
+      check_id: checkId,
+      path: ".github/workflows/ci.yml",
+      start: { line: 1 },
+      extra: { message: "simulated semgrep finding" },
+    })),
+  });
+}
+
 test("non-strict mode reports missing tools as coverage gaps", () => {
   const root = tempProject();
   const report = runLocalGate(root, {
@@ -42,6 +53,35 @@ test("strict mode blocks missing required tools", () => {
 
   assert.equal(report.passed, false);
   assert.equal(report.blockers.some((check) => check.status === "missing"), true);
+});
+
+test("strict gate still blocks quickstart-downgraded Semgrep hardening findings", () => {
+  const root = tempProject();
+  const report = runLocalGate(root, {
+    strict: true,
+    release: false,
+    runnerOptions: {
+      commandRunner: (command, args) => {
+        if (command === "gitleaks") return { status: "pass", code: 0, stdout: "gitleaks clean" };
+        if (command === "trivy" && args[0] === "fs") return { status: "pass", code: 0, stdout: "trivy clean" };
+        if (command === "semgrep") {
+          return {
+            status: "fail",
+            code: 1,
+            stdout: semgrepJson(["yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag"]),
+            stderr: "1 blocking finding",
+          };
+        }
+        if (args.includes("--version")) return { status: "pass", code: 0, stdout: `${command} 1.0.0` };
+        return { status: "missing", code: null, stderr: `${command} missing` };
+      },
+    },
+  });
+  const semgrep = report.blockers.find((check) => check.checkId === "semgrep");
+
+  assert.equal(report.passed, false);
+  assert.equal(semgrep?.blocking, true);
+  assert.equal(semgrep?.status, "fail");
 });
 
 test("non-strict mode reports Trivy DB errors as coverage gaps", () => {

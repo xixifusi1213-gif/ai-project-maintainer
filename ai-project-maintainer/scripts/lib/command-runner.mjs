@@ -36,10 +36,11 @@ export function exists(filePath) {
   }
 }
 
-export function tail(value) {
+export function tail(value, limit = maxOutput) {
   const text = String(value || "").trim();
-  if (text.length <= maxOutput) return text;
-  return text.slice(text.length - maxOutput);
+  const outputLimit = Number.isFinite(limit) && limit > 0 ? limit : maxOutput;
+  if (text.length <= outputLimit) return text;
+  return text.slice(text.length - outputLimit);
 }
 
 export function commandPath(command, options = {}) {
@@ -79,6 +80,7 @@ function spawnTarget(resolved, args) {
 }
 
 export function runCommand(command, commandArgs = [], options = {}) {
+  const outputLimit = options.maxOutput || maxOutput;
   if (typeof options.commandRunner === "function") {
     const started = Date.now();
     const commandText = [command, ...commandArgs].join(" ");
@@ -86,8 +88,8 @@ export function runCommand(command, commandArgs = [], options = {}) {
     return {
       status: result.status || (result.code === 0 ? "pass" : "fail"),
       command: result.command || commandText,
-      stdout: tail(result.stdout),
-      stderr: tail(result.stderr || result.error?.message || ""),
+      stdout: tail(result.stdout, outputLimit),
+      stderr: tail(result.stderr || result.error?.message || "", outputLimit),
       code: result.code ?? null,
       durationMs: result.durationMs ?? Date.now() - started,
     };
@@ -121,8 +123,8 @@ export function runCommand(command, commandArgs = [], options = {}) {
   return {
     status: result.status === 0 ? "pass" : "fail",
     command: commandText,
-    stdout: tail(result.stdout),
-    stderr: tail(result.stderr || result.error?.message || ""),
+    stdout: tail(result.stdout, outputLimit),
+    stderr: tail(result.stderr || result.error?.message || "", outputLimit),
     code: result.status,
     durationMs: Date.now() - started,
   };

@@ -195,3 +195,29 @@
 - Verified `npx ai-project-maintainer@latest quickstart .` exits `0` with `PASS_WITH_GAPS` and no blockers.
 - Verified `npx ai-project-maintainer@latest gate . --profile auto --agent-risk --strict --release --output reports/security-report.json` exits `0` with `PASS_WITH_GAPS`; Trivy and package tests both pass, while optional tools remain coverage gaps.
 - Adjusted the v1.4.2 quickstart test to isolate environment variables so the local `TRIVY_TIMEOUT=10m` setting does not break `npm test`.
+
+## v1.4.3 Quickstart Semgrep Calibration: 2026-07-08
+
+- User approved the v1.4.3 direction from real project smoke.
+- Created branch `codex/v1.4.3-quickstart-semgrep-calibration` from `main` at `v1.4.2`.
+- Updated planning files with the v1.4.3 scope: quickstart-only Semgrep hardening downgrade, strict release gate unchanged.
+- Added focused tests for quickstart Semgrep hardening downgrade, non-hardening Semgrep blockers, and strict release gate preservation.
+- Implemented JSON Semgrep parsing and a rule-specific quickstart-only downgrade for selected supply-chain hardening findings.
+- Added warning details to `quickstart-summary.md` so downgraded findings remain visible.
+- Updated release metadata, launch docs, promotion copy, and release notes to `v1.4.3`.
+
+- Real-project v1.4.3 smoke still showed Semgrep as a blocker because the captured Semgrep JSON was truncated to the command-runner tail limit, so rule IDs could not be parsed. Next fix: add a per-command output capture limit and use it for Semgrep JSON.
+- Added a per-command output capture limit to the command runner and applied a larger limit to Semgrep JSON output.
+- Expanded the quickstart Semgrep test with JSON larger than the old 6000-character tail limit.
+- Ran `node --test test/quickstart.test.mjs test/gate.test.mjs`; all 17 focused tests passed.
+- Re-ran local v1.4.3 quickstart against `expressjs/cors`, `sindresorhus/p-limit`, and `unjs/defu`; all three exited `0`, reported `PASS_WITH_GAPS`, had zero blockers, marked Semgrep as `recommended-hardening`, and did not create a repair pack.
+- Ran full verification after the Semgrep output-limit fix:
+  - `npm test` passed with 140 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `npm pack --dry-run` produced `ai-project-maintainer-1.4.3.tgz`.
+  - `npm run release:verify:pre` passed for `v1.4.3`.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF conversion warnings.
+
+## v1.4.3 Completion
+
+- All planned v1.4.3 quickstart Semgrep calibration stages are complete on branch `codex/v1.4.3-quickstart-semgrep-calibration`.
