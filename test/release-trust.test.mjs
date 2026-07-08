@@ -7,7 +7,7 @@ import test from "node:test";
 import YAML from "yaml";
 
 import { writeReleaseManifest } from "../ai-project-maintainer/scripts/release-manifest.mjs";
-import { resolveSpawnCommand, verifyPrepublish, verifyPublished } from "../ai-project-maintainer/scripts/verify-release.mjs";
+import { resolveSpawnCommand, resolveSpawnTarget, verifyPrepublish, verifyPublished } from "../ai-project-maintainer/scripts/verify-release.mjs";
 import { buildJsonReport } from "../ai-project-maintainer/scripts/lib/report.mjs";
 
 function sha256(text) {
@@ -21,7 +21,7 @@ function writeJson(filePath, value) {
 
 test("release manifest records tarball, SBOM, and security report hashes", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "apm-release-manifest-"));
-  const tarball = path.join(dir, "ai-project-maintainer-1.4.3.tgz");
+  const tarball = path.join(dir, "ai-project-maintainer-1.4.4.tgz");
   const sbom = path.join(dir, "sbom.cdx.json");
   const report = path.join(dir, "security-report.json");
   const output = path.join(dir, "release-manifest.json");
@@ -30,8 +30,8 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
   fs.writeFileSync(report, '{"overallStatus":"PASS"}');
 
   const { manifest, markdownOutput } = writeReleaseManifest({
-    version: "1.4.3",
-    tag: "v1.4.3",
+    version: "1.4.4",
+    tag: "v1.4.4",
     tarball,
     sbom,
     report,
@@ -39,14 +39,14 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
     commit: "abc123",
   });
 
-  assert.equal(manifest.package.version, "1.4.3");
-  assert.equal(manifest.git.tag, "v1.4.3");
+  assert.equal(manifest.package.version, "1.4.4");
+  assert.equal(manifest.git.tag, "v1.4.4");
   assert.equal(manifest.git.commit, "abc123");
   assert.equal(manifest.artifacts.tarball.sha256, sha256("package-bytes"));
   assert.equal(manifest.artifacts.sbom.sha256, sha256('{"bomFormat":"CycloneDX"}'));
   assert.equal(manifest.artifacts.securityReport.sha256, sha256('{"overallStatus":"PASS"}'));
   assert.equal(fs.existsSync(output), true);
-  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.4\.3/);
+  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.4\.4/);
 });
 
 test("prepublish verification validates versions, tag, release notes, and tarball name", () => {
@@ -118,6 +118,16 @@ test("published verification resolves npm command for Windows without shell exec
   assert.equal(resolveSpawnCommand("npm", "win32"), "npm.cmd");
   assert.equal(resolveSpawnCommand("npm", "linux"), "npm");
   assert.equal(resolveSpawnCommand("git", "win32"), "git");
+
+  const npmTarget = resolveSpawnTarget("npm", ["--version"], "win32", { ComSpec: "C:\\Windows\\System32\\cmd.exe" });
+  assert.deepEqual(npmTarget, {
+    command: "C:\\Windows\\System32\\cmd.exe",
+    args: ["/d", "/s", "/c", "call", "npm.cmd", "--version"],
+  });
+  assert.deepEqual(resolveSpawnTarget("git", ["--version"], "win32"), {
+    command: "git",
+    args: ["--version"],
+  });
 });
 
 test("published verification reports spawn creation errors", () => {

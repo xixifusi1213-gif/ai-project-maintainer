@@ -232,6 +232,37 @@ Tune quickstart first-run severity so selected Semgrep supply-chain hardening re
 
 All v1.4.3 quickstart Semgrep calibration stages are complete on branch `codex/v1.4.3-quickstart-semgrep-calibration`.
 
+## Implementation: v1.4.4 Windows Release Verify Shim
+
+## Objective
+
+Fix local Windows published-release verification after v1.4.3, where `spawnSync("npm.cmd")` can fail with `EINVAL` even though `npm.cmd` exists.
+
+## Scope
+
+- Keep release verification shell-free from Node's `spawnSync` options.
+- Route Windows `npm.cmd` through `cmd.exe /d /s /c call npm.cmd ...`, matching the existing command-runner shim pattern.
+- Leave `git`, `gh`, and non-Windows commands unchanged.
+- Bump release metadata to `1.4.4` and add release notes.
+
+## Out of Scope
+
+- Changing quickstart/Semgrep behavior.
+- Changing the GitHub Actions trusted publishing workflow.
+- Adding new scanners or connectors.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Add focused release verification tests. Status: complete.
+3. Implement Windows npm shim target handling. Status: complete.
+4. Update release metadata and docs. Status: complete.
+5. Run focused/full verification and publish. Status: in_progress.
+
+## Current Implementation Stage
+
+Stage 5 is in progress on branch `codex/v1.4.4-windows-release-verify`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |
@@ -241,3 +272,4 @@ All v1.4.3 quickstart Semgrep calibration stages are complete on branch `codex/v
 | Skill quick start and package version assertions still reflected `v1.4.0`. | 1 | Expected red test; update docs and metadata in Stage 4. |
 | Full `npm test` failed because a release manifest fixture still used `1.4.0` while package metadata was `1.4.1`. | 1 | Updated the fixture to `1.4.1` and re-ran release-trust tests. |
 | Real-project v1.4.3 smoke still blocked Semgrep hardening findings. | 1 | Found Semgrep JSON was truncated before rule parsing; added per-command output limit and used a larger limit for Semgrep JSON. |
+| Local Windows published-release verification failed with `spawnSync npm.cmd EINVAL`. | 1 | Added a Windows npm target shim that invokes `cmd.exe /d /s /c call npm.cmd ...` without using `shell: true`. |

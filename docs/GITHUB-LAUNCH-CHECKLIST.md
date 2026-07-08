@@ -50,14 +50,14 @@ If GitHub asks for PNG/JPG, export the SVG to PNG at `1280x640`.
 Current release:
 
 ```text
-Tag: v1.4.3
-Title: v1.4.3: Quickstart Semgrep calibration
+Tag: v1.4.4
+Title: v1.4.4: Windows release verify shim
 ```
 
 Release URL:
 
 ```text
-https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.3
+https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 ```
 
 Release asset checklist:

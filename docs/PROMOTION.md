@@ -43,7 +43,7 @@ ai-agents
 ```text
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.3
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 ```
@@ -55,11 +55,11 @@ I built AI Project Maintainer: a release readiness gate for AI-coded projects.
 
 AI writes code fast, but shipping safely still needs tests, security checks, release evidence, monitoring gaps, and maintainer decisions.
 
-v1.4.0 added `npx ai-project-maintainer quickstart .`, a report-only first-run path that detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack when blockers exist. The latest v1.4.3 patch keeps strict release gates conservative while reducing quickstart noise from Semgrep supply-chain hardening recommendations. The public benchmark remains available as evidence-model validation across Electron, Web/API, database, CI/supply-chain, and OSS npm library risks.
+v1.4.0 added `npx ai-project-maintainer quickstart .`, a report-only first-run path that detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack when blockers exist. The latest v1.4.4 patch keeps strict release gates conservative, reduces quickstart noise from Semgrep supply-chain hardening recommendations, and fixes Windows published-release verification for npm. The public benchmark remains available as evidence-model validation across Electron, Web/API, database, CI/supply-chain, and OSS npm library risks.
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.3
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 ```
 
@@ -106,7 +106,7 @@ AI 写代码很快，但上线前仍然需要业务测试、安全扫描、依�
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.3
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.zh-CN.md
 ```
 

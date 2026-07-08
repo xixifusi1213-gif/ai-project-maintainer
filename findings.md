@@ -143,3 +143,10 @@
 - The fix should be quickstart-only and rule-specific. Strict release gates must continue to block Semgrep failures.
 - Follow-up smoke with local v1.4.3 code showed the first implementation still blocked because Semgrep JSON output was truncated to the command-runner tail limit before rule IDs were parsed.
 - After increasing Semgrep's captured JSON output limit, real-project smoke on `expressjs/cors`, `sindresorhus/p-limit`, and `unjs/defu` produced `PASS_WITH_GAPS` with zero blockers and no quickstart repair pack while keeping Semgrep findings visible as warnings.
+
+## v1.4.4 Windows Release Verify Findings
+
+- `v1.4.3` published successfully through GitHub Actions trusted publishing and npm now reports `latest` as `1.4.3`.
+- Local Windows published-release verification still fails when invoking `npm.cmd` directly with `spawnSync`, returning `EINVAL`.
+- Direct local probes confirm `spawnSync("npm")` returns `ENOENT`, `spawnSync("npm.cmd")` returns `EINVAL`, and `spawnSync("cmd.exe", ["/d", "/s", "/c", "call", "npm.cmd", "--version"])` succeeds.
+- The release verifier should route only Windows npm calls through `cmd.exe call` while keeping `shell: true` disabled and leaving `git`/`gh` unchanged.
