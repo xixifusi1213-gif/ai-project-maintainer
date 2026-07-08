@@ -6,14 +6,13 @@ Use this after the repository has npm, CI, Security workflow, demo, license, soc
 
 I can prepare posts, screenshots, demos, titles, and issue text. Posting to external communities still needs an account controlled by the maintainer.
 
-You do not need every account on day one. Start with channels you can control:
+Start with channels you control:
 
 - GitHub README
 - GitHub Release
 - npm package page
 - direct link to the demo case
-
-When you later create accounts for V2EX, Hacker News, Reddit, X/Twitter, Zhihu, or Juejin, reuse the drafts below.
+- direct link to the real-project smoke summary
 
 ## GitHub About
 
@@ -46,6 +45,7 @@ npm: https://www.npmjs.com/package/ai-project-maintainer
 Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
+Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
 ```
 
 ## English Short Post
@@ -55,12 +55,19 @@ I built AI Project Maintainer: a release readiness gate for AI-coded projects.
 
 AI writes code fast, but shipping safely still needs tests, security checks, release evidence, monitoring gaps, and maintainer decisions.
 
-v1.4.0 added `npx ai-project-maintainer quickstart .`, a report-only first-run path that detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack when blockers exist. The latest v1.4.4 patch keeps strict release gates conservative, reduces quickstart noise from Semgrep supply-chain hardening recommendations, and fixes Windows published-release verification for npm. The public benchmark remains available as evidence-model validation across Electron, Web/API, database, CI/supply-chain, and OSS npm library risks.
+The first command is now:
+
+npx ai-project-maintainer quickstart .
+
+It is report-only by default: detect the project profile, run a lightweight gate, write a short summary, and generate an AI repair-pack only when blockers exist. PASS_WITH_GAPS is not a production safety guarantee. It means quickstart found no blockers, but release evidence or maintainer decisions are still missing.
+
+I also ran ai-project-maintainer@latest against public projects including p-limit, defu, cors, chalk, and execa. Four completed as PASS_WITH_GAPS; execa produced a real Semgrep child-process blocker for maintainer triage. That is the shape I want: low-friction first run, conservative blockers, and explicit gaps instead of false confidence.
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
 Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
+Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
 ```
 
 ## Show HN
@@ -68,7 +75,7 @@ Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/d
 Title:
 
 ```text
-Show HN: AI Project Maintainer - release readiness gate for AI-coded projects
+Show HN: AI Project Maintainer - quickstart gate for AI-coded projects
 ```
 
 Body:
@@ -80,47 +87,55 @@ The idea is simple: AI can write code quickly, but the hard part is proving a pr
 
 project profile -> audit plan -> local/CI gate -> evidence report -> AI fixes -> rerun
 
-It wraps common tools like Gitleaks, Trivy, Semgrep, OSV-Scanner, Syft, Grype, actionlint, and zizmor, but adds a production audit layer. It reports missing monitoring, release approval, database backup/rollback evidence, and business-flow test gaps as explicit GAP or USER_DECISION items.
+The first command is now:
 
-The repo dogfoods itself with GitHub CI and a heavier Security workflow. There is also a runnable demo app showing a broken before state, failing business tests, the fixed after state, and the production gate report.
+npx ai-project-maintainer quickstart .
 
-v1.4.0 added a first-run quickstart command, so users can try the workflow without first learning doctor/init/init-audit/audit-plan/gate/repair-pack. The latest patch keeps the quickstart message and smooths first-run environment gaps like missing npm lockfiles. The reproducible benchmark remains available across Electron desktop, Web/API, database, CI/supply-chain, and OSS npm library cases, with before/after reports and repair-pack output for inspection.
+Quickstart is intentionally low-friction and report-only. It detects the project profile, runs a lightweight gate, writes a short summary, and generates an AI repair-pack only when blockers exist.
 
-It is account-free by default. Optional production evidence connectors are read-only and use user-provided tokens from environment variables.
+It wraps tools like Gitleaks, Trivy, Semgrep, OSV-Scanner, Syft, Grype, actionlint, and zizmor, but adds a production audit layer. It reports missing monitoring, release approval, database backup/rollback evidence, and business-flow test gaps as explicit GAP or USER_DECISION items.
 
-Feedback on the workflow and positioning would be very useful.
+I ran the published npm package against five public projects. The command completed for all five; four reported PASS_WITH_GAPS with no repair pack, and one generated a repair pack for a code-level Semgrep blocker.
+
+PASS_WITH_GAPS is not a production safety guarantee. It means no quickstart blocker failed, while release evidence still needs maintainer confirmation.
+
+Feedback on the first-run report, false positives, and positioning would be very useful.
 ```
 
 ## Chinese Short Post
 
 ```text
-我做了一个给 AI coding 项目的生产级半自动维护门禁：AI Project Maintainer。
+我做了一个给 AI coding 项目的发布前维护门禁：AI Project Maintainer。
 
-AI 写代码很快，但上线前仍然需要业务测试、安全扫描、依赖审计、发布证据、监控告警、回滚策略和维护者判断。
+AI 写代码很快，但上线前仍然需要测试、安全检查、依赖审计、发布证据、监控告警、回滚策略和维护者判断。
 
-这个工具把流程串成一条可重复链路：
+现在陌生用户第一步只需要跑：
 
-项目画像 -> 审计计划 -> 本地/CI 门禁 -> 证据报告 -> Codex 修阻断项 -> 重新运行
+npx ai-project-maintainer quickstart .
 
-现在 v1.4.0 已经发布，新增 `npx ai-project-maintainer quickstart .`，陌生用户可以先跑轻量 gate、拿到简短 summary，并在有 blocker 时自动得到 AI repair-pack。仓库仍然保留真实 demo、CI/Security workflow 和覆盖 Electron、Web/API、数据库、CI/供应链、OSS npm library 的公开 benchmark。
+它会自动识别项目类型，跑轻量 gate，生成简短 summary；只有发现 blocker 时才生成 AI repair-pack。PASS_WITH_GAPS 不是生产安全保证，只表示 quickstart 没发现阻断项，但仍有证据缺口或需要维护者确认的事项。
+
+我也用 npm latest 跑了 5 个真实公开项目 smoke：p-limit、defu、cors、chalk、execa。5 个命令都能跑完，4 个是 PASS_WITH_GAPS，1 个因为 Semgrep 发现代码级 child_process 风险而生成 repair-pack。
 
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
 Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.4.4
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.zh-CN.md
+Real project smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
 ```
 
 ## V2EX / Zhihu / Juejin Outline
 
 ```text
-标题：我做了一个给 AI coding 项目的生产级半自动维护门禁
+标题：我做了一个给 AI coding 项目的发布前维护门禁
 
 1. 背景：AI 写代码变快后，维护、测试、安全和生产证据成了新的瓶颈。
-2. 问题：个人开发者没有安全团队、SRE、DBA，但仍然要对上线负责。
-3. 方案：把项目画像、审计计划、本地/CI 门禁和生产证据缺口串起来。
-4. Demo：展示 broken before state、业务测试失败、修复后通过、gate --production 报告。
-5. 边界：不是绝对安全，不替代最终人工审计，不托管用户数据。
-6. 想要反馈：真实项目场景、缺失检查、误报、文档可读性、定位是否清楚。
+2. 问题：个人开发者和小团队不一定有安全团队、SRE、DBA，但仍然要对上线负责。
+3. 入口：第一次先跑 npx ai-project-maintainer quickstart .，不用先理解完整 gate 链条。
+4. 输出：项目类型、轻量检查、简短 summary；有 blocker 时自动生成 AI repair-pack。
+5. 边界：PASS_WITH_GAPS 不是生产安全保证，不替代最终人工审查，不托管用户数据。
+6. 真实 smoke：用 npm latest 跑 5 个公开项目，5 个命令都能完成，4 个无 blocker，1 个生成 repair-pack。
+7. 想要反馈：报告是否看得懂、哪些 blocker 太严格、哪些 gap 表达不清、真实项目首跑是否顺畅。
 ```
 
 ## Reddit Targets
@@ -134,7 +149,20 @@ Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/d
 Suggested title:
 
 ```text
-I built a release readiness gate for AI-coded projects
+I built a quickstart release-readiness gate for AI-coded projects
+```
+
+## Feedback CTA
+
+Ask users to open a Quickstart feedback issue and paste only redacted summary data:
+
+```text
+Version:
+Command:
+Project type:
+Status:
+Blockers / warnings / gaps:
+What was confusing or too strict:
 ```
 
 ## Launch Checklist
@@ -148,4 +176,6 @@ I built a release readiness gate for AI-coded projects
 - [x] Real demo link works.
 - [x] Before/after case exists.
 - [x] 90-second GIF exported from `docs/demo-output/90-second-demo.html`.
+- [x] Real project smoke summary exists.
+- [x] Quickstart feedback issue template exists.
 - [ ] First external post published by the maintainer.

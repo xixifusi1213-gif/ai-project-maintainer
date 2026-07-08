@@ -250,3 +250,31 @@
 ## v1.4.4 Completion
 
 - v1.4.4 is published and verified.
+
+## v1.4.4 Promotion Smoke: 2026-07-08
+
+- User requested implementation of the v1.4.4 promotion and real-project quickstart smoke plan.
+- Created branch `codex/v1.4.4-promotion-smoke`.
+- Updated `task_plan.md` and `findings.md` with the promotion/smoke scope.
+- Confirmed npm latest is `1.4.4`.
+- Confirmed existing issue templates cover bugs, features, and production gaps, but not quickstart first-run feedback.
+- Ran real-project quickstart smoke with `npx -y ai-project-maintainer@latest quickstart .` against five public repos in a temp directory.
+- First smoke wrapper attempt aborted because PowerShell treated normal `git clone` stderr progress as an exception; reran with exit-code-based handling.
+- Smoke results:
+  - `sindresorhus/p-limit`: exit `0`, `PASS_WITH_GAPS`, zero blockers, no repair pack.
+  - `unjs/defu`: exit `0`, `PASS_WITH_GAPS`, zero blockers, no repair pack.
+  - `expressjs/cors`: exit `0`, `PASS_WITH_GAPS`, zero blockers, no repair pack.
+  - `chalk/chalk`: exit `0`, `PASS_WITH_GAPS`, zero blockers, no repair pack.
+  - `sindresorhus/execa`: exit `0`, `FAIL`, one Semgrep blocker, repair pack generated.
+- Inspected the `execa` blocker: it includes code-level `javascript.lang.security.detect-child-process.detect-child-process` findings, so it is maintainer triage rather than an environment failure.
+- Added `docs/REAL-PROJECT-SMOKE.md` with sanitized smoke results and no local temp paths.
+- Added `.github/ISSUE_TEMPLATE/quickstart_feedback.yml` for redacted first-run feedback.
+- Replaced `docs/PROMOTION.md` with quickstart-centered English and Chinese drafts and removed mojibake text.
+- Added a README link to the real-project smoke summary.
+- Verification passed:
+  - `npm view ai-project-maintainer version dist-tags --json` returned `1.4.4` and `latest: 1.4.4`.
+  - Documentation hygiene search found no local temp paths or mojibake markers in README, promotion, smoke doc, or the quickstart feedback template.
+  - The quickstart feedback issue template parsed as YAML.
+  - `npm test` passed with 140 tests.
+  - `npm run check` passed syntax checks for 53 files.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF conversion warnings.
