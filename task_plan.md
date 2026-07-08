@@ -288,11 +288,11 @@ Run a lightweight promotion and validation batch for `ai-project-maintainer@late
 2. Run npm latest real-project quickstart smoke. Status: complete.
 3. Add sanitized smoke results and quickstart feedback template. Status: complete.
 4. Refresh promotion copy. Status: complete.
-5. Run verification and prepare PR. Status: in_progress.
+5. Run verification and prepare PR. Status: complete.
 
 ## Current Promotion Stage
 
-Stage 5 is in progress on branch `codex/v1.4.4-promotion-smoke`.
+All v1.4.4 promotion smoke stages are complete. PR #22 is merged; no npm release was needed because this was documentation and issue-template work only.
 
 ## Errors Encountered
 

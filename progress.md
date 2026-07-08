@@ -278,3 +278,9 @@
   - `npm test` passed with 140 tests.
   - `npm run check` passed syntax checks for 53 files.
   - `git diff --check` exited successfully with only Windows LF-to-CRLF conversion warnings.
+- Created PR #22, waited for CI and the heavy security gate, and merged it into `main`.
+- No npm release was needed because the changes are promotion documentation, a smoke summary, and an issue template.
+
+## v1.4.4 Promotion Smoke Completion
+
+- v1.4.4 promotion and real-project quickstart smoke documentation is complete and merged.
