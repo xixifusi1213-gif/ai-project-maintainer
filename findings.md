@@ -150,3 +150,13 @@
 - Local Windows published-release verification still fails when invoking `npm.cmd` directly with `spawnSync`, returning `EINVAL`.
 - Direct local probes confirm `spawnSync("npm")` returns `ENOENT`, `spawnSync("npm.cmd")` returns `EINVAL`, and `spawnSync("cmd.exe", ["/d", "/s", "/c", "call", "npm.cmd", "--version"])` succeeds.
 - The release verifier should route only Windows npm calls through `cmd.exe call` while keeping `shell: true` disabled and leaving `git`/`gh` unchanged.
+
+## v1.4.4 Promotion and Real-Project Smoke Findings
+
+- npm reports `ai-project-maintainer@latest` as `1.4.4`.
+- The repository already has issue templates for bug reports, feature requests, and production evidence gaps, but not a low-friction quickstart feedback template.
+- `docs/PROMOTION.md` is already centered on quickstart and v1.4.4 links, but its Chinese draft text is mojibake and should be replaced with readable copy.
+- The real-project smoke batch should record only sanitized summaries, not full report contents or local temp paths.
+- Real-project smoke using `npx -y ai-project-maintainer@latest quickstart .` completed with exit code `0` for all five repos.
+- `sindresorhus/p-limit`, `unjs/defu`, `expressjs/cors`, and `chalk/chalk` produced `PASS_WITH_GAPS`, zero blockers, and no repair pack.
+- `sindresorhus/execa` produced `FAIL` with one Semgrep blocker and a repair pack. The blocker includes code-level `javascript.lang.security.detect-child-process.detect-child-process` findings in child process execution paths, so it should be recorded as maintainer triage rather than an environment failure.

@@ -263,6 +263,37 @@ Fix local Windows published-release verification after v1.4.3, where `spawnSync(
 
 All v1.4.4 Windows release verify shim stages are complete. `v1.4.4` is published on npm and GitHub Releases.
 
+## Promotion: v1.4.4 Real Project Quickstart Smoke
+
+## Objective
+
+Run a lightweight promotion and validation batch for `ai-project-maintainer@latest` after v1.4.4, centered on `npx ai-project-maintainer quickstart .`.
+
+## Scope
+
+- Run npm latest quickstart against five public JavaScript/TypeScript repositories in temporary directories.
+- Record only public, sanitized summary results.
+- Add a public smoke summary doc and quickstart feedback issue template.
+- Refresh promotion copy around the first-run quickstart CTA.
+
+## Out of Scope
+
+- Publishing a new package version unless a new first-run blocker is found.
+- Adding scanners, connectors, or benchmark cases.
+- Posting to external communities from maintainer-owned accounts.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Run npm latest real-project quickstart smoke. Status: complete.
+3. Add sanitized smoke results and quickstart feedback template. Status: complete.
+4. Refresh promotion copy. Status: complete.
+5. Run verification and prepare PR. Status: in_progress.
+
+## Current Promotion Stage
+
+Stage 5 is in progress on branch `codex/v1.4.4-promotion-smoke`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |
@@ -273,3 +304,4 @@ All v1.4.4 Windows release verify shim stages are complete. `v1.4.4` is publishe
 | Full `npm test` failed because a release manifest fixture still used `1.4.0` while package metadata was `1.4.1`. | 1 | Updated the fixture to `1.4.1` and re-ran release-trust tests. |
 | Real-project v1.4.3 smoke still blocked Semgrep hardening findings. | 1 | Found Semgrep JSON was truncated before rule parsing; added per-command output limit and used a larger limit for Semgrep JSON. |
 | Local Windows published-release verification failed with `spawnSync npm.cmd EINVAL`. | 1 | Added a Windows npm target shim that invokes `cmd.exe /d /s /c call npm.cmd ...` without using `shell: true`. |
+| Real-project smoke script aborted during `git clone` progress output. | 1 | PowerShell treated native stderr progress as an error under stop mode; rerun without stop-on-stderr and rely on process exit codes. |

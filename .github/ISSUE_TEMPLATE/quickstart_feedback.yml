@@ -1,0 +1,73 @@
+name: Quickstart feedback
+description: Share first-run quickstart results from a public or redacted project.
+title: "[Quickstart]: "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying quickstart. Please redact secrets, tokens, private repository names, local filesystem paths, customer data, and production logs.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Paste the npm version you used.
+      placeholder: "1.4.4"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Paste the exact command.
+      render: powershell
+      placeholder: "npx ai-project-maintainer quickstart ."
+    validations:
+      required: true
+  - type: input
+    id: project_type
+    attributes:
+      label: Project type
+      description: Describe the project without exposing private details.
+      placeholder: "Next.js app, Node API, OSS npm library, Electron app"
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Quickstart status
+      options:
+        - PASS
+        - PASS_WITH_WARNINGS
+        - PASS_WITH_GAPS
+        - FAIL
+        - Command/runtime failure
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Paste blocker, warning, and gap counts plus the top items from quickstart-summary.md after redacting sensitive data.
+      placeholder: |
+        Status: PASS_WITH_GAPS
+        Blockers: 0
+        Warnings: 3
+        Evidence gaps: 5
+        Top items: ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected or confusing behavior
+      description: What felt wrong, confusing, too strict, or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, package manager, and relevant scanner/network notes.
+      placeholder: "Windows 11, Node 24, npm 11, corporate proxy, Trivy cache present"

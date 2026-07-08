@@ -11,7 +11,7 @@
 
 AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, generate AI-agent repair tasks, and rerun until the release is defensible.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Benchmark](docs/BENCHMARK.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Benchmark](docs/BENCHMARK.md) | [Real project smoke](docs/REAL-PROJECT-SMOKE.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
 
 It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
 
@@ -53,6 +53,8 @@ Give `quickstart-summary.md`, the detailed report, and any generated repair-pack
 If a brand-new npm project has `package.json` but no `package-lock.json`, quickstart records dependency audit as a setup gap instead of a blocker. Run `npm install --package-lock-only`, then rerun quickstart when you want npm audit evidence.
 
 If Trivy cannot refresh its vulnerability database, quickstart retries with the local cached DB when one exists. That keeps the first run usable and reports `PASS_WITH_GAPS`; strict release gates still flag stale or incomplete vulnerability DB evidence until the cache is refreshed from a reachable mirror.
+
+See [Real project smoke](docs/REAL-PROJECT-SMOKE.md) for a published-package quickstart run against public repositories.
 
 ## The 3-Minute Flow
 
