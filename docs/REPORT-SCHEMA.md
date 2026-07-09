@@ -6,6 +6,8 @@ The tool may add new fields in `1.x`, but it should not remove or rename stable 
 
 v1.5.0 adds production safety inputs and audit items for data boundaries, authorization matrices, critical business-flow safety, database write safety, and AI repair safety. These are additive to the stable report shape.
 
+v1.5.1 adds `findingSummary` and per-check `findingKind` values. These explain what a non-passing item means without changing whether it blocks.
+
 Production accident checks may use more specific `group` values instead of the older broad `production-audit` group:
 
 - `data-exposure`
@@ -45,6 +47,7 @@ The following fields are stable in `reports/security-report.json`:
 - `audit`
 - `agentRisk`
 - `standards`
+- `findingSummary`
 
 The `audit.plan`, `audit.coverageGaps`, and generated `checks` may include production safety ids such as:
 
@@ -66,6 +69,34 @@ Each check item should keep:
 - `blocking`
 - `evidenceLevel`
 - `standardRefs`
+- `findingKind` for non-passing items
+
+## Finding Kind Semantics
+
+- `confirmed_vulnerability`: explicitly validated vulnerability evidence. The tool never infers this label from scanner output alone.
+- `untriaged_scanner_finding`: a scanner matched a possible issue that still needs project-specific validation.
+- `verified_check_failure`: a deterministic test, build, or engineering check failed; this is not automatically a vulnerability.
+- `production_evidence_gap`: required production proof is missing; this is not a discovered vulnerability.
+- `maintainer_decision`: business context or risk acceptance must be supplied by a human maintainer.
+- `environment_tooling_issue`: a scanner, vulnerability database, dependency, network step, or local tool was unavailable, so evidence is incomplete.
+
+`findingSummary` uses this shape:
+
+```json
+{
+  "total": 2,
+  "byKind": {
+    "confirmed_vulnerability": 0,
+    "untriaged_scanner_finding": 1,
+    "verified_check_failure": 0,
+    "production_evidence_gap": 0,
+    "maintainer_decision": 0,
+    "environment_tooling_issue": 1
+  }
+}
+```
+
+SARIF keeps non-code production evidence gaps and maintainer decisions out of GitHub Code Scanning by default, even when they block the release gate. Consumers can opt into those records with `includeCoverageGaps`, where the SARIF result carries `properties.findingKind` so it is not mislabeled as a vulnerability.
 
 ## Status Semantics
 
@@ -107,6 +138,7 @@ Stable task fields:
 - `title`
 - `type`
 - `severity`
+- `findingKind`
 - `source`
 - `evidence`
 - `targetFiles`

@@ -5,7 +5,46 @@ import path from "node:path";
 import test from "node:test";
 
 import { runCli } from "../ai-project-maintainer/scripts/cli.mjs";
-import { runQuickstart } from "../ai-project-maintainer/scripts/quickstart.mjs";
+import { buildQuickstartSummary, runQuickstart, toQuickstartMarkdown } from "../ai-project-maintainer/scripts/quickstart.mjs";
+
+test("quickstart summary explains finding categories", () => {
+  const report = {
+    root: "C:/project",
+    generatedAt: "2026-07-10T00:00:00.000Z",
+    overallStatus: "FAIL",
+    passed: false,
+    blockerCount: 1,
+    warningCount: 0,
+    coverageGapCount: 1,
+    findingSummary: {
+      total: 2,
+      byKind: {
+        confirmed_vulnerability: 0,
+        untriaged_scanner_finding: 1,
+        verified_check_failure: 0,
+        production_evidence_gap: 0,
+        maintainer_decision: 0,
+        environment_tooling_issue: 1,
+      },
+    },
+    profile: { id: "node-api", source: "detected", signals: {} },
+    mode: { profile: "auto" },
+    checks: [],
+    blockers: [{ name: "Semgrep static scan", status: "fail", summary: "Needs triage.", findingKind: "untriaged_scanner_finding" }],
+    warnings: [],
+    coverageGaps: [{ name: "Trivy database", status: "missing", summary: "Unavailable.", findingKind: "environment_tooling_issue" }],
+  };
+
+  const summary = buildQuickstartSummary(report, { projectRoot: "C:/project" });
+  const markdown = toQuickstartMarkdown(summary);
+
+  assert.deepEqual(summary.findingSummary, report.findingSummary);
+  assert.equal(summary.topBlockers[0].findingKind, "untriaged_scanner_finding");
+  assert.match(markdown, /## What This Report Actually Found/);
+  assert.match(markdown, /Untriaged scanner findings: 1/);
+  assert.match(markdown, /Environment or tooling issues: 1/);
+  assert.match(markdown, /\[Environment or tooling issues\] Trivy database/);
+});
 
 function tempProject(options = {}) {
   const { lockfile = true } = options;

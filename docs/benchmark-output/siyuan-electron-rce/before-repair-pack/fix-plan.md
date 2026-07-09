@@ -2,15 +2,17 @@
 
 Source report: before-security-report.json
 Project root: siyuan-note/siyuan@before
-Generated: 2026-07-06T04:39:21.212Z
+Generated: 2026-07-09T22:03:34.398Z
 
 ## Summary
 - Total tasks: 2
 - auto_fix_candidate: 2
+- Untriaged scanner findings: 2
 
 ## Tasks
 ### fix-001: Electron runtime hardening
 - Type: auto_fix_candidate
+- Finding kind: Untriaged scanner findings (untriaged_scanner_finding)
 - Severity: P2
 - Source: electron/electron-runtime-hardening
 - User decision required: false
@@ -24,6 +26,7 @@ Generated: 2026-07-06T04:39:21.212Z
 
 ### fix-002: Electron runtime hardening
 - Type: auto_fix_candidate
+- Finding kind: Untriaged scanner findings (untriaged_scanner_finding)
 - Severity: P2
 - Source: electron/electron-runtime-hardening
 - User decision required: false

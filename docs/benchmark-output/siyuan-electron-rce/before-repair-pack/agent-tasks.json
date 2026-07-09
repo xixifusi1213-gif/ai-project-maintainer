@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-06T04:39:21.212Z",
+  "generatedAt": "2026-07-09T22:03:34.398Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "siyuan-note/siyuan@before",
   "overallStatus": "FAIL",
@@ -11,6 +11,9 @@
     },
     "bySeverity": {
       "P2": 2
+    },
+    "byFindingKind": {
+      "untriaged_scanner_finding": 2
     }
   },
   "tasks": [
@@ -18,6 +21,7 @@
       "id": "fix-001",
       "title": "Electron runtime hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",
@@ -40,6 +44,7 @@
       "id": "fix-002",
       "title": "Electron runtime hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",

@@ -2,15 +2,17 @@
 
 Source report: before-security-report.json
 Project root: tj-actions/changed-files@before
-Generated: 2026-07-06T04:39:21.358Z
+Generated: 2026-07-09T22:03:35.044Z
 
 ## Summary
 - Total tasks: 2
 - auto_fix_candidate: 2
+- Confirmed vulnerabilities: 2
 
 ## Tasks
 ### fix-001: Compromised GitHub Action dependency
 - Type: auto_fix_candidate
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: ci-security/tj-actions-changed-files-compromise
 - User decision required: false
@@ -26,6 +28,7 @@ Generated: 2026-07-06T04:39:21.358Z
 
 ### fix-002: Compromised GitHub Action dependency
 - Type: auto_fix_candidate
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: ci-security/tj-actions-changed-files-compromise
 - User decision required: false

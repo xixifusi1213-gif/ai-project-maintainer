@@ -21,7 +21,7 @@ function writeJson(filePath, value) {
 
 test("release manifest records tarball, SBOM, and security report hashes", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "apm-release-manifest-"));
-  const tarball = path.join(dir, "ai-project-maintainer-1.5.0.tgz");
+  const tarball = path.join(dir, "ai-project-maintainer-1.5.1.tgz");
   const sbom = path.join(dir, "sbom.cdx.json");
   const report = path.join(dir, "security-report.json");
   const output = path.join(dir, "release-manifest.json");
@@ -30,8 +30,8 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
   fs.writeFileSync(report, '{"overallStatus":"PASS"}');
 
   const { manifest, markdownOutput } = writeReleaseManifest({
-    version: "1.5.0",
-    tag: "v1.5.0",
+    version: "1.5.1",
+    tag: "v1.5.1",
     tarball,
     sbom,
     report,
@@ -39,14 +39,14 @@ test("release manifest records tarball, SBOM, and security report hashes", () =>
     commit: "abc123",
   });
 
-  assert.equal(manifest.package.version, "1.5.0");
-  assert.equal(manifest.git.tag, "v1.5.0");
+  assert.equal(manifest.package.version, "1.5.1");
+  assert.equal(manifest.git.tag, "v1.5.1");
   assert.equal(manifest.git.commit, "abc123");
   assert.equal(manifest.artifacts.tarball.sha256, sha256("package-bytes"));
   assert.equal(manifest.artifacts.sbom.sha256, sha256('{"bomFormat":"CycloneDX"}'));
   assert.equal(manifest.artifacts.securityReport.sha256, sha256('{"overallStatus":"PASS"}'));
   assert.equal(fs.existsSync(output), true);
-  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.5\.0/);
+  assert.match(fs.readFileSync(markdownOutput, "utf8"), /Release Manifest: ai-project-maintainer@1\.5\.1/);
 });
 
 test("prepublish verification validates versions, tag, release notes, and tarball name", () => {
@@ -194,12 +194,14 @@ test("stable report schema is documented for 1.x", () => {
     "agentRisk",
     "standards",
     "evidenceLevel",
+    "findingSummary",
+    "findingKind",
   ];
   const report = buildJsonReport({
     root: "C:/project",
     mode: { strict: true, release: true, production: true },
     probe: {},
-    checks: [{ name: "package test", group: "tests", status: "pass", blocking: false }],
+    checks: [{ name: "semgrep static scan", group: "sast", status: "fail", blocking: false }],
     toolVersions: {},
     invalidExceptions: [],
     audit: { profile: {}, plan: [], evidence: [], coverageGaps: [], userDecisions: [] },
@@ -214,7 +216,9 @@ test("stable report schema is documented for 1.x", () => {
   assert.equal(Object.hasOwn(report, "audit"), true);
   assert.equal(Object.hasOwn(report, "agentRisk"), true);
   assert.equal(Object.hasOwn(report, "standards"), true);
+  assert.equal(Object.hasOwn(report, "findingSummary"), true);
   assert.equal(Object.hasOwn(report.checks[0], "evidenceLevel"), true);
+  assert.equal(Object.hasOwn(report.checks[0], "findingKind"), true);
 });
 
 test("release trust docs are linked from README and trust model", () => {
@@ -222,7 +226,7 @@ test("release trust docs are linked from README and trust model", () => {
   const trust = fs.readFileSync(path.resolve("TRUST.md"), "utf8");
   const releaseTrust = fs.readFileSync(path.resolve("docs", "RELEASE-TRUST.md"), "utf8");
 
-  assert.match(readme, /How releases are trusted/);
+  assert.match(readme, /## Release Trust/);
   assert.match(readme, /docs\/RELEASE-TRUST\.md/);
   assert.match(readme, /SECURITY\.md/);
   assert.match(trust, /Release trust/);

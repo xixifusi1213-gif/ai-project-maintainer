@@ -374,3 +374,26 @@
 
 - All requested v1.5.0 production gate smoke and promotion documentation updates are complete.
 - `.serena/` remains untracked and untouched by product changes.
+
+## v1.5.0 External Launch Support: 2026-07-09
+
+- Recovered post-PR context with the planning session catch-up tool.
+- Confirmed `main` is aligned with `origin/main` and only `.serena/` is untracked.
+- Recorded that PR #24 has been merged and issue #25 is open as the next evidence-category clarification candidate.
+- Added the external launch support stage to `task_plan.md` and recorded platform/account confirmation as the current blocker before any external posting.
+
+## v1.5.1 Report Clarity and First-Run Trust: 2026-07-10
+
+- Recovered planning context and preserved the existing uncommitted planning updates.
+- Read GitHub issue #25 and confirmed its report, repair-pack, SARIF, and no-strictness-change acceptance criteria.
+- Created branch `codex/v1.5.1-report-clarity`.
+- Located the report generator, quickstart summary, repair-pack tests, and committed benchmark reports that can supply a real before/after visual.
+- Recorded the implementation and user-research stages in the planning files; `.serena/` remains untouched.
+- Added red tests for JSON/Markdown finding summaries, conservative SARIF, repair-pack task categories, and quickstart interpretation; the initial red run failed in the expected three places.
+- Added `finding-kind.mjs` and integrated it into full reports, quickstart summaries, repair packs, Codex handoff instructions, and SARIF metadata/filtering.
+- Re-generated benchmark outputs and marked public advisory-backed Ghost, Next.js, and tj-actions before states as explicitly confirmed only where the benchmark evidence supports that label.
+- Replaced the README first 212-line onboarding block with a 104-line first-run path and added `assets/report-before-after.svg` from committed Ghost benchmark results.
+- Added `docs/FIRST-RUN-RESEARCH.md`, expanded the redaction-first quickstart feedback template, documented the schema, and added v1.5.1 release notes/metadata.
+- Focused report, repair-pack, quickstart, benchmark, release, CLI, and demo tests pass after updating legacy README wording expectations.
+- Ran an actual local v1.5.1 quickstart against a temporary demo copy: exit `0`, `PASS_WITH_GAPS`, zero blockers, and the summary correctly separated six environment/tooling issues from confirmed vulnerabilities.
+- Full verification passed: 151 tests, syntax checks for 54 files, benchmark verification, feedback-template YAML parse, SVG XML parse, `git diff --check`, npm pack dry-run, and v1.5.1 prepublish verification.

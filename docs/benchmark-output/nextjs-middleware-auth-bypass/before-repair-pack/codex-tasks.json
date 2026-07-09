@@ -1,12 +1,14 @@
 {
   "schemaVersion": 1,
   "targetAgent": "codex",
-  "generatedAt": "2026-07-06T04:39:21.338Z",
+  "generatedAt": "2026-07-09T22:03:35.021Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "vercel/next.js@before",
   "instructions": [
     "Fix auto_fix_candidate tasks first.",
     "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+    "Do not describe untriaged_scanner_finding as a confirmed vulnerability without project-specific validation.",
+    "Do not treat production_evidence_gap or environment_tooling_issue as a discovered vulnerability.",
     "After each fix, run the task verificationCommands before rerunning the full gate.",
     "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports."
   ],
@@ -15,6 +17,7 @@
       "id": "fix-001",
       "title": "Next.js middleware authorization bypass",
       "type": "auto_fix_candidate",
+      "findingKind": "confirmed_vulnerability",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",
@@ -37,6 +40,7 @@
       "id": "fix-002",
       "title": "Next.js middleware authorization bypass",
       "type": "auto_fix_candidate",
+      "findingKind": "confirmed_vulnerability",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",

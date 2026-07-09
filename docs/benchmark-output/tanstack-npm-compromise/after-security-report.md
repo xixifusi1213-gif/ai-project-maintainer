@@ -5,7 +5,15 @@ Mode: strict=true, release=true, production=true
 Profile: oss-library (benchmark)
 Generated: 2026-07-06T00:00:00.000Z
 Open Source Maintenance Score: 95/100 (A)
-Code Scanning Results: 0 (non-blocking production gaps stay in this report and artifacts)
+Code Scanning Results: 0 (production evidence gaps stay in this report and artifacts by default)
+
+## What This Report Actually Found
+- Confirmed vulnerabilities: 0. Validated vulnerability evidence. This label is never inferred from scanner output alone.
+- Untriaged scanner findings: 0. A scanner matched something that still needs project-specific validation.
+- Verified check failures: 0. A deterministic test, build, or engineering check failed; this is not automatically a vulnerability.
+- Production evidence gaps: 1. Required production proof is missing; this is missing proof, not a discovered vulnerability.
+- Maintainer decisions: 0. Business context or risk acceptance must be supplied by a human maintainer.
+- Environment or tooling issues: 0. A scanner, database, dependency, or local tool was unavailable, so evidence is incomplete.
 
 ## Project Profile
 - Profile: oss-library
@@ -20,10 +28,10 @@ Code Scanning Results: 0 (non-blocking production gaps stay in this report and a
 - None
 
 ## Warnings
-- Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Coverage Gaps
-- Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Production Audit
 Project Type: oss-library
@@ -48,7 +56,7 @@ CI: true
 ## Standards Crosswalk
 - case-study/benchmark-upstream-evidence: None
 - ci-security/npm-release-workflow-hardening: OpenSSF Scorecard, SLSA, Google SRE Release Engineering
-- production-audit/oss-library-production-evidence-gap: Google SRE Monitoring Distributed Systems, Google SRE Release Engineering, Google SRE Embracing Risk, CIS Control 11: Data Recovery, NIST SP 800-34 Rev. 1
+- production-audit/oss-library-production-evidence-gap: OWASP ASVS, OWASP API Security Top 10, NIST Privacy Framework, CISA Secure by Design, Google SRE Monitoring Distributed Systems, Google SRE Release Engineering, Google SRE Embracing Risk, CIS Control 11: Data Recovery, NIST SP 800-34 Rev. 1
 
 ## Tools
 - ai-project-maintainer: 1.3.1-benchmark
@@ -56,7 +64,7 @@ CI: true
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]
 - npm package release workflow hardening: pass [TOOL_VERIFIED] (zizmor .github/workflows)
-- Production evidence still required: gap [GAP]
+- Production evidence still required: gap [production_evidence_gap] [GAP]
 
 ## Exceptions
 - None

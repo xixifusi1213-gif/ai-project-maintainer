@@ -23,6 +23,17 @@
       "invalidExceptions": 0
     }
   },
+  "findingSummary": {
+    "total": 1,
+    "byKind": {
+      "confirmed_vulnerability": 1,
+      "untriaged_scanner_finding": 0,
+      "verified_check_failure": 0,
+      "production_evidence_gap": 0,
+      "maintainer_decision": 0,
+      "environment_tooling_issue": 0
+    }
+  },
   "generatedAt": "2026-07-06T00:00:00.000Z",
   "probe": {
     "caseId": "ghost-sql-injection",
@@ -78,6 +89,30 @@
   "agentRisk": null,
   "standards": {
     "sources": [
+      {
+        "id": "owasp-asvs",
+        "title": "OWASP ASVS",
+        "url": "https://owasp.org/www-project-application-security-verification-standard/",
+        "summary": "Application security verification requirements for access control, data protection, logging, and business logic."
+      },
+      {
+        "id": "owasp-api-top-10",
+        "title": "OWASP API Security Top 10",
+        "url": "https://owasp.org/API-Security/",
+        "summary": "API risk categories including broken object-level authorization and unrestricted access to sensitive business flows."
+      },
+      {
+        "id": "nist-privacy-framework",
+        "title": "NIST Privacy Framework",
+        "url": "https://www.nist.gov/privacy-framework",
+        "summary": "Privacy risk management framework for identifying and protecting personal data."
+      },
+      {
+        "id": "cisa-secure-by-design",
+        "title": "CISA Secure by Design",
+        "url": "https://www.cisa.gov/resources-tools/resources/secure-by-design",
+        "summary": "Secure-by-design guidance that shifts security burden toward software producers and safer defaults."
+      },
       {
         "id": "nist-ssdf",
         "title": "NIST SSDF SP 800-218",
@@ -186,6 +221,7 @@
       "group": "database",
       "status": "fail",
       "blocking": true,
+      "findingKind": "confirmed_vulnerability",
       "summary": "User-controlled slug ordering can be interpolated into SQL instead of using bindings.",
       "evidence": {
         "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",
@@ -240,6 +276,7 @@
       "group": "database",
       "status": "fail",
       "blocking": true,
+      "findingKind": "confirmed_vulnerability",
       "summary": "User-controlled slug ordering can be interpolated into SQL instead of using bindings.",
       "evidence": {
         "file": "ghost/core/core/server/api/endpoints/utils/serializers/input/utils/slug-filter-order.js",

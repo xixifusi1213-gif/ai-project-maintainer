@@ -226,3 +226,31 @@
 - Replaced `docs/PROMOTION.md` with v1.5.0 copy that links production gate smoke, keeps `quickstart` as the first-run CTA, adds the strict production gate command, and warns not to market untriaged findings as confirmed vulnerabilities.
 - PowerShell `Get-Content` can display Chinese text as mojibake in this environment, but Node UTF-8 reads show the file contains valid Chinese code points.
 - Documentation hygiene passed: no local temp paths, no known mojibake code points, no overstated "confirmed vulnerability" claim, and `git diff --check` reported no whitespace errors.
+
+## v1.5.0 External Launch Support Findings
+
+- PR #24 was merged into `main`; the public production smoke doc and refreshed promotion copy are already on the default branch.
+- GitHub issue #25 exists as the follow-up candidate for clarifying report evidence categories in a future `v1.5.1` patch.
+- The repository is aligned with `origin/main`; the only local untracked path is `.serena/`, which remains local metadata and should not be committed.
+- External posting is an account-side effect. The safe next step is to ask for the target platform and login context before publishing from any user-owned account.
+- Recommended first promotion channels are developer audiences that can run the command immediately: V2EX, 掘金, Hacker News, Reddit, X/Twitter, or a pinned GitHub/README announcement.
+- `docs/PROMOTION.md` already contains the copy to adapt, with `quickstart` as the first-run CTA and strict production gate as the advanced path.
+
+## v1.5.1 Report Clarity and First-Run Trust Findings
+
+- Issue #25 requires five explicit report meanings: confirmed vulnerability, untriaged scanner finding, production evidence gap, maintainer decision, and environment/tooling issue.
+- The current report already preserves blocker/warning/gap status and evidence level, but the user-facing meaning is distributed across docs rather than summarized at the top of each report.
+- The fix can be additive: derive a stable `findingKind` from existing check metadata without changing whether a check blocks.
+- Markdown should explain each category in plain language and answer `what was actually found` before listing raw checks.
+- Repair-pack tasks should carry the same category so an AI agent cannot mistake missing evidence for a confirmed code vulnerability.
+- SARIF should remain limited to actionable code/security findings and must not promote readiness gaps into vulnerability claims.
+- A trustworthy README visual should be rendered from committed benchmark JSON/Markdown, with source disclosure; it must not use invented counts or imply upstream fixes were produced by this tool.
+- Real-user research needs at least 5 independent first-run observations before drawing messaging conclusions. Recruitment should use opt-in channels and a structured, redaction-first feedback form.
+- The shared classifier now uses six meanings: confirmed vulnerability, untriaged scanner finding, verified check failure, production evidence gap, maintainer decision, and environment/tooling issue. The sixth category prevents ordinary test/build failures from being mislabeled as vulnerabilities.
+- `confirmed_vulnerability` is explicit-only and ignored on passing checks. Scanner output is never promoted to confirmed automatically.
+- Default SARIF now excludes production readiness gaps and maintainer decisions even when they block the release gate; opt-in SARIF retains them with `properties.findingKind`.
+- The README prefix before the production-audit detail section was reduced from 212 lines to 104 lines, a 51% reduction.
+- The new report image uses the committed Ghost benchmark reports: before is `FAIL` with one confirmed public-advisory vulnerability; after is `PASS_WITH_GAPS` with zero blockers and one production evidence gap.
+- Browser policy prevented local `file://` screenshot rendering. The SVG remains the exact, auditable visual source and is suitable for direct GitHub README rendering.
+- The quickstart feedback form now captures time to report, prior expectation, category interpretation, first friction, and inferred next action. `docs/FIRST-RUN-RESEARCH.md` defines the 5-10 participant protocol and confidence rules.
+- An actual first-run smoke exposed that the top category summary was clear while warning/gap list items still lacked labels. The list output now repeats the finding-kind label so users who skip the summary retain the same interpretation boundary.

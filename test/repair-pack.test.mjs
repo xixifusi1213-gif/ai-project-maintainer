@@ -54,6 +54,37 @@ test("repair pack turns blockers into auto-fix tasks", () => {
   assert.match(pack.tasks[0].fixStrategy, /Electron/);
 });
 
+test("repair pack preserves report finding categories", () => {
+  const report = baseReport({
+    checks: [
+      {
+        checkId: "semgrep",
+        group: "sast",
+        name: "Semgrep static scan",
+        status: "fail",
+        blocking: true,
+        findingKind: "untriaged_scanner_finding",
+        summary: "Scanner match needs maintainer triage.",
+      },
+      {
+        checkId: "production-data-boundaries",
+        group: "data-exposure",
+        name: "Data boundaries",
+        status: "GAP",
+        blocking: true,
+        coverageGap: true,
+        findingKind: "production_evidence_gap",
+        summary: "Evidence is incomplete.",
+      },
+    ],
+  });
+
+  const pack = buildRepairPack(report, { reportPath: "reports/security-report.json", projectRoot: "E:\\project" });
+
+  assert.deepEqual(pack.tasks.map((task) => task.findingKind), ["untriaged_scanner_finding", "production_evidence_gap"]);
+  assert.match(pack.tasks[1].fixStrategy, /maintainer/i);
+});
+
 test("repair pack turns GAP and USER_DECISION into maintainer decision tasks", () => {
   const report = baseReport({
     overallStatus: "PASS_WITH_GAPS",

@@ -86,6 +86,8 @@ test("benchmark runner generates reports and repair packs for every case", async
     }
   }
   const summary = read(path.join(outputDir, "benchmark-summary.md"));
+  assert.equal(results["ghost-sql-injection"].reports.before.blockers[0].findingKind, "confirmed_vulnerability");
+  assert.equal(results["ghost-sql-injection"].reports.after.findingSummary.byKind.production_evidence_gap, 1);
   assert.match(summary, /AI Project Maintainer Benchmark Summary/);
   assert.match(summary, /Evidence type/);
   assert.match(read(path.join(outputDir, "siyuan-electron-rce", "case-summary.md")), /Evidence type: advisory \+ patched release \+ hardening model/);
@@ -95,9 +97,14 @@ test("benchmark runner generates reports and repair packs for every case", async
 
 test("committed benchmark docs expose launch snapshot", () => {
   const packageJson = JSON.parse(read(path.resolve("package.json")));
+  const readme = read(path.resolve("README.md"));
+  const productionSectionLine = readme.split(/\r?\n/).findIndex((line) => line === "## Production Audit, Not Just Scanning") + 1;
   assert.equal(packageJson.files.includes("examples/benchmark-cases/"), true);
-  assert.match(read(path.resolve("README.md")), /Public Benchmark/);
-  assert.match(read(path.resolve("README.md")), /does not claim upstream fixes were made by this tool/);
+  assert.match(readme, /Public Benchmark/);
+  assert.match(readme, /assets\/report-before-after\.svg/);
+  assert.match(readme, /does not claim upstream fixes were made by this tool/);
+  assert.equal(productionSectionLine > 0 && productionSectionLine <= 120, true);
+  assert.equal(fs.existsSync(path.resolve("assets", "report-before-after.svg")), true);
   assert.match(read(path.resolve("docs", "BENCHMARK.md")), /npm run benchmark:verify/);
   assert.match(read(path.resolve("docs", "BENCHMARK.md")), /Evidence type/);
   assert.match(read(path.resolve("docs", "BENCHMARK.md")), /does not modify upstream projects/);

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { buildFindingSummary, findingKindDefinitions, findingKindLabel, withFindingKind } from "./finding-kind.mjs";
 import { buildStandardsSummary, enrichChecksWithTrustMetadata } from "./standards.mjs";
 
 function stableStatus(status) {
@@ -50,6 +51,7 @@ const productionReadinessGroups = new Set([
   "database-safety",
   "operational-safety",
   "ai-repair-safety",
+  "production-evidence",
 ]);
 
 function isNonCodeReadinessSignal(check) {
@@ -60,8 +62,8 @@ function isNonCodeReadinessSignal(check) {
 function shouldIncludeInSarif(check, options = {}) {
   const status = statusKey(check.status);
   if (["pass", "skipped", "missing", "n/a"].includes(status)) return false;
-  if (check.blocking) return true;
   if (isNonCodeReadinessSignal(check) && !options.includeCoverageGaps) return false;
+  if (check.blocking) return true;
   return true;
 }
 
@@ -82,7 +84,7 @@ export function buildJsonReport({
   invalidExceptions = [],
   generatedAt = new Date().toISOString(),
 }) {
-  const enrichedChecks = enrichChecksWithTrustMetadata(checks);
+  const enrichedChecks = enrichChecksWithTrustMetadata(checks).map(withFindingKind);
   const blockers = enrichedChecks.filter((check) => check.blocking);
   const warnings = enrichedChecks.filter((check) => !check.blocking && ["fail", "error", "warn", "warning", "missing", "skipped", "gap", "user_decision"].includes(statusKey(check.status)));
   const coverageGaps = enrichedChecks.filter((check) => check.coverageGap || ["missing", "skipped", "gap"].includes(statusKey(check.status)));
@@ -107,6 +109,7 @@ export function buildJsonReport({
     warningCount: warnings.length,
     coverageGapCount: coverageGaps.length,
     maintenance: buildMaintenanceSummary({ blockers, warnings, coverageGaps, invalidExceptions }),
+    findingSummary: buildFindingSummary(enrichedChecks),
     generatedAt,
     probe,
     profile,
@@ -140,7 +143,14 @@ export function toMarkdown(report) {
   if (report.maintenance) {
     lines.push(`Open Source Maintenance Score: ${report.maintenance.score}/100 (${report.maintenance.grade})`);
   }
-  lines.push(`Code Scanning Results: ${countSarifResults(report)} (non-blocking production gaps stay in this report and artifacts)`);
+  lines.push(`Code Scanning Results: ${countSarifResults(report)} (production evidence gaps stay in this report and artifacts by default)`);
+  lines.push("");
+
+  lines.push("## What This Report Actually Found");
+  const findingSummary = report.findingSummary || buildFindingSummary(report.checks || []);
+  for (const definition of findingKindDefinitions) {
+    lines.push(`- ${definition.label}: ${findingSummary.byKind?.[definition.id] || 0}. ${definition.description}`);
+  }
   lines.push("");
 
   if (report.profile) {
@@ -161,7 +171,7 @@ export function toMarkdown(report) {
   lines.push("## Blocking Checks");
   if (!report.blockers.length && !report.exceptions.invalid.length) lines.push("- None");
   for (const check of report.blockers) {
-    lines.push(`- ${check.name}: ${check.status}. ${check.summary || ""}`.trim());
+    lines.push(`- [${findingKindLabel(check.findingKind)}] ${check.name}: ${check.status}. ${check.summary || ""}`.trim());
   }
   for (const exception of report.exceptions.invalid) {
     lines.push(`- invalid exception ${exception.id || "(missing id)"}: ${exception.reason}`);
@@ -171,14 +181,14 @@ export function toMarkdown(report) {
   lines.push("## Warnings");
   if (!report.warnings.length) lines.push("- None");
   for (const check of report.warnings) {
-    lines.push(`- ${check.name}: ${check.status}. ${check.summary || ""}`.trim());
+    lines.push(`- [${findingKindLabel(check.findingKind)}] ${check.name}: ${check.status}. ${check.summary || ""}`.trim());
   }
   lines.push("");
 
   lines.push("## Coverage Gaps");
   if (!report.coverageGaps.length) lines.push("- None");
   for (const check of report.coverageGaps) {
-    lines.push(`- ${check.name}: ${check.summary || "tool unavailable"}`);
+    lines.push(`- [${findingKindLabel(check.findingKind)}] ${check.name}: ${check.summary || "tool unavailable"}`);
   }
   lines.push("");
 
@@ -274,7 +284,7 @@ export function toMarkdown(report) {
 
   lines.push("## Checks Run");
   for (const check of report.checks) {
-    lines.push(`- ${check.name}: ${check.status}${check.evidenceLevel ? ` [${check.evidenceLevel}]` : ""}${check.command ? ` (${check.command})` : ""}`);
+    lines.push(`- ${check.name}: ${check.status}${check.findingKind ? ` [${check.findingKind}]` : ""}${check.evidenceLevel ? ` [${check.evidenceLevel}]` : ""}${check.command ? ` (${check.command})` : ""}`);
   }
   lines.push("");
 
@@ -317,10 +327,17 @@ export function toSarif(report, options = {}) {
       });
     }
 
+    const findingKind = check.findingKind || null;
+    const message = check.summary || `${check.name} returned ${check.status}`;
     results.push({
       ruleId,
       level: check.blocking ? "error" : "warning",
-      message: { text: check.summary || `${check.name} returned ${check.status}` },
+      message: { text: findingKind ? `${findingKindLabel(findingKind)}: ${message}` : message },
+      properties: {
+        findingKind,
+        blocking: Boolean(check.blocking),
+        evidenceLevel: check.evidenceLevel || null,
+      },
       locations: [
         {
           physicalLocation: {

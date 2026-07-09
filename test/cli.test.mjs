@@ -129,7 +129,7 @@ test("CLI parses doctor, quickstart, init, audit, gate, agent-risk, repair-pack,
 
 test("CLI version flags print the package version", () => {
   const pkg = JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8"));
-  assert.equal(pkg.version, "1.5.0");
+  assert.equal(pkg.version, "1.5.1");
 
   for (const flag of ["--version", "-v"]) {
     let stdout = "";

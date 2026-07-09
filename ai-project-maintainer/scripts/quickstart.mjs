@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { buildAuditPlan } from "./audit-plan.mjs";
+import { buildFindingSummary, findingKindDefinitions, findingKindLabel } from "./lib/finding-kind.mjs";
 import { detectProject } from "./lib/project-detect.mjs";
 import { loadIntake } from "./lib/intake.mjs";
 import { runRepairPack } from "./repair-pack.mjs";
@@ -41,6 +42,7 @@ function topBlockers(report, limit = 5) {
     group: check.group || null,
     name: check.name,
     status: check.status,
+    findingKind: check.findingKind || null,
     summary: check.summary || "",
   }));
 }
@@ -54,6 +56,7 @@ function setupNotes(report, limit = 5) {
       group: check.group || null,
       name: check.name,
       status: check.status,
+      findingKind: check.findingKind || null,
       summary: check.summary || "",
       recommendation: check.recommendation || "",
     }));
@@ -67,6 +70,7 @@ function coverageGapNotes(report, limit = 5) {
       group: check.group || null,
       name: check.name,
       status: check.status,
+      findingKind: check.findingKind || null,
       summary: check.summary || "",
       recommendation: check.recommendation || "",
     }));
@@ -180,6 +184,7 @@ export function buildQuickstartSummary(report, options = {}) {
       warnings: report.warningCount || 0,
       coverageGaps: report.coverageGapCount || 0,
     },
+    findingSummary: report.findingSummary || buildFindingSummary(report.checks || []),
     profile: {
       id: report.profile?.id || report.mode?.profile || "auto",
       source: report.profile?.source || "unknown",
@@ -224,6 +229,11 @@ export function toQuickstartMarkdown(summary) {
   lines.push(`- Warnings: ${summary.counts.warnings}`);
   lines.push(`- Coverage gaps: ${summary.counts.coverageGaps}`);
   lines.push("");
+  lines.push("## What This Report Actually Found");
+  for (const definition of findingKindDefinitions) {
+    lines.push(`- ${definition.label}: ${summary.findingSummary?.byKind?.[definition.id] || 0}. ${definition.description}`);
+  }
+  lines.push("");
   lines.push("## Why This Profile");
   lines.push(...markdownList(summary.profile.signals));
   lines.push("");
@@ -238,7 +248,7 @@ export function toQuickstartMarkdown(summary) {
     lines.push("- None");
   } else {
     for (const blocker of summary.topBlockers) {
-      lines.push(`- ${blocker.name}: ${blocker.status}. ${blocker.summary}`.trim());
+      lines.push(`- [${findingKindLabel(blocker.findingKind)}] ${blocker.name}: ${blocker.status}. ${blocker.summary}`.trim());
     }
   }
   lines.push("");
@@ -247,7 +257,7 @@ export function toQuickstartMarkdown(summary) {
     lines.push("- None");
   } else {
     for (const warning of summary.warnings) {
-      lines.push(`- ${warning.name}: ${warning.summary}${warning.recommendation ? ` ${warning.recommendation}` : ""}`.trim());
+      lines.push(`- [${findingKindLabel(warning.findingKind)}] ${warning.name}: ${warning.summary}${warning.recommendation ? ` ${warning.recommendation}` : ""}`.trim());
     }
   }
   lines.push("");
@@ -256,7 +266,7 @@ export function toQuickstartMarkdown(summary) {
     lines.push("- None");
   } else {
     for (const gap of summary.coverageGaps) {
-      lines.push(`- ${gap.name}: ${gap.summary}${gap.recommendation ? ` ${gap.recommendation}` : ""}`.trim());
+      lines.push(`- [${findingKindLabel(gap.findingKind)}] ${gap.name}: ${gap.summary}${gap.recommendation ? ` ${gap.recommendation}` : ""}`.trim());
     }
   }
   lines.push("");

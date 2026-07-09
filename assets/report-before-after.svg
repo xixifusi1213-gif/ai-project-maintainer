@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Ghost SQL injection benchmark report before and after</title>
+  <desc id="desc">A real AI Project Maintainer benchmark report changes from FAIL with one confirmed public-advisory vulnerability to PASS_WITH_GAPS with one production evidence gap.</desc>
+  <rect width="1600" height="900" fill="#f7f8fa"/>
+  <text x="72" y="82" fill="#111827" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">What the report actually found</text>
+  <text x="72" y="126" fill="#4b5563" font-family="Arial, Helvetica, sans-serif" font-size="22">Real benchmark: Ghost Content API SQL injection advisory</text>
+
+  <rect x="72" y="166" width="666" height="588" rx="8" fill="#ffffff" stroke="#ef4444" stroke-width="3"/>
+  <rect x="98" y="194" width="132" height="42" rx="6" fill="#fee2e2"/>
+  <text x="164" y="222" text-anchor="middle" fill="#991b1b" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">BEFORE</text>
+  <text x="98" y="304" fill="#991b1b" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="700">FAIL</text>
+  <text x="98" y="346" fill="#374151" font-family="Arial, Helvetica, sans-serif" font-size="22">1 blocker</text>
+
+  <line x1="98" y1="382" x2="712" y2="382" stroke="#e5e7eb" stroke-width="2"/>
+  <text x="98" y="426" fill="#7f1d1d" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">CONFIRMED VULNERABILITY</text>
+  <text x="98" y="472" fill="#111827" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700">Database query parameterization</text>
+  <text x="98" y="516" fill="#374151" font-family="Arial, Helvetica, sans-serif" font-size="21">
+    <tspan x="98" dy="0">User-controlled slug ordering can be</tspan>
+    <tspan x="98" dy="32">interpolated into SQL instead of bindings.</tspan>
+  </text>
+  <rect x="98" y="608" width="614" height="98" rx="6" fill="#fef2f2"/>
+  <text x="120" y="644" fill="#7f1d1d" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">EVIDENCE</text>
+  <text x="120" y="678" fill="#4b5563" font-family="Arial, Helvetica, sans-serif" font-size="18">Public advisory + vulnerable ref</text>
+
+  <line x1="764" y1="458" x2="836" y2="458" stroke="#6b7280" stroke-width="5"/>
+  <polygon points="836,458 816,445 816,471" fill="#6b7280"/>
+
+  <rect x="862" y="166" width="666" height="588" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="3"/>
+  <rect x="888" y="194" width="110" height="42" rx="6" fill="#dcfce7"/>
+  <text x="943" y="222" text-anchor="middle" fill="#166534" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">AFTER</text>
+  <text x="888" y="304" fill="#166534" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700">PASS_WITH_GAPS</text>
+  <text x="888" y="346" fill="#374151" font-family="Arial, Helvetica, sans-serif" font-size="22">0 blockers · 1 evidence gap</text>
+
+  <line x1="888" y1="382" x2="1502" y2="382" stroke="#e5e7eb" stroke-width="2"/>
+  <text x="888" y="426" fill="#92400e" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">PRODUCTION EVIDENCE GAP</text>
+  <text x="888" y="472" fill="#111827" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700">Production evidence still required</text>
+  <text x="888" y="516" fill="#374151" font-family="Arial, Helvetica, sans-serif" font-size="21">
+    <tspan x="888" dy="0">The code signal is cleared, but monitoring,</tspan>
+    <tspan x="888" dy="32">rollback, and owner approval remain.</tspan>
+  </text>
+  <rect x="888" y="608" width="614" height="98" rx="6" fill="#fffbeb"/>
+  <text x="910" y="644" fill="#92400e" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">EVIDENCE</text>
+  <text x="910" y="678" fill="#4b5563" font-family="Arial, Helvetica, sans-serif" font-size="18">Upstream patch commit + patched version v6.19.1</text>
+
+  <rect x="72" y="790" width="1456" height="66" rx="8" fill="#111827"/>
+  <text x="800" y="831" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="19">Generated reports from public evidence. AI Project Maintainer did not modify Ghost or create the upstream fix.</text>
+</svg>
