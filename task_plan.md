@@ -356,6 +356,37 @@ Implement the production accident and data exposure gate described in the v1.5.0
 
 All v1.5.0 production accident / data exposure gate implementation stages are complete on branch `codex/v1.5-production-gate-research`.
 
+## Promotion: v1.5.0 Production Gate Smoke Docs
+
+## Objective
+
+Document the published v1.5.0 strict production gate smoke against real public projects and refresh the promotion copy without overstating untriaged scanner findings as confirmed upstream vulnerabilities.
+
+## Scope
+
+- Add `docs/PRODUCTION-GATE-SMOKE.md` with sanitized smoke results.
+- Update `docs/PROMOTION.md` with v1.5.0 production-gate messaging.
+- Keep public wording clear that blocker classes are release-gate findings, evidence gaps, or maintainer-triage items, not confirmed vulnerabilities unless separately validated.
+- Preserve `.serena/` as untracked local metadata.
+
+## Out of Scope
+
+- Publishing a new package version.
+- Opening upstream vulnerability reports.
+- Committing full raw smoke reports, local temp paths, or private project details.
+- Adding scanners, connectors, or code behavior changes.
+
+## Stages
+
+1. Prepare branch and planning files. Status: complete.
+2. Add sanitized production gate smoke documentation. Status: complete.
+3. Refresh promotion copy and fix readable Chinese messaging. Status: complete.
+4. Run documentation hygiene checks. Status: complete.
+
+## Current Promotion Stage
+
+All v1.5.0 production gate smoke documentation stages are complete on branch `codex/v1.5-production-smoke-docs`.
+
 ## Errors Encountered
 
 | Error | Attempt | Resolution |

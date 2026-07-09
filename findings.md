@@ -209,3 +209,20 @@
 - Documentation hygiene checks found no mojibake markers in the updated README, promotion copy, report schema, standards crosswalk, repair-pack docs, local gate reference, or quickstart feedback template.
 - Full verification passed for v1.5.0: focused tests, `npm test`, `npm run check`, `npm pack --dry-run`, `npm run release:verify:pre`, and `git diff --check`.
 - Production accident report checks now use focused groups (`data-exposure`, `auth-boundary`, `business-flow-safety`, `database-safety`, `operational-safety`, `ai-repair-safety`) instead of flattening all new production risks into `production-audit`.
+
+## v1.5.0 Production Gate Smoke Docs Findings
+
+- `ai-project-maintainer@latest` was verified as `1.5.0` after the v1.5.0 release.
+- Published-release verification passed after downloading `release-manifest.json` from the v1.5.0 GitHub Release.
+- Strict production gate smoke used `npx -y ai-project-maintainer@latest gate . --profile auto --production --agent-risk --strict --release --no-tests --output reports/security-report.json`.
+- The smoke projects were public repositories only:
+  - `expressjs/express`: mature production-grade Node API framework; report generated with `node-api` profile, `FAIL`, one SAST blocker.
+  - `tastejs/todomvc`: mature demo/example collection, not a production product; report generated with `electron-desktop` profile, `FAIL`, dependency/secret/Trivy/SAST blockers.
+  - `boxyhq/saas-starter-kit`: SaaS starter/template with real adoption, not a deployed product by itself; report generated with `database-prisma` profile, `FAIL`, build/dependency/secret/Trivy/SAST/database blockers.
+- These results show that v1.5.0 strict production gate can generate structured reports and surface release-blocking issues on real public projects.
+- Public wording should avoid claiming that upstream projects have confirmed vulnerabilities. The accurate claim is that the gate surfaced untriaged release-blocking findings and production-readiness gaps.
+- `docs/PROMOTION.md` still contains mojibake in the Chinese post and outline sections; the v1.5.0 promotion refresh should replace those sections with readable Chinese.
+- Added `docs/PRODUCTION-GATE-SMOKE.md` with sanitized v1.5.0 production gate smoke results and explicit interpretation boundaries.
+- Replaced `docs/PROMOTION.md` with v1.5.0 copy that links production gate smoke, keeps `quickstart` as the first-run CTA, adds the strict production gate command, and warns not to market untriaged findings as confirmed vulnerabilities.
+- PowerShell `Get-Content` can display Chinese text as mojibake in this environment, but Node UTF-8 reads show the file contains valid Chinese code points.
+- Documentation hygiene passed: no local temp paths, no known mojibake code points, no overstated "confirmed vulnerability" claim, and `git diff --check` reported no whitespace errors.

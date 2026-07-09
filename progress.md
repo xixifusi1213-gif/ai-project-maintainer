@@ -354,3 +354,23 @@
 
 - All planned v1.5.0 production accident / data exposure gate implementation stages are complete.
 - `.serena/` remains untracked and untouched by product changes.
+
+## v1.5.0 Production Gate Smoke Docs: 2026-07-09
+
+- User requested adding `docs/PRODUCTION-GATE-SMOKE.md` and refreshing `docs/PROMOTION.md` for v1.5.0 production gate promotion.
+- Confirmed current worktree is on `main` with only untracked `.serena/`.
+- Read planning-with-files and product-marketing skill guidance for this documentation/promotion task.
+- Ran planning session catch-up; it reported the new smoke documentation request as unsynced context.
+- Created branch `codex/v1.5-production-smoke-docs`.
+- Recorded the v1.5.0 production gate smoke documentation scope in `task_plan.md` and findings in `findings.md`.
+- Added `docs/PRODUCTION-GATE-SMOKE.md` with the v1.5.0 public-project strict production gate smoke summary.
+- Replaced `docs/PROMOTION.md` with v1.5.0 production-gate positioning, English post, Show HN draft, readable Chinese post, Chinese outline, and feedback CTA.
+- Confirmed with a Node UTF-8 read that the Chinese text is stored correctly even though PowerShell output renders it as mojibake in this terminal.
+- Ran documentation hygiene checks:
+  - Node-based check found no local temp paths, known mojibake code points, or overstated confirmed-vulnerability wording.
+  - `git diff --check` exited successfully with only Windows LF-to-CRLF warnings.
+
+## v1.5.0 Production Gate Smoke Docs Completion
+
+- All requested v1.5.0 production gate smoke and promotion documentation updates are complete.
+- `.serena/` remains untracked and untouched by product changes.
