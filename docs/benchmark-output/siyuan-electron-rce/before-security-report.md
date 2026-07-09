@@ -5,7 +5,15 @@ Mode: strict=true, release=true, production=true
 Profile: electron-desktop (benchmark)
 Generated: 2026-07-06T00:00:00.000Z
 Open Source Maintenance Score: 75/100 (B)
-Code Scanning Results: 1 (non-blocking production gaps stay in this report and artifacts)
+Code Scanning Results: 1 (production evidence gaps stay in this report and artifacts by default)
+
+## What This Report Actually Found
+- Confirmed vulnerabilities: 0. Validated vulnerability evidence. This label is never inferred from scanner output alone.
+- Untriaged scanner findings: 1. A scanner matched something that still needs project-specific validation.
+- Verified check failures: 0. A deterministic test, build, or engineering check failed; this is not automatically a vulnerability.
+- Production evidence gaps: 0. Required production proof is missing; this is missing proof, not a discovered vulnerability.
+- Maintainer decisions: 0. Business context or risk acceptance must be supplied by a human maintainer.
+- Environment or tooling issues: 0. A scanner, database, dependency, or local tool was unavailable, so evidence is incomplete.
 
 ## Project Profile
 - Profile: electron-desktop
@@ -17,7 +25,7 @@ Code Scanning Results: 1 (non-blocking production gaps stay in this report and a
   - benchmark: https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5
 
 ## Blocking Checks
-- Electron runtime hardening: fail. Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false.
+- [Untriaged scanner findings] Electron runtime hardening: fail. Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false.
 
 ## Warnings
 - None
@@ -53,7 +61,7 @@ CI: true
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]
-- Electron runtime hardening: fail [TOOL_VERIFIED]
+- Electron runtime hardening: fail [untriaged_scanner_finding] [TOOL_VERIFIED]
 
 ## Exceptions
 - None

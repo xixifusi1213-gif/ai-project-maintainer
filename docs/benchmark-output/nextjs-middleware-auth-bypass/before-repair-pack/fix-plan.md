@@ -2,15 +2,17 @@
 
 Source report: before-security-report.json
 Project root: vercel/next.js@before
-Generated: 2026-07-06T04:39:21.338Z
+Generated: 2026-07-09T22:03:35.021Z
 
 ## Summary
 - Total tasks: 2
 - auto_fix_candidate: 2
+- Confirmed vulnerabilities: 2
 
 ## Tasks
 ### fix-001: Next.js middleware authorization bypass
 - Type: auto_fix_candidate
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: web-api/nextjs-cve-2025-29927
 - User decision required: false
@@ -24,6 +26,7 @@ Generated: 2026-07-06T04:39:21.338Z
 
 ### fix-002: Next.js middleware authorization bypass
 - Type: auto_fix_candidate
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: web-api/nextjs-cve-2025-29927
 - User decision required: false

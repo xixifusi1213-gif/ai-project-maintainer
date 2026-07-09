@@ -50,14 +50,14 @@ If GitHub asks for PNG/JPG, export the SVG to PNG at `1280x640`.
 Current release:
 
 ```text
-Tag: v1.5.0
-Title: v1.5.0: Production accident and data exposure gate
+Tag: v1.5.1
+Title: v1.5.1: Clear report evidence categories
 ```
 
 Release URL:
 
 ```text
-https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.0
+https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.1
 ```
 
 Release asset checklist:

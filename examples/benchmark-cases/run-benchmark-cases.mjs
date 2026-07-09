@@ -317,6 +317,7 @@ function reportCheckFor(caseStudy, stage, source) {
       group: "database",
       status: vulnerable ? "fail" : "pass",
       blocking: vulnerable,
+      findingKind: vulnerable && stage === "before" ? "confirmed_vulnerability" : undefined,
       summary: vulnerable
         ? "User-controlled slug ordering can be interpolated into SQL instead of using bindings."
         : "User-controlled slug ordering uses placeholders and bindings.",
@@ -332,6 +333,7 @@ function reportCheckFor(caseStudy, stage, source) {
       group: "web-api",
       status: vulnerable ? "fail" : "pass",
       blocking: vulnerable,
+      findingKind: vulnerable ? "confirmed_vulnerability" : undefined,
       summary: vulnerable
         ? `Next.js ${version} is within the benchmarked middleware authorization bypass range.`
         : `Next.js ${version} is represented as the patched baseline with edge header hardening.`,
@@ -346,6 +348,7 @@ function reportCheckFor(caseStudy, stage, source) {
       group: "ci-security",
       status: vulnerable ? "fail" : "pass",
       blocking: vulnerable,
+      findingKind: vulnerable && stage === "before" ? "confirmed_vulnerability" : undefined,
       command: "zizmor .github/workflows",
       summary: vulnerable
         ? "Workflow uses the compromised changed-files action version with broad workflow permissions."

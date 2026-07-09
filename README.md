@@ -7,159 +7,79 @@
 [![CI](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/ci.yml)
 [![Security](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml/badge.svg)](https://github.com/xixifusi1213-gif/ai-project-maintainer/actions/workflows/security.yml)
 
-**Release readiness gate for AI-coded projects.**
+**Release readiness and production accident gate for AI-coded projects.**
 
-AI can generate code fast. This tool helps you keep the project maintainable after that: collect project evidence, plan the audit, run deterministic gates, generate AI-agent repair tasks, and rerun until the release is defensible.
+Run one command to see what blocks release, what is only an untriaged scanner signal, what evidence is missing, and what still needs a human decision.
 
-[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Benchmark](docs/BENCHMARK.md) | [Real project smoke](docs/REAL-PROJECT-SMOKE.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [AI repair pack](docs/REPAIR-PACK.md) | [Why trust this?](TRUST.md) | [Release trust](docs/RELEASE-TRUST.md) | [Design notes](DESIGN.md) | [Standards crosswalk](docs/STANDARDS-CROSSWALK.md)
-
-It is not another scanner wrapper. It turns AI coding maintenance into a repeatable loop:
-
-```text
-project profile -> audit plan -> local/CI gate -> evidence report -> AI fixes -> rerun
+```powershell
+npx ai-project-maintainer quickstart .
 ```
 
-## Why This Exists
+No account or project setup is required. Quickstart is report-only and writes under `reports/`.
 
-AI coding makes it easy to ship code that looks complete but quietly misses production basics:
-
-- no business-flow tests
-- no secret/dependency/security gate
-- no database migration review
-- no release approval or rollback evidence
-- no monitoring/logging/alerting proof
-- no clear owner-approved exceptions
-
-`ai-project-maintainer` makes those gaps visible before they become production surprises.
+[See the demo](docs/DEMO.md) | [Chinese demo](docs/DEMO.zh-CN.md) | [Real project smoke](docs/REAL-PROJECT-SMOKE.md) | [Production gate smoke](docs/PRODUCTION-GATE-SMOKE.md) | [Benchmark](docs/BENCHMARK.md) | [Real OSS cases](docs/CASE-STUDIES.md) | [Project profiles](docs/PROJECT-PROFILES.md) | [AI agent risk checks](docs/AGENT-RISK.md) | [Why trust this?](TRUST.md)
 
 ## 30-Second Quickstart
 
 Requires Node.js 20+.
 
 ```powershell
-npx ai-project-maintainer quickstart ".\my-project"
+npx ai-project-maintainer quickstart .
 ```
 
-`quickstart` detects the project profile, runs a lightweight report-only gate, skips project tests and production evidence by default, and writes:
+It detects the project profile, runs a lightweight gate, and creates:
 
 - `reports/quickstart-summary.md`
 - `reports/quickstart-security-report.json`
-- `reports/quickstart-security-report.md`
-- `reports/quickstart-security-report.sarif`
 - `reports/quickstart-repair-pack/` when blockers exist
 
-Give `quickstart-summary.md`, the detailed report, and any generated repair-pack files to Cursor, Claude Code, Cline, or Codex. `PASS_WITH_GAPS` means no blocking checks failed, but release-readiness evidence is still missing or needs owner approval before production. In v1.5.0, quickstart also points out missing production data/auth/business-flow model files without turning first-run gaps into blockers.
+Give the summary, detailed report, and repair pack to Cursor, Claude Code, Cline, or Codex. Quickstart skips project tests and production evidence by default so the first run stays low-cost.
 
-If a brand-new npm project has `package.json` but no `package-lock.json`, quickstart records dependency audit as a setup gap instead of a blocker. Run `npm install --package-lock-only`, then rerun quickstart when you want npm audit evidence.
+## A Real Before / After Report
 
-If Trivy cannot refresh its vulnerability database, quickstart retries with the local cached DB when one exists. That keeps the first run usable and reports `PASS_WITH_GAPS`; strict release gates still flag stale or incomplete vulnerability DB evidence until the cache is refreshed from a reachable mirror.
+![Real Ghost SQL injection benchmark report before and after](assets/report-before-after.svg)
 
-See [Real project smoke](docs/REAL-PROJECT-SMOKE.md) for a published-package quickstart run against public repositories.
+This image is rendered from the committed [before report](docs/benchmark-output/ghost-sql-injection/before-security-report.json) and [after report](docs/benchmark-output/ghost-sql-injection/after-security-report.json). It models a public Ghost advisory and upstream patched version. AI Project Maintainer did not modify Ghost, ship exploit code, or create the upstream fix.
 
-## The 3-Minute Flow
+## Read the Result in 20 Seconds
 
-Requires Node.js 20+.
+| Status | Meaning |
+| --- | --- |
+| `FAIL` | At least one release blocker exists. It is not automatically a confirmed vulnerability. |
+| `PASS_WITH_GAPS` | No blocker failed, but evidence or owner decisions are still missing. |
+| `PASS_WITH_WARNINGS` | No blockers or evidence gaps; non-blocking warnings remain. |
+| `PASS` | No blockers, warnings, gaps, or pending decisions in the checks that ran. |
 
-```powershell
-# 1. Add local and CI guardrails
-npx ai-project-maintainer init "E:\my-project" --profile auto --ci github
+Every non-passing item also has a `findingKind`:
 
-# 2. Answer the guided production audit intake
-npx ai-project-maintainer init-audit "E:\my-project" --wizard
+| Finding kind | What it means |
+| --- | --- |
+| `confirmed_vulnerability` | Explicitly validated vulnerability evidence; never inferred from scanner output alone. |
+| `untriaged_scanner_finding` | A scanner matched something that still needs project-specific validation. |
+| `verified_check_failure` | A deterministic test, build, or engineering check failed. |
+| `production_evidence_gap` | Required proof is missing; this is not a discovered vulnerability. |
+| `maintainer_decision` | Business context or risk acceptance must come from a human. |
+| `environment_tooling_issue` | A tool, database, dependency, or network step was unavailable. |
 
-# 3. Generate the project-specific audit plan
-npx ai-project-maintainer audit-plan "E:\my-project" --profile auto --output reports/audit-plan.json
+## Full Production Gate
 
-# 4. Run the production gate
-npx ai-project-maintainer gate "E:\my-project" --profile auto --production --agent-risk --strict --release --output reports/security-report.json
-
-# 5. Convert the report into AI-agent repair tasks
-npx ai-project-maintainer repair-pack "E:\my-project\reports\security-report.json" --project "E:\my-project" --output "E:\my-project\reports"
-```
-
-GitHub Actions templates can either use the npm package or clone this repository directly.
-
-## How releases are trusted
-
-Starting with v1.0.0, project releases are designed to be published by GitHub Actions through npm Trusted Publishing, not from a maintainer laptop.
-
-The release chain is:
-
-```text
-Git tag -> GitHub Actions gate -> npm provenance -> SBOM -> release manifest -> GitHub Release assets
-```
-
-Each release should include a tarball, `sbom.cdx.json`, `release-manifest.json`, and the security report used for the release decision. See [Release trust](docs/RELEASE-TRUST.md), [Report schema](docs/REPORT-SCHEMA.md), and [Security policy](SECURITY.md).
-
-Published-release alignment can be checked with:
+Use the stricter path when the project is close to release:
 
 ```powershell
-node ai-project-maintainer/scripts/verify-release.mjs --published --version 1.5.0 --tag v1.5.0 --manifest dist/release-manifest.json
+npx ai-project-maintainer init-audit . --wizard
+npx ai-project-maintainer gate . --profile auto --production --agent-risk --strict --release --output reports/security-report.json
+npx ai-project-maintainer repair-pack reports/security-report.json --project . --output reports
 ```
 
-## Profile-Aware Gates
+The full gate runs project tests, release/build checks, security tools, and production evidence checks. It can block missing data boundaries, authorization tests, idempotency/replay evidence, migration safety, monitoring, rollback, and owner approval.
 
-v1.1.0 adds project type rule packs. The default `--profile auto` detects the main risk surface and applies a matching review focus:
+## Release Trust
 
-- `electron-desktop`: IPC/preload, local file access, shell/openExternal, updates, packaged release trust
-- `nextjs-web`: auth middleware, API routes, Server Actions, public env vars, CORS/uploads, deployment evidence
-- `node-api`: authz, input validation, rate limits, CORS, log redaction, API tests
-- `database-prisma`: Prisma schema, migrations, destructive changes, backups, rollback, transactions
-- `oss-library`: package metadata, license, CI, Scorecard, SBOM, provenance, SemVer
-
-Override auto-detection when needed:
-
-```powershell
-npx ai-project-maintainer gate "E:\my-project" --profile database-prisma --production --strict --release
-```
-
-See [Project profiles](docs/PROJECT-PROFILES.md) and [中文说明](docs/PROJECT-PROFILES.zh-CN.md).
-
-## Real Demo
-
-This repository includes a runnable sample project at `examples/demo-ai-app`.
-
-![90-second demo storyboard](assets/demo-90s.gif)
-
-```powershell
-npm test --prefix .\examples\demo-ai-app
-npm run build --prefix .\examples\demo-ai-app
-node .\examples\demo-ai-app\scripts\run-demo-gate.mjs
-```
-
-The demo shows the intended workflow:
-
-- healthy business tests and release build pass
-- Gitleaks, Trivy, Semgrep, OSV, Syft, Grype, Scorecard, and CI checks are represented in the report
-- production-readiness gaps remain visible for release approval, monitoring, logs, metrics, and alerts
-
-To see the "before" state without committing unsafe fixtures:
-
-```powershell
-node .\examples\demo-ai-app\scripts\create-before-state.mjs
-```
-
-It writes a broken copy under the OS temp directory, where the business tests fail.
-
-## Repair Loop Demo
-
-v1.2.1 dogfoods the full repair loop without calling an external AI model:
-
-```powershell
-npm run smoke:repair-loop
-```
-
-The script creates a broken temp copy of `examples/demo-ai-app`, runs the gate to get `FAIL`, generates `agent-tasks.json` and `codex-tasks.json`, applies a deterministic "simulated AI repair", runs `npm test`, and runs the gate again. The expected final state is `PASS_WITH_GAPS`: deterministic blockers are fixed, while production evidence gaps remain visible.
+Releases use GitHub Actions, npm Trusted Publishing/provenance, SBOMs, release manifests, and published-package verification. See [Release trust](docs/RELEASE-TRUST.md), [Report schema](docs/REPORT-SCHEMA.md), and [Security policy](SECURITY.md).
 
 ## Public Benchmark
 
-v1.3.0 expands the real case studies into a reproducible benchmark across five project-risk categories. The benchmark uses real public incidents as evidence models; it does not modify upstream projects, vendor upstream source trees, or ship exploit code, and it does not claim upstream fixes were made by this tool.
-
-```powershell
-npm run benchmark:verify
-```
-
-Launch snapshot: [Benchmark summary](docs/benchmark-output/benchmark-summary.md)
+The reproducible benchmark uses real public incidents as evidence models:
 
 | Category | Case | Evidence type | Before | After |
 | --- | --- | --- | --- | --- |
@@ -169,46 +89,18 @@ Launch snapshot: [Benchmark summary](docs/benchmark-output/benchmark-summary.md)
 | CI / supply chain | tj-actions/changed-files compromise | advisory + CISA alert + hardening model | FAIL | PASS_WITH_GAPS |
 | OSS npm library | TanStack npm package compromise | postmortem + release workflow hardening model | FAIL | PASS_WITH_GAPS |
 
-The benchmark also writes `before-repair-pack/agent-tasks.json` and `fix-plan.md` for each case, so users can inspect how reports become AI-agent repair tasks. See [Benchmark](docs/BENCHMARK.md).
-
-How to interpret it: `FAIL` means the benchmarked blocker was detected; `PASS_WITH_GAPS` means deterministic blockers are cleared while production evidence still needs maintainer confirmation; `GAP` is missing evidence, not proof of safety. AI repair-pack tasks can help fix deterministic blockers, but they must not invent production evidence or accept risk on behalf of a maintainer.
-
-More demo material:
-
-- [Before/after case](docs/demo-output/before-after-case.md)
-- [90-second browser demo](docs/demo-output/90-second-demo.html)
-- [Animated SVG storyboard](assets/demo-90s-storyboard.svg)
-
-## Real OSS Case Studies
-
-The demo is intentionally small. The case studies use real open source advisories, releases, and patch commits:
-
-- [SiYuan Electron RCE](docs/cases/electron-oss-before-after.md): shows why a fixed advisory can still need Electron runtime hardening before release.
-- [Ghost SQL injection](docs/cases/ghost-sql-injection-before-after.md): shows a database query blocker changing from `FAIL` to `PASS_WITH_GAPS` after the upstream parameterized-binding patch.
-
-Run the case-study verifier:
-
-```powershell
-npm run cases:verify
-```
-
-The repository stores links, metadata, and generated reports. It does not vendor third-party source trees or ship exploit code.
+Run `npm run benchmark:verify`, or inspect the [benchmark summary](docs/benchmark-output/benchmark-summary.md), [Real OSS cases](docs/CASE-STUDIES.md), and [production gate smoke](docs/PRODUCTION-GATE-SMOKE.md). The benchmark does not modify upstream projects, vendor source trees, or ship exploit code, and it does not claim upstream fixes were made by this tool.
 
 ## What It Checks
 
 | Area | Evidence produced |
 | --- | --- |
 | Tests and release scripts | test/E2E/build/dist failures |
-| Secrets | Gitleaks findings |
-| Dependencies | npm/pnpm/yarn audit, Trivy, OSV-Scanner |
-| Static security | Semgrep blocking findings |
-| Supply chain | Syft SBOM, Grype scan |
-| CI security | actionlint, zizmor |
+| Code and dependencies | Gitleaks, package audit, Trivy, OSV-Scanner, Semgrep |
+| Supply chain and CI | Syft, Grype, actionlint, zizmor, provenance |
 | AI agent risk | MCP permissions, Codex/Claude/Cursor instructions, prompt injection content, dangerous agent-runnable scripts |
-| IaC | Checkov, Trivy config |
-| Electron apps | dangerous webPreferences, preload/IPC/file-read risks |
-| Database projects | migration, backup, rollback, review-tool gaps |
-| Production readiness | monitoring, logs, metrics, alerts, release approval, incident runbook |
+| App-specific risks | IaC, Electron, database migration/write safety |
+| Production accidents | data exposure, auth boundaries, critical flows, monitoring, rollback, incident response |
 
 ## Production Audit, Not Just Scanning
 

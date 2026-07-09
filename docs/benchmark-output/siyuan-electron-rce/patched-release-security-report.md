@@ -5,7 +5,15 @@ Mode: strict=true, release=true, production=true
 Profile: electron-desktop (benchmark)
 Generated: 2026-07-06T00:00:00.000Z
 Open Source Maintenance Score: 70/100 (C)
-Code Scanning Results: 1 (non-blocking production gaps stay in this report and artifacts)
+Code Scanning Results: 1 (production evidence gaps stay in this report and artifacts by default)
+
+## What This Report Actually Found
+- Confirmed vulnerabilities: 0. Validated vulnerability evidence. This label is never inferred from scanner output alone.
+- Untriaged scanner findings: 1. A scanner matched something that still needs project-specific validation.
+- Verified check failures: 0. A deterministic test, build, or engineering check failed; this is not automatically a vulnerability.
+- Production evidence gaps: 1. Required production proof is missing; this is missing proof, not a discovered vulnerability.
+- Maintainer decisions: 0. Business context or risk acceptance must be supplied by a human maintainer.
+- Environment or tooling issues: 0. A scanner, database, dependency, or local tool was unavailable, so evidence is incomplete.
 
 ## Project Profile
 - Profile: electron-desktop
@@ -17,13 +25,13 @@ Code Scanning Results: 1 (non-blocking production gaps stay in this report and a
   - benchmark: https://github.com/siyuan-note/siyuan/security/advisories/GHSA-x63q-3rcj-hhp5
 
 ## Blocking Checks
-- Electron runtime hardening: fail. Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false.
+- [Untriaged scanner findings] Electron runtime hardening: fail. Dangerous Electron settings remain: nodeIntegration: true, contextIsolation: false, webSecurity: false.
 
 ## Warnings
-- Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Coverage Gaps
-- Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Production Audit
 Project Type: electron-desktop
@@ -48,15 +56,15 @@ CI: true
 ## Standards Crosswalk
 - case-study/benchmark-upstream-evidence: None
 - electron/electron-runtime-hardening: Google SRE Release Engineering, DORA research
-- production-audit/electron-desktop-production-evidence-gap: Google SRE Monitoring Distributed Systems, Google SRE Release Engineering, Google SRE Embracing Risk, CIS Control 11: Data Recovery, NIST SP 800-34 Rev. 1
+- production-audit/electron-desktop-production-evidence-gap: OWASP ASVS, OWASP API Security Top 10, NIST Privacy Framework, CISA Secure by Design, Google SRE Monitoring Distributed Systems, Google SRE Release Engineering, Google SRE Embracing Risk, CIS Control 11: Data Recovery, NIST SP 800-34 Rev. 1
 
 ## Tools
 - ai-project-maintainer: 1.3.1-benchmark
 
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]
-- Electron runtime hardening: fail [TOOL_VERIFIED]
-- Production evidence still required: gap [GAP]
+- Electron runtime hardening: fail [untriaged_scanner_finding] [TOOL_VERIFIED]
+- Production evidence still required: gap [production_evidence_gap] [GAP]
 
 ## Exceptions
 - None

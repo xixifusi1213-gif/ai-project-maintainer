@@ -13,7 +13,7 @@ body:
     attributes:
       label: Version
       description: Paste the npm version you used.
-      placeholder: "1.5.0"
+      placeholder: "1.5.1"
     validations:
       required: true
   - type: textarea
@@ -45,6 +45,38 @@ body:
         - Command/runtime failure
     validations:
       required: true
+  - type: dropdown
+    id: time_to_report
+    attributes:
+      label: Time to first useful report
+      description: Count from reading the command to opening quickstart-summary.md.
+      options:
+        - Under 1 minute
+        - 1-3 minutes
+        - 3-10 minutes
+        - More than 10 minutes
+        - I did not get a report
+    validations:
+      required: true
+  - type: textarea
+    id: expectation
+    attributes:
+      label: What did you expect before running it?
+      description: In your own words, what did you think quickstart would do?
+    validations:
+      required: true
+  - type: dropdown
+    id: interpretation
+    attributes:
+      label: Were the result categories clear?
+      options:
+        - Yes, I understood what was actually found
+        - Partly, I still had to read the docs
+        - No, I read every blocker as a confirmed vulnerability
+        - No, I read an evidence or tooling gap as a vulnerability
+        - No, another part was unclear
+    validations:
+      required: true
   - type: textarea
     id: summary
     attributes:
@@ -63,6 +95,13 @@ body:
     attributes:
       label: Expected or confusing behavior
       description: What felt wrong, confusing, too strict, or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: What did you think you should do next?
+      description: State the next action you inferred from the report, even if you were unsure.
     validations:
       required: true
   - type: textarea

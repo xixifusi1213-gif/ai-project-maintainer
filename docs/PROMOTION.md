@@ -45,7 +45,7 @@ ai-agents
 ```text
 GitHub: https://github.com/xixifusi1213-gif/ai-project-maintainer
 npm: https://www.npmjs.com/package/ai-project-maintainer
-Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.0
+Release: https://github.com/xixifusi1213-gif/ai-project-maintainer/releases/tag/v1.5.1
 Demo case: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/demo-output/before-after-case.md
 Benchmark: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/BENCHMARK.md
 Quickstart smoke: https://github.com/xixifusi1213-gif/ai-project-maintainer/blob/main/docs/REAL-PROJECT-SMOKE.md
@@ -60,6 +60,14 @@ First run:
 ```bash
 npx ai-project-maintainer quickstart .
 ```
+
+First-run feedback study:
+
+```text
+I am looking for 5-10 developers who have never used AI Project Maintainer. Run `npx ai-project-maintainer quickstart .` in a public, throwaway, or safely redacted project, then tell me what you thought it found, what confused you, and what you would do next. Do not share private reports or secrets.
+```
+
+Feedback form: https://github.com/xixifusi1213-gif/ai-project-maintainer/issues/new?template=quickstart_feedback.yml
 
 Strict release gate:
 

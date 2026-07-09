@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { classifyFindingKind, findingKindLabel } from "./finding-kind.mjs";
 
 const safeStatusWithoutTask = new Set(["pass", "n/a", "skipped"]);
 const decisionStatuses = new Set(["gap", "user_decision"]);
@@ -148,11 +149,13 @@ function titleFor(item) {
 
 function taskFromItem(report, reportPath, item, index, projectRoot) {
   const type = taskType(item);
+  const findingKind = classifyFindingKind(item);
   const recheck = [...new Set([groupRecheckCommand(item), defaultGateCommand(report, projectRoot)].filter(Boolean))];
   return redact({
     id: `fix-${String(index + 1).padStart(3, "0")}`,
     title: titleFor(item),
     type,
+    findingKind,
     severity: severityFor(item, type),
     source: sourceFor(reportPath, item),
     evidence: evidenceFor(item),
@@ -217,8 +220,9 @@ function summarize(tasks) {
     counts.total += 1;
     counts.byType[task.type] = (counts.byType[task.type] || 0) + 1;
     counts.bySeverity[task.severity] = (counts.bySeverity[task.severity] || 0) + 1;
+    counts.byFindingKind[task.findingKind] = (counts.byFindingKind[task.findingKind] || 0) + 1;
     return counts;
-  }, { total: 0, byType: {}, bySeverity: {} });
+  }, { total: 0, byType: {}, bySeverity: {}, byFindingKind: {} });
 }
 
 export function buildRepairPack(report, options = {}) {
@@ -247,6 +251,8 @@ export function buildCodexTasks(repairPack) {
     instructions: [
       "Fix auto_fix_candidate tasks first.",
       "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+      "Do not describe untriaged_scanner_finding as a confirmed vulnerability without project-specific validation.",
+      "Do not treat production_evidence_gap or environment_tooling_issue as a discovered vulnerability.",
       "After each fix, run the task verificationCommands before rerunning the full gate.",
       "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports.",
     ],
@@ -266,12 +272,14 @@ export function toRepairPackMarkdown(repairPack) {
   lines.push("## Summary");
   lines.push(`- Total tasks: ${repairPack.summary.total}`);
   for (const [type, count] of Object.entries(repairPack.summary.byType)) lines.push(`- ${type}: ${count}`);
+  for (const [findingKind, count] of Object.entries(repairPack.summary.byFindingKind || {})) lines.push(`- ${findingKindLabel(findingKind)}: ${count}`);
   lines.push("");
   lines.push("## Tasks");
   if (!repairPack.tasks.length) lines.push("- No repair tasks. The report has no blockers, warnings, gaps, user decisions, or invalid exceptions.");
   for (const task of repairPack.tasks) {
     lines.push(`### ${task.id}: ${task.title}`);
     lines.push(`- Type: ${task.type}`);
+    lines.push(`- Finding kind: ${findingKindLabel(task.findingKind)} (${task.findingKind})`);
     lines.push(`- Severity: ${task.severity}`);
     lines.push(`- Source: ${task.source.group}/${task.source.checkId || "unknown"}`);
     lines.push(`- User decision required: ${task.userDecisionRequired}`);

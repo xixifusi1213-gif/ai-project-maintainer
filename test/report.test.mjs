@@ -42,6 +42,51 @@ test("reports include blockers, warnings, coverage gaps, and tool versions", () 
   assert.equal(toSarif(report).version, "2.1.0");
 });
 
+test("reports explain what was actually found without changing blocker behavior", () => {
+  const report = buildJsonReport({
+    root: "C:/project",
+    mode: { strict: true, release: true, production: true },
+    probe: {},
+    checks: [
+      { name: "validated advisory", group: "sast", status: "fail", blocking: true, findingKind: "confirmed_vulnerability", summary: "Validated against a published advisory." },
+      { name: "semgrep static scan", group: "sast", status: "fail", blocking: true, summary: "Scanner match needs maintainer triage." },
+      { name: "production audit: Data boundaries", group: "data-exposure", status: "GAP", blocking: true, coverageGap: true, summary: "Data boundary evidence is incomplete." },
+      { name: "production audit: Critical flow", group: "business-flow-safety", status: "USER_DECISION", blocking: false, summary: "Owner must confirm replay policy." },
+      { name: "trivy filesystem scan", group: "dependencies", status: "missing", blocking: false, coverageGap: true, summary: "Scanner database unavailable." },
+      { name: "package test", group: "tests", status: "fail", blocking: true, summary: "Test command failed." },
+    ],
+    toolVersions: {},
+    invalidExceptions: [],
+  });
+
+  const byName = Object.fromEntries(report.checks.map((check) => [check.name, check]));
+  const markdown = toMarkdown(report);
+  const defaultSarif = JSON.stringify(toSarif(report));
+  const gapSarif = JSON.stringify(toSarif(report, { includeCoverageGaps: true }));
+
+  assert.equal(report.blockerCount, 4);
+  assert.deepEqual(report.findingSummary.byKind, {
+    confirmed_vulnerability: 1,
+    untriaged_scanner_finding: 1,
+    verified_check_failure: 1,
+    production_evidence_gap: 1,
+    maintainer_decision: 1,
+    environment_tooling_issue: 1,
+  });
+  assert.equal(byName["validated advisory"].findingKind, "confirmed_vulnerability");
+  assert.equal(byName["semgrep static scan"].findingKind, "untriaged_scanner_finding");
+  assert.equal(byName["package test"].findingKind, "verified_check_failure");
+  assert.equal(byName["production audit: Data boundaries"].findingKind, "production_evidence_gap");
+  assert.equal(byName["production audit: Critical flow"].findingKind, "maintainer_decision");
+  assert.equal(byName["trivy filesystem scan"].findingKind, "environment_tooling_issue");
+  assert.match(markdown, /## What This Report Actually Found/);
+  assert.match(markdown, /Untriaged scanner findings: 1/);
+  assert.match(markdown, /missing proof, not a discovered vulnerability/i);
+  assert.match(defaultSarif, /untriaged_scanner_finding/);
+  assert.doesNotMatch(defaultSarif, /Data boundary evidence is incomplete/);
+  assert.match(gapSarif, /production_evidence_gap/);
+});
+
 test("reports attach standards and evidence levels to core check groups", () => {
   const checks = [
     { name: "package test", checkId: "tests", group: "tests", status: "pass", blocking: false, command: "npm test" },

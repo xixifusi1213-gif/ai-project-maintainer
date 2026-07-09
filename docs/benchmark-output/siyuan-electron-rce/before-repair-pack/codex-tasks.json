@@ -1,12 +1,14 @@
 {
   "schemaVersion": 1,
   "targetAgent": "codex",
-  "generatedAt": "2026-07-06T04:39:21.212Z",
+  "generatedAt": "2026-07-09T22:03:34.398Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "siyuan-note/siyuan@before",
   "instructions": [
     "Fix auto_fix_candidate tasks first.",
     "Ask the maintainer before changing needs_maintainer_decision or manual_review_required tasks.",
+    "Do not describe untriaged_scanner_finding as a confirmed vulnerability without project-specific validation.",
+    "Do not treat production_evidence_gap or environment_tooling_issue as a discovered vulnerability.",
     "After each fix, run the task verificationCommands before rerunning the full gate.",
     "Do not paste secrets, tokens, DSNs, or production credentials into code, prompts, or reports."
   ],
@@ -15,6 +17,7 @@
       "id": "fix-001",
       "title": "Electron runtime hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",
@@ -37,6 +40,7 @@
       "id": "fix-002",
       "title": "Electron runtime hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",

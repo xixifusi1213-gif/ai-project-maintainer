@@ -2,15 +2,17 @@
 
 Source report: before-security-report.json
 Project root: TryGhost/Ghost@before
-Generated: 2026-07-06T04:39:21.319Z
+Generated: 2026-07-09T22:03:35.000Z
 
 ## Summary
 - Total tasks: 2
 - manual_review_required: 2
+- Confirmed vulnerabilities: 2
 
 ## Tasks
 ### fix-001: Database query parameterization
 - Type: manual_review_required
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: database/database-query-parameterization
 - User decision required: true
@@ -24,6 +26,7 @@ Generated: 2026-07-06T04:39:21.319Z
 
 ### fix-002: Database query parameterization
 - Type: manual_review_required
+- Finding kind: Confirmed vulnerabilities (confirmed_vulnerability)
 - Severity: P2
 - Source: database/database-query-parameterization
 - User decision required: true

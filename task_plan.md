@@ -398,3 +398,74 @@ All v1.5.0 production gate smoke documentation stages are complete on branch `co
 | Real-project v1.4.3 smoke still blocked Semgrep hardening findings. | 1 | Found Semgrep JSON was truncated before rule parsing; added per-command output limit and used a larger limit for Semgrep JSON. |
 | Local Windows published-release verification failed with `spawnSync npm.cmd EINVAL`. | 1 | Added a Windows npm target shim that invokes `cmd.exe /d /s /c call npm.cmd ...` without using `shell: true`. |
 | Real-project smoke script aborted during `git clone` progress output. | 1 | PowerShell treated native stderr progress as an error under stop mode; rerun without stop-on-stderr and rely on process exit codes. |
+
+## Promotion: v1.5.0 External Launch Support
+
+## Objective
+
+Help turn the merged v1.5.0 production-gate promotion materials into external launch posts while preserving trust boundaries and avoiding unapproved account-side effects.
+
+## Scope
+
+- Use the already-merged `docs/PROMOTION.md` copy as the source of truth.
+- Keep the CTA centered on `npx ai-project-maintainer quickstart .`.
+- Mention strict production gate as the advanced path, not the first command for unfamiliar users.
+- Preserve the boundary that smoke blockers are release-gate findings, evidence gaps, or maintainer-triage items, not automatically confirmed upstream vulnerabilities.
+- Require explicit platform/account confirmation before posting externally.
+
+## Out of Scope
+
+- Posting from the maintainer's accounts without explicit platform confirmation.
+- Adding product features or releasing a new package version.
+- Opening upstream vulnerability reports based only on untriaged smoke output.
+
+## Stages
+
+1. Recover merged docs and current repository state. Status: complete.
+2. Sync planning files with PR #24 merge and v1.5.1 follow-up issue. Status: complete.
+3. Confirm target external platform or prepare paste-ready launch copy. Status: in_progress.
+
+## Current Promotion Stage
+
+Stage 3 is in progress. External posting is ready to proceed once the user names the platform/account context.
+
+## Implementation: v1.5.1 Report Clarity and First-Run Trust
+
+## Objective
+
+Complete GitHub issue #25 and make an unfamiliar developer understand the product, report result, and next action within 30 seconds.
+
+## Scope
+
+- Add an additive finding classification to JSON, Markdown, repair-pack, and conservative SARIF wording.
+- Preserve v1.5.0 blocking behavior and quickstart's low-friction behavior.
+- Reduce the first half of README by roughly 50% and lead with the quickstart outcome.
+- Add one real before/after report image generated from committed benchmark output.
+- Create an ethical recruitment and structured feedback loop for 5-10 unfamiliar developers.
+
+## Out of Scope
+
+- New scanners, connectors, benchmark categories, or gate strictness changes.
+- Treating untriaged scanner output as a confirmed upstream vulnerability.
+- Inventing user interviews or posting unsolicited comments to unrelated repositories.
+
+## Stages
+
+1. Inspect issue #25 and current report/readme/feedback surfaces. Status: complete.
+2. Add focused tests and implement report evidence categories. Status: complete.
+3. Rewrite the README first half and generate a real report image. Status: complete.
+4. Add tester recruitment and feedback synthesis materials. Status: complete.
+5. Run focused/full verification, publish a PR, and track real-user responses. Status: in_progress.
+
+## Current Stage
+
+Stage 5 is in progress on branch `codex/v1.5.1-report-clarity`.
+
+## v1.5.1 Errors Encountered
+
+| Error | Attempt | Resolution |
+| --- | --- | --- |
+| Focused tests failed because finding categories were not implemented yet. | 1 | Expected red tests; added the shared finding-kind module and report/quickstart/repair-pack integration. |
+| In-app browser rejected the local `file://` SVG preview. | 1 | Did not bypass browser policy; kept the exact, auditable SVG as the GitHub-rendered README image and validated its source structure. |
+| Large README patch contexts failed around Windows paths and a UTF-8 link. | 3 | Switched to smaller scoped patches with exact escaping and UTF-8 text. |
+| Two focused docs tests expected legacy README phrasing. | 1 | Preserved the trusted link labels and exact upstream-boundary wording in the shorter README. |

@@ -57,6 +57,7 @@ Examples: exposed secrets that require credential rotation, complex database mig
   "id": "fix-001",
   "title": "Fix dangerous Electron preload exposure",
   "type": "auto_fix_candidate",
+  "findingKind": "untriaged_scanner_finding",
   "severity": "P2",
   "source": {
     "report": "reports/security-report.json",
@@ -71,6 +72,8 @@ Examples: exposed secrets that require credential rotation, complex database mig
   "riskNotes": ""
 }
 ```
+
+`findingKind` is copied from the source report. It tells the agent whether the task came from validated vulnerability evidence, an untriaged scanner result, a deterministic check failure, missing production evidence, a maintainer decision, or an unavailable tool/environment. The task type still controls who may act; classification does not grant an AI agent permission to accept risk.
 
 ## Intended Loop
 
@@ -93,6 +96,8 @@ Then regenerate the repair pack if any blockers, warnings, gaps, or user decisio
 - The repair pack does not deploy, roll back, or modify production systems.
 - Token-like values, `Authorization`, `Bearer`, passwords, API keys, and DSNs are redacted before task files are written.
 - `needs_maintainer_decision` and `manual_review_required` tasks are not permission for an agent to guess production risk acceptance.
+- `untriaged_scanner_finding` is not a confirmed vulnerability until project-specific validation says so.
+- `production_evidence_gap` and `environment_tooling_issue` describe incomplete evidence, not discovered vulnerabilities.
 
 ## Agent Guidance
 

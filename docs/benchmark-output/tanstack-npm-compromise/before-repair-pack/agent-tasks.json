@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-06T04:39:21.375Z",
+  "generatedAt": "2026-07-09T22:03:35.066Z",
   "sourceReport": "before-security-report.json",
   "projectRoot": "TanStack/query@before",
   "overallStatus": "FAIL",
@@ -11,6 +11,9 @@
     },
     "bySeverity": {
       "P2": 2
+    },
+    "byFindingKind": {
+      "untriaged_scanner_finding": 2
     }
   },
   "tasks": [
@@ -18,6 +21,7 @@
       "id": "fix-001",
       "title": "npm package release workflow hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",
@@ -42,6 +46,7 @@
       "id": "fix-002",
       "title": "npm package release workflow hardening",
       "type": "auto_fix_candidate",
+      "findingKind": "untriaged_scanner_finding",
       "severity": "P2",
       "source": {
         "report": "before-security-report.json",

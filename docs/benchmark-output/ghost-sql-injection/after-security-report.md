@@ -5,7 +5,15 @@ Mode: strict=true, release=true, production=true
 Profile: database (benchmark)
 Generated: 2026-07-06T00:00:00.000Z
 Open Source Maintenance Score: 95/100 (A)
-Code Scanning Results: 0 (non-blocking production gaps stay in this report and artifacts)
+Code Scanning Results: 0 (production evidence gaps stay in this report and artifacts by default)
+
+## What This Report Actually Found
+- Confirmed vulnerabilities: 0. Validated vulnerability evidence. This label is never inferred from scanner output alone.
+- Untriaged scanner findings: 0. A scanner matched something that still needs project-specific validation.
+- Verified check failures: 0. A deterministic test, build, or engineering check failed; this is not automatically a vulnerability.
+- Production evidence gaps: 1. Required production proof is missing; this is missing proof, not a discovered vulnerability.
+- Maintainer decisions: 0. Business context or risk acceptance must be supplied by a human maintainer.
+- Environment or tooling issues: 0. A scanner, database, dependency, or local tool was unavailable, so evidence is incomplete.
 
 ## Project Profile
 - Profile: database
@@ -20,10 +28,10 @@ Code Scanning Results: 0 (non-blocking production gaps stay in this report and a
 - None
 
 ## Warnings
-- Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: gap. The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Coverage Gaps
-- Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
+- [Production evidence gaps] Production evidence still required: The benchmark verifies the code or workflow signal, but deployed monitoring, rollback, and owner approval remain project-specific evidence.
 
 ## Production Audit
 Project Type: database
@@ -56,7 +64,7 @@ CI: true
 ## Checks Run
 - Benchmark upstream evidence: pass [INFERRED]
 - Database query parameterization: pass [TOOL_VERIFIED]
-- Production evidence still required: gap [GAP]
+- Production evidence still required: gap [production_evidence_gap] [GAP]
 
 ## Exceptions
 - None
